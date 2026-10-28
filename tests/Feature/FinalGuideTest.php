@@ -158,3 +158,27 @@ test('the owner of a legacy long quote sees a length notice on the edit form', f
     $this->actingAs($owner)->get(route('quotes.edit', $quote))->assertOk()
         ->assertSee('اختصر النص إلى 155 حرفًا أو أقل');
 });
+
+test('likes and bookmarks toggle, appear on the favorites page and are unique per user at the database level', function () {
+    $reader = User::factory()->create();
+    $quote = Quote::query()->create(['text' => 'اقتباس يستحق الحفظ.', 'category' => 'أمل']);
+    $this->actingAs($reader);
+
+    $this->post(route('quotes.favorite', $quote))->assertSessionHas('status', 'حُفظ الاقتباس في مفضلتك.');
+    $this->get(route('favorites'))->assertOk()->assertSee('اقتباس يستحق الحفظ.');
+    expect($reader->favorites()->count())->toBe(1)->and($reader->favorites()->first()->quote->is($quote))->toBeTrue();
+
+    $this->post(route('quotes.favorite', $quote))->assertSessionHas('status', 'أُزيل الاقتباس من مفضلتك.');
+    $this->get(route('favorites'))->assertDontSee('اقتباس يستحق الحفظ.');
+
+    $reader->likes()->create(['quote_id' => $quote->id]);
+    expect(fn () => $reader->likes()->create(['quote_id' => $quote->id]))
+        ->toThrow(\Illuminate\Database\UniqueConstraintViolationException::class);
+    $reader->favorites()->create(['quote_id' => $quote->id]);
+    expect(fn () => $reader->favorites()->create(['quote_id' => $quote->id]))
+        ->toThrow(\Illuminate\Database\UniqueConstraintViolationException::class);
+
+    $quote->delete();
+    $this->assertDatabaseCount('quote_likes', 0);
+    $this->assertDatabaseCount('quote_favorites', 0);
+});

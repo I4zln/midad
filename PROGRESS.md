@@ -36,3 +36,14 @@ Resume rule: read this file, then continue from the first phase not marked done.
 - Legacy-length notice on the edit form for quotes > 155 chars (Phase 6 decision).
 - Tests: shared card on all 5 listings, every page view `@extends('layouts.app')`, legacy notice. 39/39 pass.
 - Next: Phase 5.
+
+## Phase 5 — Extra feature · DONE
+- Present: **Likes + Bookmarks (الإعجاب والحفظ)**, supported by search & category filter.
+- Added `User::likes()/favorites()`, `QuoteLike::quote()/user()`, `QuoteFavorite::user()`.
+- Bookmark toggle now uses the same locked transaction as likes (no 500 on double submit).
+- Test: toggle, favorites page, DB unique constraint, cascade on quote delete. 40/40 pass.
+
+## Phase 6 — Length conflict · DONE (owner chose "keep as legacy")
+- Mu'allaqat (`config/muallaqat.php`) and classical poets (`config/featured_poets.php`) are separate from the DB.
+- 9 long rows stay untouched in `quotes`; create/edit limited to 3–155 via `QuoteRequest`; edit form shows a legacy-length notice.
+- Next: Phase 7 deliverables.

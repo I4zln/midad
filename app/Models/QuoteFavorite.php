@@ -13,4 +13,9 @@ class QuoteFavorite extends Model
     {
         return $this->belongsTo(Quote::class);
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

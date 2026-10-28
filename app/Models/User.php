@@ -72,6 +72,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(QuoteComment::class);
     }
 
+    public function likes(): HasMany
+    {
+        return $this->hasMany(QuoteLike::class);
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(QuoteFavorite::class);
+    }
+
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new EthraaResetPasswordNotification($token));

@@ -55,17 +55,23 @@ class CommunityController extends Controller
 
     public function favorite(Quote $quote): RedirectResponse
     {
-        $favorite = QuoteFavorite::query()->where('quote_id', $quote->id)->where('user_id', Auth::id())->first();
+        // Same locked toggle as likes, so a double submit cannot hit the unique (quote_id, user_id) index.
+        $saved = DB::transaction(function () use ($quote): bool {
+            Quote::query()->whereKey($quote->id)->lockForUpdate()->first();
+            $favorite = QuoteFavorite::query()->where('quote_id', $quote->id)->where('user_id', Auth::id())->first();
 
-        if ($favorite) {
-            $favorite->delete();
+            if ($favorite) {
+                $favorite->delete();
 
-            return back()->with('status', 'أُزيل الاقتباس من مفضلتك.');
-        }
+                return false;
+            }
 
-        QuoteFavorite::query()->create(['quote_id' => $quote->id, 'user_id' => Auth::id()]);
+            QuoteFavorite::query()->create(['quote_id' => $quote->id, 'user_id' => Auth::id()]);
 
-        return back()->with('status', 'حُفظ الاقتباس في مفضلتك.');
+            return true;
+        });
+
+        return back()->with('status', $saved ? 'حُفظ الاقتباس في مفضلتك.' : 'أُزيل الاقتباس من مفضلتك.');
     }
 
     public function comment(Request $request, Quote $quote): RedirectResponse
