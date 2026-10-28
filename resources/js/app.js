@@ -451,7 +451,15 @@ async function loadPage(url, push = true) {
         const status = nextDocument.querySelector('meta[name="flash-status"]')?.content;
         if (status) showToast(status);
         if (nextDialog?.dataset.quoteFormErrors === 'true') nextDialog.showModal();
+        markClampedQuotes();
     } catch (error) { window.location.href = url; }
+}
+
+// Show "قراءة المزيد" only on cards whose text is actually cut by the CSS line clamp.
+function markClampedQuotes() {
+    document.querySelectorAll('.quote-card .card-quote-text').forEach((text) => {
+        text.closest('.quote-card')?.classList.toggle('is-unclamped', text.scrollHeight <= text.clientHeight + 1);
+    });
 }
 
 document.addEventListener('submit', async (event) => {
@@ -526,6 +534,13 @@ document.addEventListener('submit', (event) => {
 const flashStatus = document.querySelector('meta[name="flash-status"]')?.content;
 if (flashStatus) showToast(flashStatus);
 if (composerDialog && document.querySelector('[data-quote-form-errors="true"]')) composerDialog.showModal();
+markClampedQuotes();
+document.fonts?.ready.then(markClampedQuotes);
+let clampResizeTimer;
+window.addEventListener('resize', () => {
+    window.clearTimeout(clampResizeTimer);
+    clampResizeTimer = window.setTimeout(markClampedQuotes, 150);
+});
 
 
 
