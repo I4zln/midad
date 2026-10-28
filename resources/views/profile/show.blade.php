@@ -52,6 +52,51 @@
             <p class="member-about member-about-hint">أضف نبذة قصيرة عنك من <a href="{{ route('profile.edit') }}">تعديل الملف</a> ليتعرّف عليك القرّاء.</p>
         @endif
 
+        {{-- Private identity card: shown only to the special account's owner, after the address is verified (PageController). --}}
+        @if ($specialMessage)
+            @php
+                [$cardName, $cardRole] = array_pad(explode('، ', \Illuminate\Support\Str::after($specialMessage->title, 'إلى '), 2), 2, '');
+                $verses = array_chunk(array_values(array_filter(array_map('trim', explode("\n", $specialMessage->body)))), 2);
+            @endphp
+            <aside class="member-idcard" aria-labelledby="member-idcard-name">
+                <header class="member-idcard-top">
+                    <span>مِداد · <span dir="ltr">MIDAD</span></span>
+                    <span class="member-idcard-private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg> تظهر لك وحدك</span>
+                </header>
+                <div class="member-idcard-body">
+                    <x-ink-seal class="member-idcard-seal" :letter="mb_substr($cardName, 0, 1)" />
+                    <div>
+                        <span class="member-idcard-label">بطاقة تعريف</span>
+                        <h2 id="member-idcard-name">{{ $cardName }}</h2>
+                        @if ($cardRole)<p class="member-idcard-role">{{ $cardRole }}</p>@endif
+                    </div>
+                </div>
+                <div class="member-idcard-verse" dir="rtl">
+                    @foreach ($verses as $verse)
+                        <p>@foreach ($verse as $hemistich)<span>{{ $hemistich }}</span>@endforeach</p>
+                    @endforeach
+                </div>
+                <footer class="member-idcard-foot">
+                    <span>من {{ $specialMessage->sender_name }} · {{ $specialMessage->sender_role }}</span>
+                    <small>الأبيات للشاعر جرير · <a href="https://dorar.net/arabia/6057/%D8%A7%D9%84%D9%85%D8%B7%D9%84%D8%A8-%D8%A7%D9%84%D8%A3%D9%88%D9%84-%D8%AC%D8%B1%D9%8A%D8%B1" target="_blank" rel="noopener noreferrer">مرجع النص</a></small>
+                </footer>
+            </aside>
+        @elseif ($specialPending ?? false)
+            <aside class="member-idcard member-idcard-pending" aria-labelledby="member-idcard-pending-title">
+                <header class="member-idcard-top">
+                    <span>مِداد · <span dir="ltr">MIDAD</span></span>
+                    <span class="member-idcard-private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg> تظهر لك وحدك</span>
+                </header>
+                <h2 id="member-idcard-pending-title">بطاقة تعريف بانتظارك</h2>
+                @if ($mailReady)
+                    <p>هذه البطاقة لصاحب هذا البريد وحده، لذلك نتأكد منه أولًا. أرسل رابط التأكيد ثم افتحه من بريدك، وستظهر هنا.</p>
+                    <form method="POST" action="{{ route('verification.send') }}">@csrf<x-button>أرسل رابط التأكيد</x-button></form>
+                @else
+                    <p>هذه البطاقة لصاحب هذا البريد وحده، لذلك تظهر بعد تأكيده. خدمة البريد غير متصلة الآن، فلا يلزمك شيء حاليًا؛ تصفّح مِداد كالمعتاد.</p>
+                @endif
+            </aside>
+        @endif
+
         <dl class="member-stats">
             <div><dt>اقتباسات</dt><dd>{{ number_format($stats['quotes']) }}</dd></div>
             <div><dt>إعجابات على الاقتباسات</dt><dd>{{ number_format($stats['likes_received']) }}</dd></div>
@@ -59,31 +104,6 @@
             <div><dt>قيد المتابعة</dt><dd>{{ number_format($following) }}</dd></div>
         </dl>
     </section>
-
-    @if ($specialPending ?? false)
-        <aside class="special-profile-message special-profile-pending" aria-labelledby="special-pending-title">
-            <div class="special-message-ornament" aria-hidden="true">✦</div>
-            <div class="eyebrow"><span class="eyebrow-line"></span> رسالة خاصة بانتظارك</div>
-            <h2 id="special-pending-title">أكّد بريدك لتظهر لك</h2>
-            @if ($mailReady)
-                <p>هذه الرسالة لصاحب هذا البريد وحده، لذلك نتأكد منه أولًا. أرسل رابط التأكيد ثم افتحه من بريدك، وستظهر الرسالة هنا.</p>
-                <form method="POST" action="{{ route('verification.send') }}">@csrf<x-button>أرسل رابط التأكيد</x-button></form>
-            @else
-                <p>هذه الرسالة لصاحب هذا البريد وحده، لذلك تظهر بعد تأكيده. خدمة البريد غير متصلة الآن، فلا يلزمك شيء حاليًا؛ تصفّح مِداد كالمعتاد، وسيصلك رابط التأكيد حين تُفعَّل.</p>
-            @endif
-        </aside>
-    @endif
-
-    @if ($specialMessage)
-        <aside class="special-profile-message" aria-labelledby="special-profile-message-title">
-            <div class="special-message-ornament" aria-hidden="true">✦</div>
-            <div class="eyebrow"><span class="eyebrow-line"></span> رسالة خاصة لك</div>
-            <h2 id="special-profile-message-title">{{ $specialMessage->title }}</h2>
-            <blockquote dir="rtl">{{ $specialMessage->body }}</blockquote>
-            <p class="special-message-signature">من {{ $specialMessage->sender_name }} · {{ $specialMessage->sender_role }}</p>
-            <small class="special-message-source">الأبيات للشاعر جرير · <a href="https://dorar.net/arabia/6057/%D8%A7%D9%84%D9%85%D8%B7%D9%84%D8%A8-%D8%A7%D9%84%D8%A3%D9%88%D9%84-%D8%AC%D8%B1%D9%8A%D8%B1" target="_blank" rel="noopener noreferrer">مرجع النص</a></small>
-        </aside>
-    @endif
 
     <nav class="profile-tabs" aria-label="أقسام الملف">
         @foreach ($tabs as $key => [$label, $count])

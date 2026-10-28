@@ -565,13 +565,6 @@ dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(0.25rem); 
 .admin-delete { color: var(--danger); }
 .admin-delete:hover { color: var(--danger-strong); }
 .profile-quotes-heading { margin-block: 3.125rem 1.375rem; }
-.special-profile-message { position: relative; overflow: hidden; margin: 1.875rem 0 2.625rem; padding: clamp(1.5625rem, 5vw, 3.375rem); border: 1px solid color-mix(in srgb, var(--copper) 48%, var(--line)); background: radial-gradient(ellipse at 85% 15%, color-mix(in srgb, var(--copper-soft) 22%, transparent), transparent 48%), var(--paper-raised); box-shadow: 0 1.125rem 3.125rem color-mix(in srgb, var(--shadow) 4%, transparent); }
-.special-message-ornament { position: absolute; top: 1.25rem; left: 1.5625rem; color: var(--copper); font-size: 1.5rem; opacity: .7; }
-.special-profile-message h2 { margin: 0.9375rem 0 1.375rem; font-family: var(--font-display); font-size: clamp(1.25rem, 3vw, 1.75rem); }
-.special-profile-message blockquote { margin: 0; padding-inline-start: 1.25rem; border-inline-start: 2px solid var(--copper); color: var(--ink); font-family: var(--font-arabic); font-size: clamp(1.4375rem, 4vw, 2.25rem); line-height: 2; white-space: pre-line; text-align: center; }
-.special-message-signature { margin: 1.25rem 0 0; color: var(--copper); font-family: var(--font-display); font-size: 1.0625rem; }
-.special-message-source { display: block; margin-top: 0.8125rem; color: var(--stone); font-size: max(var(--fs-floor), 0.6875rem); }
-.special-message-source a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .notifications-heading { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; }
 .notification-list { border-top: 1px solid var(--line); }
 .notification-item { display: flex; gap: 0.875rem; padding: 1.125rem 0.9375rem; border-bottom: 1px solid var(--line); }
@@ -1582,6 +1575,28 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
     .editorial-feature-latest .editorial-feature-source strong a { display: inline-flex; min-height: 2.75rem; align-items: center; }
 }
 
-/* Special card still waiting for a verified address (profile owner only). */
-.special-profile-pending p { max-width: 40rem; margin: 0 0 1.25rem; color: var(--ink-soft); font: 1rem/2 var(--font-arabic); text-align: start; }
-.special-profile-pending h2 { margin-bottom: 0.75rem; }
+
+/* Private identity card on the special account's own profile (profile/show.blade.php). */
+.member-idcard { position: relative; max-width: 34rem; margin: 1.375rem clamp(1.125rem, 4vw, 2.5rem) 0; padding: 1.125rem 1.375rem 1rem; border: 1px solid color-mix(in srgb, var(--copper) 45%, var(--line)); border-radius: 0.875rem; background: radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--copper) 10%, transparent), transparent 55%), var(--paper-raised); box-shadow: inset 0 0 0 4px var(--paper-raised), inset 0 0 0 5px color-mix(in srgb, var(--copper) 22%, transparent), 0 10px 28px color-mix(in srgb, var(--shadow) 7%, transparent); }
+.member-idcard-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding-bottom: 0.625rem; border-bottom: 1px dashed color-mix(in srgb, var(--copper) 35%, transparent); color: var(--copper); font: 600 max(var(--fs-floor), 0.75rem) var(--font-ui); letter-spacing: .04em; }
+.member-idcard-private { display: inline-flex; align-items: center; gap: 0.3125rem; color: var(--stone); font-weight: 500; letter-spacing: 0; }
+.member-idcard-private svg { width: 0.875rem; height: 0.875rem; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.member-idcard-body { display: flex; align-items: center; gap: 1rem; margin-top: 0.875rem; }
+.member-idcard-seal { width: 4.25rem; height: 4.25rem; flex: none; color: var(--copper); transform: rotate(-6deg); }
+.member-idcard-label { color: var(--stone); font-size: max(var(--fs-floor), 0.75rem); }
+.member-idcard h2 { margin: 0.125rem 0 0; color: var(--ink); font: 500 clamp(1.375rem, 2.4vw, 1.75rem)/1.4 var(--font-display); }
+.member-idcard-role { margin: 0.125rem 0 0; color: var(--copper); font: 500 0.9375rem/1.7 var(--font-arabic); text-align: start; }
+.member-idcard-verse { margin: 1rem 0 0; padding: 0.75rem 0.875rem; border-radius: 0.5rem; background: color-mix(in srgb, var(--copper) 6%, var(--paper)); }
+.member-idcard-verse p { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1.25rem; margin: 0; color: var(--ink); font: 1.0625rem/2 var(--font-arabic); text-align: center; }
+.member-idcard-verse p + p { margin-top: 0.125rem; }
+.member-idcard-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 0.75rem; margin-top: 0.75rem; color: var(--copper); font: 500 0.875rem/1.7 var(--font-display); }
+.member-idcard-foot small { color: var(--stone); font: max(var(--fs-floor), 0.75rem)/1.7 var(--font-ui); }
+.member-idcard-foot a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.member-idcard-pending h2 { margin-top: 0.875rem; font-size: 1.25rem; }
+.member-idcard-pending p { margin: 0.5rem 0 0.875rem; color: var(--ink-soft); font: 0.9375rem/1.9 var(--font-arabic); text-align: start; }
+@media (max-width: 680px) {
+    .member-idcard { margin-inline: 1.125rem; padding-inline: 1.125rem; }
+    .member-idcard-verse p { grid-template-columns: 1fr; gap: 0; }
+    .member-idcard-verse p + p { margin-top: 0.5rem; }
+    .member-idcard-foot a { display: inline-flex; min-height: 2.75rem; align-items: center; }
+}

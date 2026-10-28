@@ -23,7 +23,7 @@ test('while unverified, the owner sees how to unlock the card; nobody else does;
 
     config(['mail.default' => 'log']);
     $this->actingAs($user)->get(route('profile.show', $user))->assertOk()
-        ->assertSee('رسالة خاصة بانتظارك')
+        ->assertSee('بطاقة تعريف بانتظارك')
         ->assertSee('خدمة البريد غير متصلة الآن')
         ->assertDontSee('أرسل رابط التأكيد')
         ->assertDontSee('إلى زياد إمام');
@@ -31,15 +31,15 @@ test('while unverified, the owner sees how to unlock the card; nobody else does;
     config(['mail.default' => 'smtp']);
     $this->actingAs($user)->get(route('profile.show', $user))->assertSee('أرسل رابط التأكيد');
 
-    $this->actingAs(User::factory()->create())->get(route('profile.show', $user))->assertOk()->assertDontSee('رسالة خاصة بانتظارك');
+    $this->actingAs(User::factory()->create())->get(route('profile.show', $user))->assertOk()->assertDontSee('بطاقة تعريف بانتظارك');
 });
 
 test('after verification the private message appears and the waiting card is gone', function () {
     $user = User::factory()->create(['email' => 'special-reader@example.test']);
 
     $this->actingAs($user)->get(route('profile.show', $user))->assertOk()
-        ->assertSee('رسالة خاصة لك')
-        ->assertDontSee('رسالة خاصة بانتظارك');
+        ->assertSee('aria-labelledby="member-idcard-name"', false)
+        ->assertDontSee('بطاقة تعريف بانتظارك');
 });
 
 test('registering with the special email sends one verification link only when mail is connected, and never blocks', function () {
@@ -71,7 +71,7 @@ test('a verified special account goes to its profile until the message has been 
     $credentials = ['email' => 'special-reader@example.test', 'password' => 'secret-pass-1'];
 
     $this->post(route('login.store'), $credentials)->assertRedirect(route('profile.show', $user));
-    $this->get(route('profile.show', $user))->assertSee('رسالة خاصة لك');
+    $this->get(route('profile.show', $user))->assertSee('aria-labelledby="member-idcard-name"', false);
 
     auth()->logout();
     $this->post(route('login.store'), $credentials)->assertRedirect(route('home'));
@@ -80,8 +80,8 @@ test('a verified special account goes to its profile until the message has been 
 test('the private message stays on the owner profile after a refresh and is never shown to anyone else', function () {
     $user = User::factory()->create(['email' => 'special-reader@example.test']);
 
-    $this->actingAs($user)->get(route('profile.show', $user))->assertSee('رسالة خاصة لك');
-    $this->actingAs($user)->get(route('profile.show', $user))->assertSee('رسالة خاصة لك');
-    $this->actingAs(User::factory()->create())->get(route('profile.show', $user))->assertDontSee('رسالة خاصة لك');
-    $this->get(route('profile.show', $user))->assertDontSee('رسالة خاصة لك');
+    $this->actingAs($user)->get(route('profile.show', $user))->assertSee('aria-labelledby="member-idcard-name"', false);
+    $this->actingAs($user)->get(route('profile.show', $user))->assertSee('aria-labelledby="member-idcard-name"', false);
+    $this->actingAs(User::factory()->create())->get(route('profile.show', $user))->assertDontSee('member-idcard-name');
+    $this->get(route('profile.show', $user))->assertDontSee('member-idcard-name');
 });
