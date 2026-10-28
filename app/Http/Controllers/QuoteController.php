@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\QuoteRequest;
 use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class QuoteController extends Controller
 
     private function applyLibraryFilters($query, string $category, string $search): void
     {
-        if (in_array($category, ['تأمل', 'حياة', 'حب', 'أمل'], true)) {
+        if (in_array($category, QuoteRequest::CATEGORIES, true)) {
             $query->where('category', $category);
         }
 
@@ -75,31 +76,18 @@ class QuoteController extends Controller
         return view('quotes.edit', ['quote' => $quote]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(QuoteRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'text' => ['required', 'string', 'min:3', 'max:155'],
-            'author' => ['nullable', 'string', 'max:120'],
-            'source' => ['nullable', 'string', 'max:160'],
-            'category' => ['required', 'string', 'in:تأمل,حياة,حب,أمل'],
-        ]);
-
+        $validated = $request->validated();
         $validated['user_id'] = Auth::id();
         Quote::query()->create($validated);
 
         return redirect()->route('home')->with('status', 'تمت إضافة اقتباسك إلى المكتبة، وسيظهر في مقدمة الصفحة.');
     }
 
-    public function update(Request $request, Quote $quote): RedirectResponse
+    public function update(QuoteRequest $request, Quote $quote): RedirectResponse
     {
-        $validated = $request->validate([
-            'text' => ['required', 'string', 'min:3', 'max:155'],
-            'author' => ['nullable', 'string', 'max:120'],
-            'source' => ['nullable', 'string', 'max:160'],
-            'category' => ['required', 'string', 'in:تأمل,حياة,حب,أمل'],
-        ]);
-
-        $quote->update($validated);
+        $quote->update($request->validated());
 
         return redirect()->route('quotes.show', $quote)->with('status', 'تم تحديث اقتباسك.');
     }

@@ -21,3 +21,10 @@ Resume rule: read this file, then continue from the first phase not marked done.
 - Arabic length messages ("عدد أحرف الاسم يجب ألا يقل عن 2."); fixed CSS that turned `.field-error` grey outside the quote form.
 - New `tests/Feature/FinalGuideTest.php` (8 tests); timed tests now use `forceCreate` (created_at is not fillable). 34/34 pass.
 - Next: Phase 3.
+
+## Phase 3 — Non-functional · DONE
+- Quote rules moved to `app/Http/Requests/QuoteRequest.php` (shared by store/update, trims text, category constant).
+- `tests/Feature/PerformanceTest.php`: query count is constant with 3 vs 23 quotes on home and /quotes (no N+1); indexes asserted.
+- Local DB: backed up to `database/database.backup-2026-10-28.sqlite` (git-ignored), then applied pending `quotes_latest_index` migration; 29 rows intact.
+- Measured (local `php artisan serve`, 5 runs): /quotes median 0.237s, page 2 0.245s, search+filter 0.209s, home 0.223s.
+- 36/36 tests pass. Next: Phase 4.
