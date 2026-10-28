@@ -15,3 +15,9 @@ Resume rule: read this file, then continue from the first phase not marked done.
 - "قراءة المزيد" shown only on clamped cards (`markClampedQuotes()` in `app.js`); assets rebuilt.
 - Verified on local server: home renders exactly 5 cards; `/quotes?page=2` shows "عرض 13–24 من 29".
 - Next: Phase 2.
+
+## Phase 2 — Functional requirements · DONE
+- All 7 rules were already enforced server-side; gap was UX: password/login errors now render next to the field via `x-form-field`.
+- Arabic length messages ("عدد أحرف الاسم يجب ألا يقل عن 2."); fixed CSS that turned `.field-error` grey outside the quote form.
+- New `tests/Feature/FinalGuideTest.php` (8 tests); timed tests now use `forceCreate` (created_at is not fillable). 34/34 pass.
+- Next: Phase 3.

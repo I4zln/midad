@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 test('home shows exactly the five most recently published quotes while the library is paginated', function () {
     $published = [];
     foreach (range(1, 14) as $number) {
-        $published[] = Quote::query()->create([
+        $published[] = Quote::query()->forceCreate([
             'text' => "اقتباس رقم {$number} للاختبار.",
             'category' => 'تأمل',
             'created_at' => now()->subMinutes(20 - $number),

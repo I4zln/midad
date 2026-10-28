@@ -1020,7 +1020,7 @@ dialog::backdrop { background: #151613a6; backdrop-filter: blur(4px); }
 .quote-form textarea, .quote-form input, .quote-form select { width: 100%; border: 1px solid var(--line); padding: 11px; background: var(--paper-raised); color: var(--ink); font: 14px/1.8 var(--font-arabic); }
 .quote-form textarea { min-height: 142px; resize: vertical; }
 .quote-form textarea:focus, .quote-form input:focus, .quote-form select:focus { outline: 1px solid var(--copper); }
-.quote-form .composer-field-hint, .field-error { color: var(--stone); font: 11px/1.7 var(--font-arabic); }
+.quote-form .composer-field-hint { color: var(--stone); font: 11px/1.7 var(--font-arabic); }
 .quote-form .field-error { color: #a44b42; }
 .character-count { justify-self: end; color: var(--stone); font-size: 10px; }
 .quote-delete-form { margin-top: 20px; }
