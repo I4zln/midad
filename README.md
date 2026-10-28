@@ -36,3 +36,4 @@ php artisan test
 - `docs/ERD.mmd` — مخطط قاعدة البيانات (Mermaid) من ملفات migrations
 - `docs/DEMO-1-MIN.md` — سيناريو فيديو العرض
 - `docs/AUDIT.md` — مراجعة الامتثال لدليل المشروع
+- `DEPLOY.md` — خطوات النشر بشهادة HTTPS ونطاق خاص

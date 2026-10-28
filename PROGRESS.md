@@ -113,3 +113,17 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Measured (Edge headless, guest light + signed-in dark, 390/1440): pen tip within 1% of the drawn stroke at every sample; fades to 0 by 3.4s; CLS ≤ 0.0038; no overflow; no pen on 2nd visit; reduced motion: no pen, title fully visible.
 - Static pen icon in the «＋ أضف اقتباسًا» buttons (quotes page, profile, home hero + empty state).
 - Email: `.env` + `.env.example` set for Gmail SMTP (smtp.gmail.com:587) but `MAIL_MAILER=log` until MAIL_USERNAME/MAIL_PASSWORD are filled; sender falls back to the Gmail username (`config/mail.php`); `php artisan midad:mail-test <email>` checks the setup. `.env` backup at `.env.backup-before-gmail` (git-ignored). No real email sent.
+
+---
+# TASK 3 — Mobile, About page, deployment
+
+## Mobile · DONE
+- Browser audit (14 guest + 7 signed-in pages × 360/390): 72 touch targets <44px and 67 text styles <12px found → mobile layer in `app.css` (≤680px): 44px header/footer/menu controls, like/save/copy/share/edit/delete 44px, chips/pagination/search 44px, 16px inputs (no iOS zoom), 12px minimum small print, owner actions on their own row, natural text alignment in cards, header fits one line at 360px, shorter search placeholder. After: 0 overflow; remaining <44px only inline byline link (43px) and hidden file inputs (their labels are 44px); only <12px text is the decorative Latin «MIDAD» in the logo.
+
+## About («عنّي») · DONE
+- `pages/creator.blade.php` rebuilt: name meaning, what you can do (4 items with working links), owner + 4 links; removed dark hero and personal details (city, university, timeline). Links: GitHub 200, Instagram/X 200 (weak signal), LinkedIn blocks bots (999) — check manually.
+
+## Deployment · DONE
+- `SecureResponses` middleware (HTTPS 301 + headers), `FORCE_HTTPS` (false in local .env), `URL::forceScheme`, `.env.production.example`, `DEPLOY.md`, `tests/Feature/DeploymentTest.php` (5 tests). 54/54.
+- Local production-mode run (config/routes/events/views cached to `storage/framework/prod-cache` so tests never read them): 301 http→https, 5 headers + HSTS, secure/httponly/lax cookies, 404 without debug, https links, CSRF 419, TTFB 21–31ms.
+- Cloudflare quick tunnel (signed cloudflared 2026.10.3) → public https URL serving the real database; browser login check over https OK.

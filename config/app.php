@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Production only: redirect http→https and generate https URLs. Turn off when running production mode over plain http locally.
+    'force_https' => (bool) env('FORCE_HTTPS', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
