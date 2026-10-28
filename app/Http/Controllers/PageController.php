@@ -137,9 +137,8 @@ class PageController extends Controller
                 ],
             );
 
-            if ($specialMessage->shown_at) {
-                $specialMessage = null;
-            } else {
+            // Stays on the owner's profile on every visit; shown_at records the first time it was seen.
+            if (! $specialMessage->shown_at) {
                 $specialMessage->forceFill(['shown_at' => now()])->save();
             }
         }

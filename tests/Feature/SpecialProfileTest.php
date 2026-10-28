@@ -76,3 +76,12 @@ test('a verified special account goes to its profile until the message has been 
     auth()->logout();
     $this->post(route('login.store'), $credentials)->assertRedirect(route('home'));
 });
+
+test('the private message stays on the owner profile after a refresh and is never shown to anyone else', function () {
+    $user = User::factory()->create(['email' => 'special-reader@example.test']);
+
+    $this->actingAs($user)->get(route('profile.show', $user))->assertSee('رسالة خاصة لك');
+    $this->actingAs($user)->get(route('profile.show', $user))->assertSee('رسالة خاصة لك');
+    $this->actingAs(User::factory()->create())->get(route('profile.show', $user))->assertDontSee('رسالة خاصة لك');
+    $this->get(route('profile.show', $user))->assertDontSee('رسالة خاصة لك');
+});
