@@ -64,11 +64,9 @@ class AuthController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
+        // The special card needs a verified address, but the rest of the site never waits for it: go to the profile, which explains.
         if ($this->isSpecialProfileEmail($user->email) && ! $user->hasVerifiedEmail()) {
-            return redirect()->route('verification.notice')->with(
-                'status',
-                $this->sendVerificationEmail($user) ? 'verification-link-sent' : 'verification-link-failed',
-            );
+            return redirect()->route('profile.show', $user)->with('status', 'مرحبًا بعودتك يا '.$user->name.'. لديك رسالة خاصة في ملفك.');
         }
 
         return redirect()->intended(route('home'))->with('status', 'مرحبًا بعودتك يا '.$user->name.'.');
@@ -98,10 +96,9 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         if ($this->isSpecialProfileEmail($user->email)) {
-            return redirect()->route('verification.notice')->with(
-                'status',
-                $this->sendVerificationEmail($user) ? 'verification-link-sent' : 'verification-link-failed',
-            );
+            $this->sendVerificationEmail($user);
+
+            return redirect()->route('profile.show', $user)->with('status', 'أهلًا بك في مِداد يا '.$user->name.'. لديك رسالة خاصة في ملفك.');
         }
 
         // A guest who signed up from an action (like, save…) goes back there; everyone else writes a first quote.
@@ -167,10 +164,11 @@ class AuthController extends Controller
             return redirect()->route('profile.show', $request->user());
         }
 
-        return back()->with('status', $this->sendVerificationEmail($request->user())
-            ? 'verification-link-sent'
-            : 'verification-link-failed');
+        return back()->with('status', $this->sendVerificationEmail($request->user()) ? self::LINK_SENT : self::LINK_FAILED);
     }
+
+    public const LINK_SENT = 'أرسلنا رابط التأكيد إلى بريدك. افتحه لتظهر رسالتك الخاصة.';
+    public const LINK_FAILED = 'تعذّر إرسال رابط التأكيد الآن لأن خدمة البريد غير متصلة. حاول لاحقًا.';
 
     private function isSpecialProfileEmail(string $email): bool
     {

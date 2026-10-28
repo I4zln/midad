@@ -60,6 +60,20 @@
         </dl>
     </section>
 
+    @if ($specialPending ?? false)
+        <aside class="special-profile-message special-profile-pending" aria-labelledby="special-pending-title">
+            <div class="special-message-ornament" aria-hidden="true">✦</div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> رسالة خاصة بانتظارك</div>
+            <h2 id="special-pending-title">أكّد بريدك لتظهر لك</h2>
+            @if ($mailReady)
+                <p>هذه الرسالة لصاحب هذا البريد وحده، لذلك نتأكد منه أولًا. أرسل رابط التأكيد ثم افتحه من بريدك، وستظهر الرسالة هنا.</p>
+                <form method="POST" action="{{ route('verification.send') }}">@csrf<x-button>أرسل رابط التأكيد</x-button></form>
+            @else
+                <p>هذه الرسالة لصاحب هذا البريد وحده، لذلك تظهر بعد تأكيده. خدمة البريد غير متصلة الآن، فلا يلزمك شيء حاليًا؛ تصفّح مِداد كالمعتاد، وسيصلك رابط التأكيد حين تُفعَّل.</p>
+            @endif
+        </aside>
+    @endif
+
     @if ($specialMessage)
         <aside class="special-profile-message" aria-labelledby="special-profile-message-title">
             <div class="special-message-ornament" aria-hidden="true">✦</div>

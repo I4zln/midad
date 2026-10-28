@@ -1581,3 +1581,7 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
     .editorial-feature-quote blockquote.is-long { font-size: 1.1875rem; }
     .editorial-feature-latest .editorial-feature-source strong a { display: inline-flex; min-height: 2.75rem; align-items: center; }
 }
+
+/* Special card still waiting for a verified address (profile owner only). */
+.special-profile-pending p { max-width: 40rem; margin: 0 0 1.25rem; color: var(--ink-soft); font: 1rem/2 var(--font-arabic); text-align: start; }
+.special-profile-pending h2 { margin-bottom: 0.75rem; }

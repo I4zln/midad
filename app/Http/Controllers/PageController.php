@@ -123,8 +123,10 @@ class PageController extends Controller
         $specialMessage = null;
         $specialEmail = (string) config('ethraa.special_profile_email', '');
 
-        if (Auth::check() && Auth::user()->is($user) && $user->hasVerifiedEmail()
-            && $specialEmail !== '' && hash_equals(mb_strtolower($specialEmail), mb_strtolower($user->email))) {
+        $isSpecialOwner = Auth::check() && Auth::user()->is($user)
+            && $specialEmail !== '' && hash_equals(mb_strtolower($specialEmail), mb_strtolower($user->email));
+
+        if ($isSpecialOwner && $user->hasVerifiedEmail()) {
             $specialMessage = SpecialProfileMessage::query()->firstOrCreate(
                 ['user_id' => $user->id, 'message_key' => 'jarir-welcome-2026'],
                 [
@@ -148,6 +150,9 @@ class PageController extends Controller
             'tab' => $tab,
             'isOwner' => $isOwner,
             'stats' => $stats,
+            // The special card waits for a verified address; until then the owner sees how to unlock it.
+            'specialPending' => $isSpecialOwner && ! $user->hasVerifiedEmail(),
+            'mailReady' => config('mail.default') !== 'log',
             'followers' => UserFollow::query()->where('followed_id', $user->id)->count(),
             'following' => UserFollow::query()->where('follower_id', $user->id)->count(),
             'isFollowing' => Auth::check() && UserFollow::query()
