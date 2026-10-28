@@ -15,7 +15,7 @@
         @foreach ($muallaqat as $index => $poem)
         <article class="muallaqa-card" data-search="{{ $poem['poet'] }} {{ $poem['title'] }} {{ $poem['tagline'] }} {{ $poem['bio'] }}">
             <a class="muallaqa-image" href="{{ route('muallaqat.show', $poem['slug']) }}" aria-label="افتح معلقة {{ $poem['poet'] }}">
-                <img src="{{ str_starts_with($poem['image'], 'http') ? $poem['image'] : asset($poem['image']) }}" alt="{{ $poem['image_note'] }}" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/poets/literary-scribe.jpg') }}'">
+                <img src="{{ str_starts_with($poem['image'], 'http') ? $poem['image'] : asset($poem['image']) }}" alt="{{ $poem['image_note'] }}" loading="lazy" data-fallback-src="{{ asset('images/poets/literary-scribe.jpg') }}">
                 <span class="muallaqa-image-shade"></span><span class="muallaqa-number">{{ sprintf('%02d', $index + 1) }}</span><span class="muallaqa-image-name">{{ $poem['poet'] }}</span>
             </a>
             <div class="muallaqa-card-copy"><div class="eyebrow"><span class="eyebrow-line"></span> المعلّقة {{ sprintf('%02d', $index + 1) }}</div><h2><a href="{{ route('muallaqat.show', $poem['slug']) }}">{{ $poem['title'] }}</a></h2><p>{{ $poem['tagline'] }}</p><a class="muallaqa-read-link" href="{{ route('muallaqat.show', $poem['slug']) }}">اقرأ عن المعلّقة <span aria-hidden="true">←</span></a>
@@ -27,7 +27,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
 const searchInput = document.querySelector('#muallaqat-search');
 if (searchInput) {
     const cards = [...document.querySelectorAll('.muallaqa-card')];

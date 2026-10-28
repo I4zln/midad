@@ -31,6 +31,13 @@ return [
     'string' => 'يجب أن يكون :attribute نصًا.',
     'unique' => ':attribute مستخدم من قبل.',
     'url' => 'أدخل :attribute بصيغة رابط صحيح.',
+    'password' => [
+        'letters' => 'يجب أن تحتوي :attribute على حرف واحد على الأقل.',
+        'numbers' => 'يجب أن تحتوي :attribute على رقم واحد على الأقل.',
+        'mixed' => 'يجب أن تحتوي :attribute على حرف كبير وحرف صغير.',
+        'symbols' => 'يجب أن تحتوي :attribute على رمز واحد على الأقل.',
+        'uncompromised' => 'ظهرت :attribute هذه في تسريبات بيانات. اختر كلمة مرور أخرى.',
+    ],
 
     'attributes' => [
         'name' => 'الاسم',

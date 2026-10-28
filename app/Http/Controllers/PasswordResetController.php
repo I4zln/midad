@@ -74,7 +74,7 @@ class PasswordResetController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => User::newPasswordRules(),
             'password_confirmation' => ['required', 'same:password'],
         ], [
             'email.required' => 'أدخل البريد الإلكتروني المرتبط بطلب الاستعادة.',

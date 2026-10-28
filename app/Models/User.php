@@ -32,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'cover_path',
         'skills',
         'social_links',
-        'is_admin',
+        // is_admin is deliberately not mass-assignable; grant it with forceFill from the console only.
     ];
 
     /**
@@ -80,6 +80,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function favorites(): HasMany
     {
         return $this->hasMany(QuoteFavorite::class);
+    }
+
+    /** Rules for a new password (sign-up and reset): at least 8 characters, with letters and numbers. */
+    public static function newPasswordRules(): array
+    {
+        return ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->letters()->numbers()];
     }
 
     public function sendPasswordResetNotification($token): void

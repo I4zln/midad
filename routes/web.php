@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
 Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::view('/privacy', 'pages.privacy')->name('privacy');
 // The former «عنّي» page is now the maker section of «من نحن»; keep old links working.
 Route::permanentRedirect('/about-me', '/about#maker')->name('creator');
 Route::get('/muallaqat', [PageController::class, 'muallaqat'])->name('muallaqat.index');
@@ -42,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile/edit', [PageController::class, 'editProfile'])->name('profile.edit');
     Route::patch('/profile', [PageController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/account', [\App\Http\Controllers\AccountController::class, 'destroy'])->middleware('throttle:5,1')->name('account.destroy');
     Route::get('/favorites', [PageController::class, 'favorites'])->name('favorites');
     Route::get('/notifications', [PageController::class, 'notifications'])->name('notifications');
     Route::post('/notifications/read', [PageController::class, 'markNotificationsRead'])->name('notifications.read');

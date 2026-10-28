@@ -65,7 +65,7 @@
             @foreach (config('featured_poets') as $poet)
                 <article class="poet-artwork">
                     <button class="poet-gallery-card" type="button" data-poet-reveal aria-expanded="false" aria-label="أظهر أبياتًا من شعر {{ $poet['poet'] }}">
-                        <img src="{{ str_starts_with($poet['image'], 'http') ? $poet['image'] : asset($poet['image']) }}" alt="{{ $poet['image_note'] }}" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/poets/literary-scribe.jpg') }}'">
+                        <img src="{{ str_starts_with($poet['image'], 'http') ? $poet['image'] : asset($poet['image']) }}" alt="{{ $poet['image_note'] }}" loading="lazy" data-fallback-src="{{ asset('images/poets/literary-scribe.jpg') }}">
                         <span class="poet-gallery-shade"></span><span class="poet-gallery-label"><small>من ذاكرة الشعر العربي · اضغط للصورة</small><strong>{{ $poet['poet'] }}</strong><em>{{ $poet['tagline'] }}</em></span>
                         <span class="poet-verse-panel poet-verse-start" aria-hidden="true"><small>{{ $poet['verse_label'] }}</small><span>{{ $poet['verse_start'] }}</span></span>
                         <span class="poet-verse-panel poet-verse-end" aria-hidden="true"><small>ومن أبياتها</small><span>{{ $poet['verse_end'] }}</span></span>

@@ -46,5 +46,19 @@
         </section>
         <div class="profile-edit-actions"><a class="text-button" href="{{ route('profile.show', $profile) }}">إلغاء</a><button class="button button-dark" type="submit">حفظ الملف الشخصي <span aria-hidden="true">←</span></button></div>
     </form>
+
+    {{-- Deleting the account: separate form, current password required, confirmed in the shared dialog. --}}
+    <section class="profile-edit-section account-delete" aria-labelledby="account-delete-title">
+        <h2 id="account-delete-title">حذف الحساب</h2>
+        <p>يحذف حسابك نهائيًا مع اقتباساتك وإعجاباتك ومحفوظاتك وتعليقاتك ومتابعاتك وصورك. لا يمكن التراجع عن ذلك.</p>
+        <form method="POST" action="{{ route('account.destroy') }}" class="account-form" data-confirm="حذف حسابك وكل بياناتك نهائيًا؟ لا يمكن التراجع.">
+            @csrf
+            @method('DELETE')
+            <x-form-field for="delete-password" name="password" label="كلمة المرور الحالية" help="للتأكد أنك صاحب الحساب.">
+                <x-password-input id="delete-password" name="password" autocomplete="current-password" />
+            </x-form-field>
+            <button class="button button-danger" type="submit">حذف حسابي نهائيًا</button>
+        </form>
+    </section>
 </main>
 @endsection

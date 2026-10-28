@@ -15,7 +15,7 @@
             <x-form-field for="email" label="البريد الإلكتروني" help="بريد صحيح لم يُستخدم في حساب آخر.">
                 <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" inputmode="email" dir="ltr" required>
             </x-form-field>
-            <x-form-field for="password" label="كلمة المرور" help="8 أحرف على الأقل.">
+            <x-form-field for="password" label="كلمة المرور" help="8 أحرف على الأقل، فيها حروف وأرقام.">
                 <x-password-input id="password" autocomplete="new-password" minlength="8" />
             </x-form-field>
             <x-form-field for="password_confirmation" label="تأكيد كلمة المرور" help="أعد كتابة كلمة المرور نفسها.">
@@ -24,6 +24,7 @@
             <x-button class="auth-submit">إنشاء الحساب <span aria-hidden="true">←</span></x-button>
         </form>
         <p class="auth-switch">لديك حساب؟ <a href="{{ route('login') }}">سجّل الدخول</a></p>
+        <p class="auth-switch">نحفظ اسمك وبريدك وكلمة مرورك مشفّرة فقط. <a href="{{ route('privacy') }}">كيف نتعامل مع بياناتك</a></p>
     </div>
     <div class="auth-aside"><span class="quote-mark">“</span><p>كل مكتبة تبدأ بكلمة، وكل كلمة تجد طريقها إلى قارئها.</p><span>مِداد | MIDAD</span></div>
 </main>

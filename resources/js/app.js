@@ -797,3 +797,14 @@ document.addEventListener('submit', async (event) => {
         button.disabled = false;
     }
 }, true); // capture: runs before the full-page form guard below marks the form as submitting
+
+// Images with data-fallback-src swap to it when they fail (replaces inline onerror, which the CSP blocks).
+const useImageFallback = (img) => {
+    if (img.dataset.fallbackSrc && !img.dataset.fellBack) { img.dataset.fellBack = 'true'; img.src = img.dataset.fallbackSrc; }
+};
+document.addEventListener('error', (event) => {
+    if (event.target instanceof HTMLImageElement) useImageFallback(event.target);
+}, true);
+const checkFailedImages = () => document.querySelectorAll('img[data-fallback-src]').forEach((img) => { if (img.complete && img.naturalWidth === 0) useImageFallback(img); });
+checkFailedImages();
+document.addEventListener('midad:page-loaded', checkFailedImages);

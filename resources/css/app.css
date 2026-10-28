@@ -1600,3 +1600,22 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
     .member-idcard-verse p + p { margin-top: 0.5rem; }
     .member-idcard-foot a { display: inline-flex; min-height: 2.75rem; align-items: center; }
 }
+
+/* Error pages (resources/views/errors). */
+.error-page { display: grid; min-height: 100vh; align-content: center; justify-items: center; gap: 2.5rem; padding-block: 3rem; text-align: center; }
+.error-card { max-width: 32rem; }
+.error-code { display: block; color: var(--copper-soft); font: 500 clamp(4rem, 12vw, 6.5rem)/1 var(--font-display); }
+.error-card h1 { margin: 0.75rem 0 0.5rem; color: var(--ink); font: 500 clamp(1.5rem, 3vw, 2rem)/1.5 var(--font-display); }
+.error-card p { margin: 0 0 1.5rem; color: var(--ink-soft); font: 1rem/1.9 var(--font-arabic); text-align: center; }
+
+/* Privacy page and the delete-account section (profile/edit). */
+.privacy-page .us-section + .us-section { margin-top: 2.25rem; }
+.privacy-title { margin: 0.75rem 0 0.75rem; color: var(--ink); font: 500 clamp(1.75rem, 3.5vw, 2.5rem)/1.5 var(--font-display); }
+.privacy-lead { max-width: 42rem; margin: 0; color: var(--ink-soft); font: clamp(1rem, 1.6vw, 1.125rem)/2 var(--font-arabic); text-align: start; }
+.privacy-list { display: grid; gap: 0.75rem; max-width: 44rem; margin: 0; padding: 0; list-style: none; }
+.privacy-list li { padding: 0.875rem 1rem; border: 1px solid var(--line); border-radius: 0.625rem; background: var(--paper-raised); color: var(--ink-soft); font: 0.9375rem/1.95 var(--font-arabic); text-align: start; }
+.privacy-list strong { color: var(--ink); font-weight: 600; }
+.account-delete { max-width: 55rem; margin: 2.5rem auto 0; padding: 1.5rem; border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--line)); border-radius: 0.75rem; }
+.account-delete h2 { margin: 0 0 0.5rem; color: var(--danger); font: 600 1.125rem/1.6 var(--font-ui); }
+.account-delete > p { margin: 0 0 1rem; color: var(--ink-soft); font: 0.9375rem/1.9 var(--font-arabic); text-align: start; }
+.account-delete .account-form { display: grid; gap: 0.875rem; max-width: 26rem; }

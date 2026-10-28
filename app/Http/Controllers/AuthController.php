@@ -91,7 +91,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:50'],
             'email' => ['required', 'email:rfc', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => User::newPasswordRules(),
             'password_confirmation' => ['required', 'same:password'],
         ], [
             'password_confirmation.same' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',

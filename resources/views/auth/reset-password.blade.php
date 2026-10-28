@@ -13,7 +13,7 @@
             <x-form-field for="email" label="البريد الإلكتروني" help="البريد الذي وصلك عليه رابط الاستعادة.">
                 <input id="email" name="email" type="email" value="{{ old('email', $email) }}" autocomplete="email" dir="ltr" required>
             </x-form-field>
-            <x-form-field for="password" label="كلمة المرور الجديدة" help="8 أحرف على الأقل.">
+            <x-form-field for="password" label="كلمة المرور الجديدة" help="8 أحرف على الأقل، فيها حروف وأرقام.">
                 <x-password-input id="password" autocomplete="new-password" minlength="8" autofocus />
             </x-form-field>
             <x-form-field for="password_confirmation" label="تأكيد كلمة المرور" help="أعد كتابة كلمة المرور الجديدة.">

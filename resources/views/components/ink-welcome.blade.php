@@ -17,7 +17,7 @@
     </div>
     <p class="ink-welcome-line">هنا يهدأُ الحبرُ على الورق، وتبقى الكلمةُ أثرًا لا يجفّ.</p>
 </div>
-<script>
+<script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     try {
         if (!sessionStorage.getItem('midad-ink-played') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
             document.currentScript.previousElementSibling.classList.add('is-animating');
