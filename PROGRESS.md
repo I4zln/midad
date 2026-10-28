@@ -47,3 +47,10 @@ Resume rule: read this file, then continue from the first phase not marked done.
 - Mu'allaqat (`config/muallaqat.php`) and classical poets (`config/featured_poets.php`) are separate from the DB.
 - 9 long rows stay untouched in `quotes`; create/edit limited to 3–155 via `QuoteRequest`; edit form shows a legacy-length notice.
 - Next: Phase 7 deliverables.
+
+## Phase 7 — Deliverables · DONE
+- `docs/SRS.md` rewritten for the final app → `deliverables/Abdulaziz_SRS.pdf` (rendered with headless Edge).
+- `docs/ERD.mmd` annotated with unique keys/indexes → `deliverables/Abdulaziz_ERD.pdf` + `.png` + `.mmd`.
+- `docs/DEMO-1-MIN.md` 60-second Arabic script → `deliverables/Abdulaziz_Demo_Script.md`.
+- README run steps updated. `deliverables/Abdulaziz_SourceCode.zip` built with `git archive HEAD` (excludes vendor, node_modules, .env, *.sqlite, logs, public/build).
+- Layout check (Edge headless): 10 pages × 390/1440px, no horizontal scroll; full load 0.31–0.60s.

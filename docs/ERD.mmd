@@ -21,23 +21,23 @@ erDiagram
     QUOTES {
         bigint id PK
         bigint user_id FK "nullable, nullOnDelete"
-        text text
+        text text "3-155 chars on create/edit"
         string author
         string source
-        string category
-        timestamp created_at
+        string category "idx(category, created_at)"
+        timestamp created_at "idx(created_at, id)"
         timestamp updated_at
     }
     QUOTE_LIKES {
         bigint id PK
-        bigint quote_id FK
+        bigint quote_id FK "UK(quote_id, user_id), cascadeOnDelete"
         bigint user_id FK
         timestamp created_at
         timestamp updated_at
     }
     QUOTE_FAVORITES {
         bigint id PK
-        bigint quote_id FK
+        bigint quote_id FK "UK(quote_id, user_id), cascadeOnDelete"
         bigint user_id FK
         timestamp created_at
         timestamp updated_at
@@ -52,7 +52,7 @@ erDiagram
     }
     USER_FOLLOWS {
         bigint id PK
-        bigint follower_id FK
+        bigint follower_id FK "UK(follower_id, followed_id)"
         bigint followed_id FK
         timestamp created_at
         timestamp updated_at
@@ -70,7 +70,7 @@ erDiagram
     }
     SPECIAL_PROFILE_MESSAGES {
         bigint id PK
-        bigint user_id FK
+        bigint user_id FK "UK(user_id, message_key)"
         string message_key
         string title
         text body
