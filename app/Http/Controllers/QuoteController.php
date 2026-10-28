@@ -15,11 +15,7 @@ class QuoteController extends Controller
     {
         $category = $request->string('category')->toString();
         $search = $request->string('q')->trim()->toString();
-        $query = Quote::query()->with('user')->withCount(['likes', 'comments'])
-            ->when(Auth::check(), fn ($query) => $query
-                ->withExists(['likes as is_liked' => fn ($likes) => $likes->where('user_id', Auth::id())])
-                ->withExists(['favorites as is_favorited' => fn ($favorites) => $favorites->where('user_id', Auth::id())]))
-            ->latest('created_at')->latest('id');
+        $query = Quote::query()->withCardData()->latest('created_at')->latest('id');
 
         if ($request->routeIs('quotes.index')) {
             $this->applyLibraryFilters($query, $category, $search);
@@ -114,7 +110,7 @@ class QuoteController extends Controller
     {
         return view('authors.show', [
             'author' => $author,
-            'quotes' => Quote::query()->where('author', $author)->with('user')->withCount(['likes', 'comments'])->latest()->paginate(12),
+            'quotes' => Quote::query()->where('author', $author)->withCardData()->latest()->latest('id')->paginate(12),
         ]);
     }
 }

@@ -96,15 +96,8 @@
         @csrf
         <div class="dialog-heading"><div><span class="eyebrow">مساحة القرّاء</span><h2 id="composer-title">أضف اقتباسًا <em>إلى مِداد.</em></h2></div><button class="icon-button dialog-close" type="button" data-close-dialog aria-label="إغلاق">×</button></div>
         <p class="composer-intro">اكتب النص كما تحب أن يقرؤه الآخرون. سيظهر اسم حسابك بوصفك صاحب المشاركة، واكتب في خانة القائل اسم الشاعر أو الكاتب إن كان معروفًا.</p>
-        <label class="field-label" for="quote-text">نص الاقتباس <span>مطلوب</span></label>
-        <textarea id="quote-text" name="text" minlength="3" maxlength="155" data-char-counter required placeholder="اكتب الاقتباس هنا..." rows="5">{{ old('text') }}</textarea>
-        <p class="composer-hint">من 3 إلى 155 حرفًا. <span data-character-count aria-live="polite">{{ mb_strlen(old('text', '')) }} / 155</span></p>
-        <div class="field-row">
-            <label class="field-label" for="quote-author">اسم الشاعر أو الكاتب — قائل الاقتباس <span>اختياري</span><input id="quote-author" name="author" maxlength="120" value="{{ old('author') }}" placeholder="مثال: محمود درويش"><small class="composer-field-hint">هذا اسم صاحب الكلمات، وسيظهر اسم حسابك تلقائيًا بوصفك من أضاف الاقتباس.</small></label>
-            <label class="field-label" for="quote-category">التصنيف<select id="quote-category" name="category"><option>تأمل</option><option>حياة</option><option>حب</option><option>أمل</option></select></label>
-        </div>
-        <label class="field-label" for="quote-source">المصدر أو اسم الكتاب <span>اختياري</span><input id="quote-source" name="source" maxlength="160" value="{{ old('source') }}" placeholder="اسم الديوان أو الكتاب ورقم الصفحة"></label>
-        <div class="dialog-actions"><button class="button button-dark" type="submit">أضف الاقتباس إلى المكتبة <span aria-hidden="true">←</span></button><p>سيظهر باسمك في المكتبة، مع المصدر الذي أضفته.</p></div>
+        <x-quote-fields prefix="quote-" />
+        <div class="dialog-actions"><x-button>أضف الاقتباس إلى المكتبة <span aria-hidden="true">←</span></x-button><p>سيظهر باسمك في المكتبة، مع المصدر الذي أضفته.</p></div>
     </form>
 </dialog>
 @endpush

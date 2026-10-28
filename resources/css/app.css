@@ -1045,3 +1045,9 @@ a.midad-page:hover, a.midad-page:focus-visible { border-color: var(--copper); co
 
 /* Hide "قراءة المزيد" when the full text already fits (set by markClampedQuotes in app.js) */
 .quote-card.is-unclamped .quote-read-more { visibility: hidden; }
+
+/* Composer dialog uses <x-quote-fields>; keep its original field spacing */
+.composer-form > .field-label { display: block; margin-top: 19px; }
+.composer-form > .field-label :is(input, select, textarea) { margin-top: 9px; }
+.composer-form > .field-label .character-count { display: block; margin-top: 6px; text-align: end; }
+.legacy-length-note { margin-top: 0; font-size: 12px; line-height: 1.8; }

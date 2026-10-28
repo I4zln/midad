@@ -40,8 +40,8 @@
         </aside>
     @endif
     <div class="quote-grid">
-        @forelse ($quotes as $quote)
-            <article class="quote-card"><div class="card-topline"><span class="card-category">{{ $quote->category }}</span><span>{{ $quote->likes_count }} إعجاب</span></div><a class="card-quote-button" href="{{ route('quotes.show', $quote) }}"><span class="card-quote-mark">“</span><span class="card-quote-text">{{ $quote->text }}</span></a><div class="card-bottom"><span>{{ $quote->source ?: 'من مكتبة أثر' }}</span><a class="text-button" href="{{ route('quotes.show', $quote) }}">التفاصيل ↗</a></div></article>
+        @forelse ($quotes as $index => $quote)
+            <x-quote-card :quote="$quote" :index="$index" />
         @empty
             <p class="empty-inline">لم يضف هذا الحساب اقتباسات بعد.</p>
         @endforelse

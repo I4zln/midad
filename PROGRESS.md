@@ -28,3 +28,11 @@ Resume rule: read this file, then continue from the first phase not marked done.
 - Local DB: backed up to `database/database.backup-2026-10-28.sqlite` (git-ignored), then applied pending `quotes_latest_index` migration; 29 rows intact.
 - Measured (local `php artisan serve`, 5 runs): /quotes median 0.237s, page 2 0.245s, search+filter 0.209s, home 0.223s.
 - 36/36 tests pass. Next: Phase 4.
+
+## Phase 4 — Blade inheritance + components · DONE
+- `Quote::scopeWithCardData()` holds the card's eager loading; used by home, /quotes, favorites, profile, author pages.
+- Favorites, profile and author pages now render `<x-quote-card>` (was 3 hand-written copies).
+- New `<x-quote-fields>` used by create, edit and the home composer dialog (was 3 copies); `<x-form-field>` gained a `name` prop.
+- Legacy-length notice on the edit form for quotes > 155 chars (Phase 6 decision).
+- Tests: shared card on all 5 listings, every page view `@extends('layouts.app')`, legacy notice. 39/39 pass.
+- Next: Phase 5.

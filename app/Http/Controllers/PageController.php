@@ -71,10 +71,12 @@ class PageController extends Controller
 
     public function favorites(): View
     {
-        $quotes = QuoteFavorite::query()
-            ->where('user_id', Auth::id())
-            ->with(['quote.user'])
-            ->latest()
+        // Saved quotes, most recently saved first.
+        $quotes = Quote::query()
+            ->whereHas('favorites', fn ($favorites) => $favorites->where('user_id', Auth::id()))
+            ->withCardData()
+            ->orderByDesc(QuoteFavorite::query()->select('created_at')
+                ->whereColumn('quote_id', 'quotes.id')->where('user_id', Auth::id())->limit(1))
             ->paginate(12);
 
         return view('pages.favorites', ['quotes' => $quotes]);
@@ -103,7 +105,7 @@ class PageController extends Controller
 
     public function profile(User $user): View
     {
-        $quotes = $user->quotes()->withCount(['likes', 'comments'])->latest()->paginate(9);
+        $quotes = $user->quotes()->withCardData()->latest()->latest('id')->paginate(9);
         $specialMessage = null;
         $specialEmail = (string) config('ethraa.special_profile_email', '');
 

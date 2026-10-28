@@ -127,3 +127,34 @@ test('legacy quotes longer than 155 characters are kept intact and fully readabl
     $this->get(route('quotes.index'))->assertOk()->assertSee('قراءة المزيد');
     expect($quote->fresh()->text)->toBe($long);
 });
+
+test('every quote listing renders the single shared quote-card component', function () {
+    $reader = User::factory()->create();
+    $quote = Quote::query()->create(['user_id' => $reader->id, 'text' => 'بطاقة واحدة لكل الصفحات.', 'author' => 'المتنبي', 'category' => 'تأمل']);
+    $this->actingAs($reader)->post(route('quotes.favorite', $quote));
+
+    foreach ([route('home'), route('quotes.index'), route('favorites'), route('profile.show', $reader), route('authors.show', ['author' => 'المتنبي'])] as $url) {
+        $this->get($url)->assertOk()
+            ->assertSee('quote-card-publisher', false)
+            ->assertSee('بطاقة واحدة لكل الصفحات.');
+    }
+});
+
+test('every page view extends the shared layout', function () {
+    $views = collect(\Illuminate\Support\Facades\File::allFiles(resource_path('views')))
+        ->filter(fn ($file) => str_ends_with($file->getFilename(), '.blade.php'))
+        ->reject(fn ($file) => preg_match('#^(components|mail|pagination|layouts)(/|$)#', str_replace('\\', '/', $file->getRelativePath())));
+
+    expect($views)->not->toBeEmpty();
+    foreach ($views as $file) {
+        expect(file_get_contents($file->getPathname()))->toContain("@extends('layouts.app')");
+    }
+});
+
+test('the owner of a legacy long quote sees a length notice on the edit form', function () {
+    $owner = User::factory()->create();
+    $quote = Quote::query()->create(['user_id' => $owner->id, 'text' => str_repeat('كلمة طويلة ', 20), 'category' => 'حياة']);
+
+    $this->actingAs($owner)->get(route('quotes.edit', $quote))->assertOk()
+        ->assertSee('اختصر النص إلى 155 حرفًا أو أقل');
+});
