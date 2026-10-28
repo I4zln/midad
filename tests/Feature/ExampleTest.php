@@ -3,8 +3,6 @@
 use App\Models\Quote;
 use App\Models\User;
 
-uses(Tests\TestCase::class, Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 test('the application returns a successful response', function () {
     $response = $this->get('/');
 

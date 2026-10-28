@@ -3,7 +3,6 @@
 use App\Models\User;
 use App\Notifications\EthraaResetPasswordNotification;
 
-uses(Tests\TestCase::class, Illuminate\Foundation\Testing\RefreshDatabase::class);
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;

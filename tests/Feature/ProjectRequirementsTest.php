@@ -4,8 +4,6 @@ use App\Models\Quote;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-uses(Tests\TestCase::class, Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 test('home shows exactly the five most recently published quotes while the library is paginated', function () {
     $published = [];
     foreach (range(1, 14) as $number) {
