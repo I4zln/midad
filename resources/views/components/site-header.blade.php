@@ -37,9 +37,24 @@
                     <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.5A8.5 8.5 0 0 1 8.5 3.8 8.5 8.5 0 1 0 20.2 15.5Z"/></svg>
                 </button>
                 @auth
-                    @if (auth()->user()->is_admin)<a class="nav-link admin-nav-link {{ request()->routeIs('admin.*') ? 'is-active' : '' }}" href="{{ route('admin.index') }}">لوحة الإدارة</a>@endif
-                    <a class="profile-shortcut" href="{{ route('profile.show', auth()->user()) }}">{{ auth()->user()->name }}</a>
-                    <form method="POST" action="{{ route('logout') }}">@csrf<button class="text-button" type="submit">خروج</button></form>
+                    @php($unread = \App\Models\UserNotification::query()->where('user_id', auth()->id())->whereNull('read_at')->count())
+                    <details class="account-menu">
+                        <summary class="account-summary" aria-label="قائمة حسابك{{ $unread ? '، '.$unread.' إشعارات جديدة' : '' }}">
+                            <span class="account-initial" aria-hidden="true">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                            <span class="account-name">{{ auth()->user()->name }}</span>
+                            @if ($unread)<span class="account-badge" aria-hidden="true">{{ $unread > 9 ? '9+' : $unread }}</span>@endif
+                        </summary>
+                        <nav class="account-panel" aria-label="حسابي">
+                            <p class="account-panel-name">{{ auth()->user()->name }}</p>
+                            <a href="{{ route('profile.show', auth()->user()) }}">ملفي واقتباساتي</a>
+                            <a href="{{ route('quotes.create') }}">＋ أضف اقتباسًا</a>
+                            <a href="{{ route('favorites') }}">المحفوظات</a>
+                            <a href="{{ route('notifications') }}">الإشعارات @if ($unread)<b>{{ $unread }}</b>@endif</a>
+                            <a href="{{ route('profile.edit') }}">تعديل الملف</a>
+                            @if (auth()->user()->is_admin)<a href="{{ route('admin.index') }}">لوحة الإدارة</a>@endif
+                            <form method="POST" action="{{ route('logout') }}">@csrf<button class="account-logout" type="submit">تسجيل الخروج</button></form>
+                        </nav>
+                    </details>
                 @else
                     <a class="text-button" href="{{ route('login') }}">دخول</a>
                     <a class="button button-dark button-small" href="{{ route('register') }}">أنشئ حسابًا</a>

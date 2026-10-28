@@ -610,7 +610,7 @@ dialog::backdrop { background: #151613a6; backdrop-filter: blur(4px); }
     .nav-link:hover, .nav-link.is-active { color: var(--copper); }
     .nav-link.is-active::after { bottom: -3px; height: 2px; }
     .topbar-actions { min-width: 0; gap: 5px; }
-    .topbar-actions form, .profile-shortcut { display: none; }
+    .profile-shortcut { display: none; }
     .topbar-actions > .text-button { font-size: 10px; }
     .button-small { min-height: 35px; padding-inline: 11px; font-size: 10px; }
     .topbar-actions .icon-button { width: 35px; height: 35px; }
@@ -1073,4 +1073,43 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
     .ink-welcome { margin-top: 14px; }
     .ink-welcome-title { font-size: clamp(38px, 11vw, 54px); line-height: 1.8; }
     .ink-welcome-line { font-size: 17px; }
+}
+
+/* Auth flow polish (login / register / reset) */
+.auth-reason { margin-block: 16px 0; border-inline-start-color: var(--copper); background: color-mix(in srgb, var(--copper) 7%, var(--paper-raised)); font-size: 12.5px; line-height: 1.9; }
+.auth-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.auth-row .forgot-password-link { margin-top: 0; }
+.account-form .button.auth-submit { justify-self: stretch; justify-content: center; min-height: 48px; font-size: 13px; }
+.account-form input[dir='ltr'] { text-align: left; }
+.account-form input[dir='ltr']::placeholder { text-align: right; }
+.account-form input[aria-invalid='true'], .account-form .password-field:has(input[aria-invalid='true']) input { border-color: #a44b42; }
+.account-form .field-label:has([aria-invalid='true']) { color: #a44b42; }
+.account-form .field-error::before { content: '! '; font-weight: 700; }
+.mail-setup-note code { font-size: 11px; }
+:root[data-theme='dark'] .account-form input[aria-invalid='true'], :root[data-theme='dark'] .field-error { color: #e09a8f; border-color: #e09a8f; }
+
+/* Mobile: the bottom nav is fixed, so scrolled-to / focused elements must stop above it */
+@media (max-width: 680px) { html { scroll-padding-bottom: 76px; } }
+
+/* Account menu (signed-in readers): reachable at every width */
+.account-menu { position: relative; }
+.account-summary { display: inline-flex; min-height: 36px; align-items: center; gap: 8px; padding: 2px 4px 2px 12px; border: 1px solid var(--line); border-radius: 22px; color: var(--ink); cursor: pointer; list-style: none; user-select: none; }
+.account-summary::-webkit-details-marker { display: none; }
+.account-summary:hover, .account-menu[open] .account-summary { border-color: var(--copper); }
+.account-summary:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.account-initial { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 50%; background: var(--ink); color: var(--paper); font: 500 13px var(--font-display); }
+.account-name { max-width: 110px; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.account-badge { min-width: 18px; padding: 0 5px; border-radius: 9px; background: var(--copper); color: #fff; font-size: 10px; line-height: 18px; text-align: center; }
+.account-panel { position: absolute; z-index: 60; top: calc(100% + 8px); left: 0; display: grid; width: 220px; padding: 8px; border: 1px solid var(--line); background: var(--paper-raised); box-shadow: 0 10px 30px #24231f14; }
+.account-panel-name { margin: 4px 10px 8px; padding-bottom: 9px; border-bottom: 1px solid var(--line); color: var(--stone); font-size: 11px; text-align: start; }
+.account-panel a, .account-logout { display: flex; min-height: 40px; align-items: center; justify-content: space-between; padding: 0 10px; border: 0; background: none; color: var(--ink); font: 13px var(--font-ui); text-align: start; cursor: pointer; }
+.account-panel a:hover, .account-panel a:focus-visible, .account-logout:hover, .account-logout:focus-visible { background: color-mix(in srgb, var(--copper) 9%, transparent); color: var(--copper); outline: none; }
+.account-panel a b { min-width: 20px; border-radius: 10px; background: var(--copper); color: #fff; font-size: 10px; line-height: 20px; text-align: center; }
+.account-panel form { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.account-logout { width: 100%; color: #a44b42; }
+@media (max-width: 680px) {
+    .account-name { display: none; }
+    .account-summary { padding: 2px; }
+    .account-panel { position: fixed; top: auto; right: 12px; bottom: 70px; left: 12px; width: auto; }
+    .account-panel a, .account-logout { min-height: 46px; font-size: 14px; }
 }

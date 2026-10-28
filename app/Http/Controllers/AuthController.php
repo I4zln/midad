@@ -17,41 +17,49 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function loginForm(): View
+    // Why a guest was sent to log in, keyed by the ?reason= value used on guest action links.
+    private const LOGIN_REASONS = [
+        'like' => 'سجّل الدخول لتتمكن من الإعجاب بالاقتباس، وسنعيدك إلى حيث كنت.',
+        'save' => 'سجّل الدخول لحفظ الاقتباس في مفضلتك، وسنعيدك إلى حيث كنت.',
+        'add' => 'سجّل الدخول لإضافة اقتباسك إلى المكتبة.',
+        'comment' => 'سجّل الدخول لتشارك في التعليقات، وسنعيدك إلى الاقتباس نفسه.',
+        'follow' => 'سجّل الدخول لمتابعة هذا القارئ، وسنعيدك إلى ملفه.',
+    ];
+
+    public function loginForm(Request $request): View
     {
-        return view('auth.login');
+        $this->rememberIntendedPage($request);
+
+        return view('auth.login', ['reason' => $this->loginReason($request)]);
     }
 
     public function login(Request $request): RedirectResponse
     {
-        if (! $request->filled('identifier') && $request->filled('email')) {
-            $request->merge(['identifier' => $request->input('email')]);
+        // Older forms posted the address as "identifier".
+        if (! $request->filled('email') && $request->filled('identifier')) {
+            $request->merge(['email' => $request->input('identifier')]);
         }
 
         $credentials = $request->validate([
-            'identifier' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string'],
         ]);
-        $key = Str::lower($request->input('identifier')).'|'.$request->ip();
+        $key = Str::lower($credentials['email']).'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
-                'identifier' => 'محاولات كثيرة. حاول مجددًا بعد دقيقة.',
+                'email' => 'محاولات كثيرة. انتظر '.RateLimiter::availableIn($key).' ثانية ثم حاول مجددًا.',
             ]);
         }
 
-        $user = User::query()
-            ->where('username', $credentials['identifier'])
-            ->orWhere('email', $credentials['identifier'])
-            ->first();
-
-        if (! $user || ! Auth::attempt(['email' => $user->email, 'password' => $credentials['password']], $request->boolean('remember'))) {
+        if (! Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->boolean('remember'))) {
             RateLimiter::hit($key, 60);
             throw ValidationException::withMessages([
-                'identifier' => 'بيانات الدخول غير صحيحة.',
+                'password' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقّق منهما وحاول مجددًا.',
             ]);
         }
 
+        $user = Auth::user();
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
@@ -62,12 +70,14 @@ class AuthController extends Controller
             );
         }
 
-        return redirect()->intended(route('home'))->with('status', 'مرحبًا بعودتك إلى أثر.');
+        return redirect()->intended(route('home'))->with('status', 'مرحبًا بعودتك يا '.$user->name.'.');
     }
 
-    public function registerForm(): View
+    public function registerForm(Request $request): View
     {
-        return view('auth.register');
+        $this->rememberIntendedPage($request);
+
+        return view('auth.register', ['reason' => $this->loginReason($request)]);
     }
 
     public function register(Request $request): RedirectResponse
@@ -75,10 +85,13 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:50'],
             'email' => ['required', 'email:rfc', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8'],
+            'password_confirmation' => ['required', 'same:password'],
+        ], [
+            'password_confirmation.same' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',
         ]);
 
-        $user = User::query()->create($validated);
+        $user = User::query()->create(collect($validated)->except('password_confirmation')->all());
         Auth::login($user);
         $request->session()->regenerate();
 
@@ -89,7 +102,33 @@ class AuthController extends Controller
             );
         }
 
-        return redirect()->route('quotes.create')->with('status', 'أهلًا بك. أضف اقتباسك الأول الآن.');
+        // A guest who signed up from an action (like, save…) goes back there; everyone else writes a first quote.
+        return redirect()->intended(route('quotes.create'))->with('status', 'أهلًا بك في مِداد يا '.$user->name.'.');
+    }
+
+    // Store ?next= as the post-login destination, but only for paths on this site.
+    private function rememberIntendedPage(Request $request): void
+    {
+        $next = $request->query('next');
+        if (! is_string($next) || $next === '') {
+            return;
+        }
+
+        $parts = parse_url($next);
+        $path = $parts['path'] ?? '';
+        $sameHost = ! isset($parts['host']) || $parts['host'] === $request->getHost();
+        if ($parts === false || ! $sameHost || ! str_starts_with($path, '/') || str_starts_with($path, '//') || isset($parts['user'])) {
+            return;
+        }
+
+        $request->session()->put('url.intended', url($path.(isset($parts['query']) ? '?'.$parts['query'] : '').(isset($parts['fragment']) ? '#'.$parts['fragment'] : '')));
+    }
+
+    private function loginReason(Request $request): ?string
+    {
+        $reason = self::LOGIN_REASONS[(string) $request->query('reason')] ?? null;
+
+        return $reason ?? ($request->session()->has('url.intended') ? 'هذه الصفحة تحتاج إلى تسجيل الدخول، وسنعيدك إليها مباشرة بعده.' : null);
     }
 
     public function verificationNotice(): View

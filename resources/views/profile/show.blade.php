@@ -18,7 +18,7 @@
                         <form method="POST" action="{{ route('users.follow', $profile) }}">@csrf<button class="button {{ $isFollowing ? 'button-outline' : 'button-dark' }}" type="submit">{{ $isFollowing ? 'إلغاء المتابعة' : 'متابعة' }} <span aria-hidden="true">＋</span></button></form>
                     @endif
                 @else
-                    <a class="button button-outline" href="{{ route('login') }}">سجّل الدخول للمتابعة</a>
+                    <a class="button button-outline" href="{{ route('login', ['next' => request()->getRequestUri(), 'reason' => 'follow']) }}">سجّل الدخول للمتابعة</a>
                 @endauth
             </div>
             <div class="profile-identity"><div class="eyebrow"><span class="eyebrow-line"></span> {{ $profile->is_admin ? 'إدارة مِداد' : 'قارئ في مِداد' }}</div><h1>{{ $profile->name }} @if ($profile->is_admin)<span class="admin-badge">مدير مِداد</span>@endif</h1>@if ($profile->username)<p class="member-username">{{ '@'.$profile->username }}</p>@endif<p>عضو منذ {{ $profile->created_at->format('Y') }}</p></div>

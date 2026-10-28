@@ -360,6 +360,7 @@ function prefetchPage(url) {
 
 function setNavigating(active) {
     root.classList.toggle('is-navigating', active);
+    if (active) document.querySelectorAll('.ambient-menu[open], .account-menu[open]').forEach((menu) => { menu.open = false; });
 }
 
 async function loadPage(url, push = true) {
@@ -534,11 +535,11 @@ window.addEventListener('resize', () => {
 
 // Close the navbar audio menu on outside click or Escape.
 document.addEventListener('click', (event) => {
-    document.querySelectorAll('.ambient-menu[open]').forEach((menu) => { if (!menu.contains(event.target)) menu.open = false; });
+    document.querySelectorAll('.ambient-menu[open], .account-menu[open]').forEach((menu) => { if (!menu.contains(event.target)) menu.open = false; });
 });
 document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    document.querySelectorAll('.ambient-menu[open]').forEach((menu) => { menu.open = false; menu.querySelector('summary')?.focus(); });
+    document.querySelectorAll('.ambient-menu[open], .account-menu[open]').forEach((menu) => { menu.open = false; menu.querySelector('summary')?.focus(); });
 });
 
 // In-page navigation inserts the homepage without running its inline script; apply the same once-per-session rule.
@@ -551,3 +552,79 @@ document.addEventListener('midad:page-loaded', () => {
         sessionStorage.setItem('midad-ink-played', '1');
     } catch (error) { /* Without storage the greeting simply shows in its final state. */ }
 });
+
+// Inline Arabic validation for forms marked data-validate (server errors use the same .field-error slot).
+function fieldProblem(input) {
+    const length = Array.from(input.value).length;
+    if (input.dataset.match) {
+        const other = document.getElementById(input.dataset.match);
+        input.setCustomValidity(other && input.value && input.value !== other.value ? 'mismatch' : '');
+    }
+    const { validity } = input;
+    if (validity.valid) return '';
+    if (validity.valueMissing) return 'هذا الحقل مطلوب.';
+    if (validity.typeMismatch && input.type === 'email') return 'أدخل بريدًا إلكترونيًا صحيحًا، مثل name@example.com.';
+    if (validity.tooShort) return `عدد الأحرف يجب ألا يقل عن ${input.minLength} (الحالي ${length}).`;
+    if (validity.tooLong) return `عدد الأحرف يجب ألا يزيد على ${input.maxLength}.`;
+    if (validity.customError) return 'تأكيد كلمة المرور لا يطابق كلمة المرور.';
+    return 'تحقّق من قيمة هذا الحقل.';
+}
+
+function showFieldProblem(input, message) {
+    const label = input.closest('.field-label');
+    if (!label) return;
+    let error = label.querySelector('.field-error');
+    if (message) {
+        if (!error) {
+            error = document.createElement('small');
+            error.className = 'field-error';
+            error.id = `${input.id}-error`;
+            error.setAttribute('role', 'alert');
+            label.append(error);
+        }
+        error.textContent = message;
+    } else error?.remove();
+    input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    input.setAttribute('aria-describedby', [`${input.id}-hint`, message ? `${input.id}-error` : ''].filter((id) => id && document.getElementById(id)).join(' '));
+}
+
+function linkFieldDescriptions(scope = document) {
+    scope.querySelectorAll('.field-label input[id], .field-label textarea[id], .field-label select[id]').forEach((input) => {
+        const hasError = Boolean(document.getElementById(`${input.id}-error`));
+        input.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+        const ids = [`${input.id}-hint`, `${input.id}-error`].filter((id) => document.getElementById(id));
+        if (ids.length) input.setAttribute('aria-describedby', ids.join(' '));
+    });
+}
+
+const validatedField = (target) => target?.closest?.('form[data-validate]') && target.matches?.('input:not([type="hidden"]):not([type="checkbox"]), textarea, select') ? target : null;
+document.addEventListener('focusout', (event) => {
+    const input = validatedField(event.target);
+    if (!input || (!input.value && !input.dataset.touched)) return;
+    input.dataset.touched = 'true';
+    showFieldProblem(input, fieldProblem(input));
+});
+document.addEventListener('input', (event) => {
+    const input = validatedField(event.target);
+    if (!input) return;
+    if (input.dataset.touched || input.getAttribute('aria-invalid') === 'true') showFieldProblem(input, fieldProblem(input));
+    const confirmation = input.form.querySelector(`[data-match="${input.id}"]`);
+    if (confirmation?.dataset.touched) showFieldProblem(confirmation, fieldProblem(confirmation));
+});
+document.addEventListener('invalid', (event) => {
+    const input = validatedField(event.target);
+    if (!input) return;
+    event.preventDefault();
+    input.dataset.touched = 'true';
+    showFieldProblem(input, fieldProblem(input));
+    const firstInvalid = input.form.querySelector(':invalid');
+    if (firstInvalid === input) input.focus();
+}, true);
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || !form.matches('[data-validate]')) return;
+    form.querySelectorAll('[data-match]').forEach((input) => fieldProblem(input));
+    if (!form.checkValidity()) { event.preventDefault(); event.stopImmediatePropagation(); form.reportValidity(); }
+}, true);
+linkFieldDescriptions();
+document.addEventListener('midad:page-loaded', () => linkFieldDescriptions());

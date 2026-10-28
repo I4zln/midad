@@ -5,18 +5,23 @@
     <div class="auth-card">
         <div class="eyebrow"><span class="eyebrow-line"></span> ابدأ حكايتك</div>
         <h1>مكانٌ لك <em>بين الكلمات.</em></h1>
-        <p>أنشئ حسابًا لتشارك اقتباساتك وتتابع ما يترك أثرًا فيك.</p>
-        <form method="POST" action="{{ route('register.store') }}" class="account-form">
+        <p>أربعة حقول فقط، ثم تشارك اقتباسك الأول.</p>
+        @if ($reason)<div class="form-alert auth-reason" role="note">{{ $reason }}</div>@endif
+        <form method="POST" action="{{ route('register.store') }}" class="account-form" data-validate>
             @csrf
-            <x-form-field for="name" label="الاسم" help="من 2 إلى 50 حرفًا."><input id="name" name="name" value="{{ old('name') }}" minlength="2" maxlength="50" autocomplete="name" required autofocus></x-form-field>
-            <x-form-field for="email" label="البريد الإلكتروني" help="أدخل بريدًا صحيحًا غير مستخدم من قبل."><input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required></x-form-field>
+            <x-form-field for="name" label="الاسم" help="من 2 إلى 50 حرفًا، وسيظهر مع اقتباساتك.">
+                <input id="name" name="name" value="{{ old('name') }}" minlength="2" maxlength="50" autocomplete="name" required autofocus>
+            </x-form-field>
+            <x-form-field for="email" label="البريد الإلكتروني" help="بريد صحيح لم يُستخدم في حساب آخر.">
+                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" inputmode="email" dir="ltr" required>
+            </x-form-field>
             <x-form-field for="password" label="كلمة المرور" help="8 أحرف على الأقل.">
-                <span class="password-field"><input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required><button class="password-visibility" type="button" data-toggle-password="password" aria-pressed="false">إظهار</button></span>
+                <x-password-input id="password" autocomplete="new-password" minlength="8" />
             </x-form-field>
-            <x-form-field for="password_confirmation" label="تأكيد كلمة المرور" help="أعد إدخال كلمة المرور نفسها.">
-                <span class="password-field"><input id="password_confirmation" name="password_confirmation" type="password" minlength="8" autocomplete="new-password" required><button class="password-visibility" type="button" data-toggle-password="password_confirmation" aria-pressed="false">إظهار</button></span>
+            <x-form-field for="password_confirmation" label="تأكيد كلمة المرور" help="أعد كتابة كلمة المرور نفسها.">
+                <x-password-input id="password_confirmation" autocomplete="new-password" minlength="8" data-match="password" />
             </x-form-field>
-            <x-button>إنشاء الحساب <span aria-hidden="true">←</span></x-button>
+            <x-button class="auth-submit">إنشاء الحساب <span aria-hidden="true">←</span></x-button>
         </form>
         <p class="auth-switch">لديك حساب؟ <a href="{{ route('login') }}">سجّل الدخول</a></p>
     </div>

@@ -96,7 +96,7 @@ test('password mismatch is rejected and the reset token remains usable', functio
             'password' => 'new-password-456',
             'password_confirmation' => 'different-password',
         ])->assertRedirect(route('password.reset', ['token' => $token, 'email' => $user->email]))
-        ->assertSessionHasErrors(['password']);
+        ->assertSessionHasErrors(['password_confirmation' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.']);
 
     expect(Password::broker()->tokenExists($user->fresh(), $token))->toBeTrue();
     $this->assertGuest();
@@ -147,7 +147,7 @@ test('failed SMTP delivery is not reported as sent and its unusable token is rem
 
     $this->from(route('password.request'))->post(route('password.email'), ['email' => $user->email])
         ->assertRedirect(route('password.request'))
-        ->assertSessionHas('status', 'إذا كان البريد مرتبطًا بحساب، فستصلك رسالة إذا نجح الإرسال. تحقق من الوارد، وأعد المحاولة لاحقًا إن لم تصل.')
+        ->assertSessionHas('status', 'إن كان البريد مسجّلًا لدينا فستصلك رسالة خلال دقائق.')
         ->assertSessionMissing('errors');
 
     expect(DB::table('password_reset_tokens')->where('email', $user->email)->exists())->toBeFalse();

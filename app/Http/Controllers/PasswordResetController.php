@@ -43,7 +43,8 @@ class PasswordResetController extends Controller
             }
         }
 
-        return back()->with('status', 'إذا كان البريد مرتبطًا بحساب، فستصلك رسالة إذا نجح الإرسال. تحقق من الوارد، وأعد المحاولة لاحقًا إن لم تصل.');
+        // Same response whether or not the address exists.
+        return back()->with('status', 'إن كان البريد مسجّلًا لدينا فستصلك رسالة خلال دقائق.');
     }
 
     public function resetForm(Request $request, string $token): View|RedirectResponse
@@ -70,13 +71,15 @@ class PasswordResetController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8'],
+            'password_confirmation' => ['required', 'same:password'],
         ], [
             'email.required' => 'أدخل البريد الإلكتروني المرتبط بطلب الاستعادة.',
             'email.email' => 'تحقق من صيغة البريد الإلكتروني.',
             'password.required' => 'أدخل كلمة المرور الجديدة.',
             'password.min' => 'يجب ألا تقل كلمة المرور عن 8 أحرف.',
-            'password.confirmed' => 'تأكيد كلمة المرور غير مطابق.',
+            'password_confirmation.required' => 'أعد كتابة كلمة المرور الجديدة للتأكيد.',
+            'password_confirmation.same' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',
         ]);
 
         $status = Password::reset(

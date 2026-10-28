@@ -5,15 +5,21 @@
     <div class="auth-card">
         <div class="eyebrow"><span class="eyebrow-line"></span> خطوة أخيرة</div>
         <h1>اختر كلمة<br><em>مرور جديدة.</em></h1>
-        <p>اختر كلمة مرور جديدة لا تقل عن 8 أحرف، ثم أكّدها.</p>
+        <p>بعد الحفظ ستعود إلى تسجيل الدخول بكلمتك الجديدة.</p>
         @if (session('status'))<div class="form-alert auth-status" role="status">{{ session('status') }}</div>@endif
-        <form method="POST" action="{{ route('password.update') }}" class="account-form">
+        <form method="POST" action="{{ route('password.update') }}" class="account-form" data-validate>
             @csrf
             <input type="hidden" name="token" value="{{ $token }}">
-            <label class="field-label" for="email">البريد الإلكتروني<input id="email" name="email" type="email" value="{{ old('email', $email) }}" autocomplete="email" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" aria-describedby="email-error" required>@error('email')<small class="field-error" id="email-error">{{ $message }}</small>@enderror</label>
-            <label class="field-label" for="password">كلمة المرور الجديدة<span class="password-field"><input id="password" name="password" type="password" minlength="8" autocomplete="new-password" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" aria-describedby="password-error" required><button class="password-visibility" type="button" data-toggle-password="password" aria-pressed="false">إظهار</button></span>@error('password')<small class="field-error" id="password-error">{{ $message }}</small>@enderror</label>
-            <label class="field-label" for="password_confirmation">تأكيد كلمة المرور<span class="password-field"><input id="password_confirmation" name="password_confirmation" type="password" minlength="8" autocomplete="new-password" required><button class="password-visibility" type="button" data-toggle-password="password_confirmation" aria-pressed="false">إظهار</button></span></label>
-            <button class="button button-dark" type="submit">حفظ كلمة المرور <span aria-hidden="true">←</span></button>
+            <x-form-field for="email" label="البريد الإلكتروني" help="البريد الذي وصلك عليه رابط الاستعادة.">
+                <input id="email" name="email" type="email" value="{{ old('email', $email) }}" autocomplete="email" dir="ltr" required>
+            </x-form-field>
+            <x-form-field for="password" label="كلمة المرور الجديدة" help="8 أحرف على الأقل.">
+                <x-password-input id="password" autocomplete="new-password" minlength="8" autofocus />
+            </x-form-field>
+            <x-form-field for="password_confirmation" label="تأكيد كلمة المرور" help="أعد كتابة كلمة المرور الجديدة.">
+                <x-password-input id="password_confirmation" autocomplete="new-password" minlength="8" data-match="password" />
+            </x-form-field>
+            <x-button class="auth-submit">حفظ كلمة المرور <span aria-hidden="true">←</span></x-button>
         </form>
         <p class="auth-switch"><a href="{{ route('login') }}">العودة إلى تسجيل الدخول</a></p>
     </div>

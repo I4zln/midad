@@ -28,7 +28,7 @@
                 <form method="POST" action="{{ route('quotes.like', $quote) }}" data-like-form>@csrf<button class="like-button like-button-detail {{ $quote->is_liked ?? false ? 'is-liked' : '' }}" type="submit" aria-label="{{ $quote->is_liked ?? false ? 'إزالة الإعجاب' : 'إعجاب بهذا الاقتباس' }}" aria-pressed="{{ $quote->is_liked ?? false ? 'true' : 'false' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.3-8.8 10.3S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"/></svg><span>أعجبني</span><b>{{ $quote->likes_count }}</b></button></form>
                 <form method="POST" action="{{ route('quotes.favorite', $quote) }}">@csrf<button class="button button-outline" type="submit">حفظ في المفضلة</button></form>
             @else
-                <a class="like-button like-button-detail" href="{{ route('login') }}" aria-label="سجّل الدخول للإعجاب"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.3-8.8 10.3S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"/></svg><span>أعجبني</span><b>{{ $quote->likes_count }}</b><small>سجّل للمشاركة</small></a>
+                <a class="like-button like-button-detail" href="{{ route('login', ['next' => request()->getRequestUri(), 'reason' => 'like']) }}" aria-label="سجّل الدخول للإعجاب"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.3-8.8 10.3S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"/></svg><span>أعجبني</span><b>{{ $quote->likes_count }}</b><small>سجّل للمشاركة</small></a>
             @endauth
             <button class="button button-outline" type="button" data-export-quote data-text="{{ $quote->text }}" data-author="{{ $quote->author ?: ($quote->user?->name ?? 'كاتب مجهول') }}" data-source="{{ $quote->source ?: 'من مكتبة أثر' }}">تنزيل كصورة ↓</button>
             <button class="button button-outline" type="button" data-copy-link>مشاركة الرابط ↗</button>
@@ -45,7 +45,7 @@
                 <button class="button button-dark" type="submit">نشر التعليق <span aria-hidden="true">←</span></button>
             </form>
         @else
-            <p class="login-prompt"><a href="{{ route('login') }}">سجّل الدخول</a> لتشارك رأيك في هذا الاقتباس.</p>
+            <p class="login-prompt"><a href="{{ route('login', ['next' => request()->getRequestUri().'#comments', 'reason' => 'comment']) }}">سجّل الدخول</a> لتشارك رأيك في هذا الاقتباس.</p>
         @endauth
         <div class="comment-list">
             @forelse ($quote->comments as $comment)

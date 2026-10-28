@@ -16,9 +16,9 @@ test('registration rejects bad data with Arabic messages shown next to the field
         ]);
 
     $page = $this->get(route('register'))->assertOk();
-    $page->assertSee('<small class="field-error">عدد أحرف الاسم يجب ألا يقل عن 2.</small>', false)
-        ->assertSee('<small class="field-error">البريد الإلكتروني مستخدم من قبل.</small>', false)
-        ->assertSee('<small class="field-error">عدد أحرف كلمة المرور يجب ألا يقل عن 8.</small>', false);
+    $page->assertSee('<small class="field-error" id="name-error" role="alert">عدد أحرف الاسم يجب ألا يقل عن 2.</small>', false)
+        ->assertSee('<small class="field-error" id="email-error" role="alert">البريد الإلكتروني مستخدم من قبل.</small>', false)
+        ->assertSee('<small class="field-error" id="password-error" role="alert">عدد أحرف كلمة المرور يجب ألا يقل عن 8.</small>', false);
     expect(User::query()->count())->toBe(1);
 });
 
