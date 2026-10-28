@@ -10,8 +10,6 @@
 @font-face { font-family: 'Thmanyah Serif Display'; src: url('/fonts/thmanyah/thmanyahserifdisplay-Medium.woff2') format('woff2'); font-style: normal; font-weight: 500; font-display: swap; }
 @font-face { font-family: 'Thmanyah Serif Display'; src: url('/fonts/thmanyah/thmanyahserifdisplay-Bold.woff2') format('woff2'); font-style: normal; font-weight: 700; font-display: swap; }
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
@@ -1051,3 +1049,11 @@ a.midad-page:hover, a.midad-page:focus-visible { border-color: var(--copper); co
 .composer-form > .field-label :is(input, select, textarea) { margin-top: 9px; }
 .composer-form > .field-label .character-count { display: block; margin-top: 6px; text-align: end; }
 .legacy-length-note { margin-top: 0; font-size: 12px; line-height: 1.8; }
+
+/* Navigation / submit progress: thin copper ink line at the top (toggled by setNavigating in app.js) */
+html::before { content: ''; position: fixed; z-index: 200; top: 0; right: 0; left: 0; height: 2px; background: linear-gradient(to left, transparent, var(--copper) 30%, var(--copper) 70%, transparent); opacity: 0; transform: scaleX(0); transform-origin: right; pointer-events: none; }
+html.is-navigating::before { opacity: 1; animation: midad-progress 1.4s ease-out forwards; }
+html.is-navigating .site-shell > :not(.topbar) { opacity: .72; transition: opacity .25s ease .15s; }
+@keyframes midad-progress { from { transform: scaleX(0); } 60% { transform: scaleX(.7); } to { transform: scaleX(.92); } }
+.button.is-loading, button.is-loading { cursor: progress; opacity: .7; }
+form[aria-busy='true'] button[type='submit'] { pointer-events: none; }

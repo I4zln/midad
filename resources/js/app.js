@@ -1,5 +1,3 @@
-import './bootstrap';
-
 const root = document.documentElement;
 const themeToggle = document.querySelector('#theme-toggle');
 const toast = document.querySelector('#toast');
@@ -412,14 +410,38 @@ async function exportQuote(button) {
         showToast('تم تجهيز صورة الاقتباس.');
 }
 
+// Pages fetched on hover/touch, reused if the click follows within a few seconds.
+const prefetched = new Map();
+const PREFETCH_TTL = 10000;
+
+function fetchPage(url) {
+    return fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(async (response) => ({
+        ok: response.ok && Boolean(response.headers.get('content-type')?.includes('text/html')),
+        html: await response.text(),
+    }));
+}
+
+function prefetchPage(url) {
+    const cached = prefetched.get(url);
+    if (cached && Date.now() - cached.at < PREFETCH_TTL) return;
+    prefetched.set(url, { at: Date.now(), page: fetchPage(url).catch(() => null) });
+}
+
+function setNavigating(active) {
+    root.classList.toggle('is-navigating', active);
+}
+
 async function loadPage(url, push = true) {
     const source = new URL(window.location.href);
     const previousScrollY = window.scrollY;
     if (push) history.replaceState({ ...history.state, scrollY: previousScrollY }, '', source.href);
+    setNavigating(true);
     try {
-        const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        if (!response.ok || !response.headers.get('content-type')?.includes('text/html')) { window.location.href = url; return; }
-        const nextDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const cached = prefetched.get(url);
+        prefetched.clear();
+        const page = (cached && Date.now() - cached.at < PREFETCH_TTL && await cached.page) || await fetchPage(url);
+        if (!page.ok) { window.location.href = url; return; }
+        const nextDocument = new DOMParser().parseFromString(page.html, 'text/html');
         const currentShell = document.querySelector('.site-shell');
         const nextShell = nextDocument.querySelector('.site-shell');
         if (!currentShell || !nextShell) { window.location.href = url; return; }
@@ -452,7 +474,8 @@ async function loadPage(url, push = true) {
         if (status) showToast(status);
         if (nextDialog?.dataset.quoteFormErrors === 'true') nextDialog.showModal();
         markClampedQuotes();
-    } catch (error) { window.location.href = url; }
+        document.dispatchEvent(new CustomEvent('midad:page-loaded'));
+    } catch (error) { window.location.href = url; } finally { setNavigating(false); }
 }
 
 // Show "قراءة المزيد" only on cards whose text is actually cut by the CSS line clamp.
@@ -510,15 +533,45 @@ document.addEventListener('submit', async (event) => {
     }
 });
 
-document.addEventListener('click', (event) => {
-    const link = event.target.closest('a[href]');
-    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target || link.hasAttribute('download')) return;
+// Same-origin page links handled by loadPage(); null for anything the browser should handle itself.
+function inPageDestination(link) {
+    if (!link || link.target || link.hasAttribute('download') || link.closest('form')) return null;
     const destination = new URL(link.href, window.location.href);
-    if (destination.origin !== window.location.origin) return;
-    if (destination.pathname === window.location.pathname && destination.search === window.location.search && destination.hash) return;
-    if (link.closest('form')) return;
+    if (destination.origin !== window.location.origin) return null;
+    if (destination.pathname === window.location.pathname && destination.search === window.location.search && destination.hash) return null;
+    return destination;
+}
+
+document.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const destination = inPageDestination(event.target.closest('a[href]'));
+    if (!destination) return;
     event.preventDefault();
     loadPage(destination.href);
+});
+['pointerover', 'touchstart', 'focusin'].forEach((type) => document.addEventListener(type, (event) => {
+    const destination = inPageDestination(event.target.closest?.('a[href]'));
+    if (destination && destination.href !== window.location.href) prefetchPage(destination.href);
+}, { passive: true }));
+
+// Full-page POST forms: show progress and ignore repeat submits until the next page arrives.
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (event.defaultPrevented || !(form instanceof HTMLFormElement) || form.method.toLowerCase() === 'get') return;
+    if (form.dataset.submitting === 'true') { event.preventDefault(); return; }
+    form.dataset.submitting = 'true';
+    form.setAttribute('aria-busy', 'true');
+    form.querySelectorAll('button[type="submit"], button:not([type])').forEach((button) => button.classList.add('is-loading'));
+    prefetched.clear();
+    setNavigating(true);
+});
+window.addEventListener('pageshow', () => {
+    setNavigating(false);
+    document.querySelectorAll('form[data-submitting]').forEach((form) => {
+        delete form.dataset.submitting;
+        form.removeAttribute('aria-busy');
+        form.querySelectorAll('.is-loading').forEach((button) => button.classList.remove('is-loading'));
+    });
 });
 window.addEventListener('popstate', () => loadPage(window.location.href, false));
 document.addEventListener('submit', (event) => {

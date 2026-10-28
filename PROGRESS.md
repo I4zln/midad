@@ -54,3 +54,18 @@ Resume rule: read this file, then continue from the first phase not marked done.
 - `docs/DEMO-1-MIN.md` 60-second Arabic script → `deliverables/Abdulaziz_Demo_Script.md`.
 - README run steps updated. `deliverables/Abdulaziz_SourceCode.zip` built with `git archive HEAD` (excludes vendor, node_modules, .env, *.sqlite, logs, public/build).
 - Layout check (Edge headless): 10 pages × 390/1440px, no horizontal scroll; full load 0.31–0.60s.
+
+---
+# TASK 2 — UX polish, profile, ink welcome, auth, speed
+
+## T2 Phase 1 — Speed · DONE
+Root causes (measured with headless Edge, cache disabled, 1440px):
+1. PHP OPcache disabled in XAMPP → every request recompiled Laravel. Enabled in `C:\xampp\php\php.ini` (backup `php.ini.backup-2026-10-28`; outside repo). TTFB 270–454ms → 17–44ms.
+2. Hotlinked Wikimedia images (home 318KB, /muallaqat 2.6MB, 0.8–1.5s each) → self-hosted 720px WebP in `public/images/poets/` (425KB total); credits unchanged.
+3. Unused axios in every bundle → removed `resources/js/bootstrap.js`. JS 66.5KB → 16.1KB.
+4. Tailwind scanned Laravel's unused pagination views → removed `@source`. CSS 104.6KB → 92.1KB.
+5. Saved dark theme applied only after JS → inline head script (no light flash).
+Added: hover/touch/focus prefetch (10s TTL) in `loadPage`, copper progress line, POST double-submit guard.
+Numbers: home load 819ms → 321ms; /quotes 446ms → 95ms; /muallaqat 464ms/3.35MB → 146ms/1.03MB.
+In-site navigation (click → new page): 42–71ms; hover-then-click 11–16ms.
+Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified files not in repo.
