@@ -14,12 +14,45 @@
             <p>مِداد مساحةٌ للكلمة: نقرأ الشعر على مهل، ونحفظ من الكلمات ما يضيء الذاكرة.</p>
             <div class="editorial-hero-actions"><a class="button button-dark" href="#quotes">اكتشف المكتبة <span aria-hidden="true">←</span></a>@auth<button class="button button-outline" type="button" data-open-composer>أضف اقتباسًا <span aria-hidden="true">＋</span> <x-fountain-pen class="pen-icon" /></button>@else<a class="button button-outline" href="{{ route('register') }}">أنشئ حسابًا وانشر اقتباسًا</a>@endauth<a class="button button-outline" href="{{ route('poets.index') }}">استكشف الشعراء</a></div>
         </div>
-        <aside class="editorial-feature" aria-label="عن مكتبة مِداد">
-            <span class="editorial-feature-mark" aria-hidden="true">❞</span>
-            <span class="editorial-feature-label">مكتبة مِداد</span>
-            <blockquote>الكلمات التي نحبها تستحق مكانًا نعود إليه.</blockquote>
-            <div class="editorial-feature-source"><span></span><div><strong>لأن للكلمات أثرًا يبقى</strong><small>اقرأ، احفظ، وشارك ما يعنيك</small></div></div>
-        </aside>
+        @if ($featuredQuote)
+            {{-- The newest quote in the library, with who shared it. --}}
+            @php($sharer = $featuredQuote->user)
+            <aside class="editorial-feature editorial-feature-latest" aria-label="أحدث اقتباس في المكتبة">
+                <span class="editorial-feature-mark" aria-hidden="true">❞</span>
+                <span class="editorial-feature-label"><span>أحدث اقتباس</span>@if ($featuredQuote->category)<span aria-hidden="true">·</span><span>{{ $featuredQuote->category }}</span>@endif</span>
+                <a class="editorial-feature-quote" href="{{ route('quotes.show', $featuredQuote) }}">
+                    @php($length = mb_strlen($featuredQuote->text))
+                    <blockquote @class(['is-long' => $length > 90, 'is-medium' => $length <= 90 && ($length > 45 || str_contains($featuredQuote->text, "
+"))])>{{ $featuredQuote->text }}</blockquote>
+                    <span class="sr-only">— اقرأ الاقتباس كاملًا</span>
+                </a>
+                @if ($featuredQuote->author)
+                    <p class="editorial-feature-author">— {{ $featuredQuote->author }}</p>
+                @endif
+                <div class="editorial-feature-source">
+                    @if ($sharer?->avatar_path)
+                        <img class="editorial-feature-avatar" src="{{ asset('storage/'.$sharer->avatar_path) }}" alt="" loading="lazy">
+                    @else
+                        <span class="editorial-feature-avatar" aria-hidden="true">{{ mb_substr($sharer?->name ?: 'ق', 0, 1) }}</span>
+                    @endif
+                    <div>
+                        @if ($sharer)
+                            <strong><a href="{{ route('profile.show', $sharer) }}">{{ $sharer->name }}</a></strong>
+                        @else
+                            <strong>قارئ سابق</strong>
+                        @endif
+                        <small>شاركه <time datetime="{{ $featuredQuote->created_at->toIso8601String() }}">{{ $featuredQuote->created_at->diffForHumans() }}</time></small>
+                    </div>
+                </div>
+            </aside>
+        @else
+            <aside class="editorial-feature" aria-label="عن مكتبة مِداد">
+                <span class="editorial-feature-mark" aria-hidden="true">❞</span>
+                <span class="editorial-feature-label">مكتبة مِداد</span>
+                <blockquote>الكلمات التي نحبها تستحق مكانًا نعود إليه.</blockquote>
+                <div class="editorial-feature-source"><span></span><div><strong>لأن للكلمات أثرًا يبقى</strong><small>اقرأ، احفظ، وشارك ما يعنيك</small></div></div>
+            </aside>
+        @endif
         <div class="editorial-hero-foot"><span>01 / 03</span><span>الشعر · الذاكرة · الإنسان</span></div>
     </section>
 
