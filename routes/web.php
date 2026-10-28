@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
 Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::get('/about-me', [PageController::class, 'creator'])->name('creator');
+// The former «عنّي» page is now the maker section of «من نحن»; keep old links working.
+Route::permanentRedirect('/about-me', '/about#maker')->name('creator');
 Route::get('/muallaqat', [PageController::class, 'muallaqat'])->name('muallaqat.index');
 Route::get('/muallaqat/{slug}', [PageController::class, 'muallaqa'])->name('muallaqat.show');
 Route::get('/poets', [PageController::class, 'poets'])->name('poets.index');

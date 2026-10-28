@@ -70,10 +70,14 @@ test('quote submissions are validated', function () {
     $this->assertDatabaseCount('quotes', 0);
 });
 
-test('the creator page includes developer links and the muallaqat page is public', function () {
-    $this->get(route('creator'))
+test('the about page includes the maker section with developer links and the muallaqat page is public', function () {
+    $this->get(route('about'))
         ->assertOk()
-        ->assertSee('عبدالعزيز المطرفي')
+        ->assertSee('<title>من نحن | مِداد</title>', false)
+        ->assertSee('لأن للكلمات أثرًا يبقى')
+        ->assertSee('id="maker"', false)
+        ->assertSee('عبدالعزيز تركي المطرفي')
+        ->assertSee('https://x.com/i4zl4')
         ->assertSee('https://www.instagram.com/i1zln/')
         ->assertSee('https://github.com/I4zln')
         ->assertSee('https://www.linkedin.com/in/abdulaziz-al-matrafi-bbb238358/')

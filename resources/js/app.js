@@ -649,3 +649,77 @@ document.addEventListener('submit', (event) => {
     dialog.returnValue = '';
     dialog.showModal();
 }, true);
+
+// «من نحن» page: ink reveal once per visit, timeline drawn by scroll, skill notes, journey items open on hover.
+function initAboutPage() {
+    const page = document.querySelector('[data-about-page]');
+    if (!page || page.dataset.ready) return;
+    page.dataset.ready = 'true';
+
+    const output = page.querySelector('[data-skill-output]');
+    const skills = [...page.querySelectorAll('[data-skill-note]')];
+    const showNote = (button) => {
+        output.textContent = button ? document.getElementById(button.dataset.skillNote).textContent : output.dataset.default;
+        output.classList.toggle('is-active', Boolean(button));
+    };
+    const pressedSkill = () => skills.find((skill) => skill.getAttribute('aria-pressed') === 'true');
+    skills.forEach((skill) => {
+        skill.addEventListener('click', () => {
+            const pressed = skill.getAttribute('aria-pressed') !== 'true';
+            skills.forEach((other) => other.setAttribute('aria-pressed', String(other === skill && pressed)));
+            showNote(pressedSkill());
+        });
+        skill.addEventListener('mouseenter', () => showNote(skill));
+        skill.addEventListener('focus', () => showNote(skill));
+        skill.addEventListener('mouseleave', () => showNote(pressedSkill()));
+        skill.addEventListener('blur', () => showNote(pressedSkill()));
+    });
+
+    // With a mouse, hovering an item opens it; clicking while hover-opened keeps it open.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        page.querySelectorAll('.us-journey details').forEach((details) => {
+            details.addEventListener('mouseenter', () => { if (!details.open) { details.open = true; details.dataset.hoverOpen = 'true'; } });
+            details.addEventListener('mouseleave', () => { if (details.dataset.hoverOpen) { details.open = false; delete details.dataset.hoverOpen; } });
+            details.querySelector('summary').addEventListener('click', (event) => {
+                if (!details.dataset.hoverOpen) return;
+                event.preventDefault();
+                delete details.dataset.hoverOpen;
+            });
+        });
+    }
+
+    let animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window;
+    try {
+        if (sessionStorage.getItem('midad-about-played')) animate = false;
+        else if (animate) sessionStorage.setItem('midad-about-played', '1');
+    } catch (error) { animate = false; }
+    if (!animate) return;
+
+    page.classList.add('is-revealing');
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-seen');
+        observer.unobserve(entry.target);
+    }), { rootMargin: '0px 0px -12% 0px' });
+    page.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element));
+
+    const journey = page.querySelector('[data-journey]');
+    const items = [...journey.querySelectorAll('.us-journey-item')];
+    let frame = 0;
+    let drawn = 0; // the line only grows, so scrolling back up never erases it
+    const draw = () => {
+        frame = 0;
+        if (!journey.isConnected) { window.removeEventListener('scroll', onScroll); return; }
+        const box = journey.getBoundingClientRect();
+        const reach = window.innerHeight * 0.8 - box.top;
+        drawn = Math.max(drawn, Math.min(1, reach / box.height));
+        journey.style.setProperty('--draw', drawn.toFixed(3));
+        items.forEach((item) => { if (item.offsetTop + 18 <= drawn * box.height) item.classList.add('is-reached'); });
+        if (drawn === 1) window.removeEventListener('scroll', onScroll);
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(draw); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    draw();
+}
+initAboutPage();
+document.addEventListener('midad:page-loaded', initAboutPage);

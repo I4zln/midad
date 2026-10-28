@@ -127,3 +127,12 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - `SecureResponses` middleware (HTTPS 301 + headers), `FORCE_HTTPS` (false in local .env), `URL::forceScheme`, `.env.production.example`, `DEPLOY.md`, `tests/Feature/DeploymentTest.php` (5 tests). 54/54.
 - Local production-mode run (config/routes/events/views cached to `storage/framework/prod-cache` so tests never read them): 301 http→https, 5 headers + HSTS, secure/httponly/lax cookies, 404 without debug, https links, CSRF 419, TTFB 21–31ms.
 - Cloudflare quick tunnel (signed cloudflared 2026.10.3) → public https URL serving the real database; browser login check over https OK.
+
+## TASK 4 — «من نحن» (About Us) redesign
+
+- `pages/about.blade.php` rebuilt as the single «من نحن» page: hero (مِداد, meaning, slogan), what MIDAD is, 4 real features, the maker (bio, skills, journey, side project, social links), closing «＋ أضف اقتباسًا» (login-aware: create form, or login with reason=add and next=/quotes/create).
+- `/about-me` (route name `creator`) is now a 301 redirect to `/about#maker`; «عنّي» removed from footer and the nav partial; `pages/creator.blade.php` and `PageController::creator` removed (content merged).
+- New components: `ink-seal` (copper stamp «ع»), `ink-divider`, `social-icon`.
+- Motion only on the first visit per session and never with reduced motion: ink-bleed hero and seal, dividers draw, sections settle, timeline draws with scroll. Skills show what was built with them (hover/focus/tap); journey items open on hover (mouse) or tap/Enter (native details).
+- Tests: `AboutPageTest` (redirect, nav/footer, section order, link safety, login-aware button). Browser checks at 1440 and 390 (layout, links, interactions, keyboard, reduced motion, scroll drawing, dark theme).
+- Found, not fixed (other page): `profile/show.blade.php:39` passes a pre-escaped URL to x-button, so the follow login link loses `reason`.

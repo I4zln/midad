@@ -22,11 +22,6 @@ class PageController extends Controller
         return view('pages.about');
     }
 
-    public function creator(): View
-    {
-        return view('pages.creator');
-    }
-
     public function muallaqat(): View
     {
         return view('pages.muallaqat', ['muallaqat' => config('muallaqat')]);
