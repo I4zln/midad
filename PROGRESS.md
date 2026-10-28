@@ -145,3 +145,11 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Theme switch: light / dark / follow system (default), saved in localStorage, resolved by an inline script before first paint, live system changes, short colour fade (none with reduced motion), Arabic menu in the navbar, browser bar colour follows.
 - Not tokenized on purpose: emails (inline hex, email clients ignore CSS variables; copper/stone updated to the AA values) and the quote-image canvas (exports a fixed ivory PNG).
 - Tested: `ThemeTest` + full suite; contrast script for every token pair; browser audit of 17 pages × 2 themes × 390/1440 (text and placeholder contrast, bright blocks in dark, pure white/black, theme attribute) — 68/68 clean; switch behaviour checks 26/26.
+
+## TASK 6 — Fixes + welcome email
+
+- Password field: the input is `dir=ltr` but «إظهار» sits on its left, while the reserved space was on the right, so typed dots ran under the button. Space is now reserved on the left; Edge's built-in eye is hidden so «إظهار» is the only toggle.
+- Poets section (dark): sketches get a warm dimmed-paper tone instead of flat grey; the background star behind the heading is fainter.
+- Welcome email: `Registered` is fired on sign-up; `App\Listeners\SendWelcomeEmail` sends `App\Mail\WelcomeMail` (views `mail/welcome` + `mail/welcome-text`) after the response, inside try/catch; failures are logged with user id + exception class only. Laravel's automatic verification listener on `Registered` is replaced (it would have emailed every member a verification link and failed registration on SMTP errors); verification stays opt-in via AuthController.
+- `php artisan midad:welcome-test {to*} --name=` sends the welcome email to addresses given at runtime.
+- Tested: `WelcomeEmailTest` (single listener, one email per registration, failure never blocks and logs no addresses, escaped name/verse/buttons/no password, command), full suite; real browser registration on a demo database with the log mailer → exactly one email; forgot-password on the same server → one reset email.

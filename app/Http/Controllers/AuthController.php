@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Mail;
@@ -92,6 +93,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::query()->create(collect($validated)->except('password_confirmation')->all());
+        event(new Registered($user));
         Auth::login($user);
         $request->session()->regenerate();
 

@@ -616,7 +616,9 @@ dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(4px); }
 .about-midad .about-note p { max-width: 620px; font-family: var(--font-arabic); line-height: 1.9; }
 
 .account-form .password-field { position: relative; display: block; width: 100%; }
-.account-form .password-field input { padding-inline-end: 76px !important; border-radius: 8px; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
+/* The input is dir=ltr while the show/hide button sits at the RTL end (left): keep typed text clear of it. */
+.password-field input::-ms-reveal, .password-field input::-ms-clear { display: none; } /* Edge adds its own eye; «إظهار» is the one control. */
+.account-form .password-field input { padding-left: 76px !important; padding-right: 12px !important; border-radius: 8px; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
 .account-form .password-field:focus-within input, .account-form input:not([type=checkbox]):focus { border-color: var(--copper); box-shadow: 0 0 0 3px color-mix(in srgb, var(--copper) 13%, transparent); }
 .account-form .password-field input:hover, .account-form input:not([type=checkbox]):hover { border-color: var(--copper-soft); }
 .password-visibility { position: absolute; inset-inline-end: 7px; top: 50%; min-width: 58px; padding: 6px 8px; transform: translateY(-50%); border: 0; border-radius: 6px; background: transparent; color: var(--copper); cursor: pointer; font-size: 10px; }
@@ -1523,4 +1525,9 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 }
 
 /* The poet sketches are drawn on white paper; dim them a little more in dark mode. */
-:root[data-theme='dark'] .poet-gallery-card img, :root[data-theme='dark'] .muallaqa-image img { --image-brightness: .72; }
+:root[data-theme='dark'] .muallaqa-image img { --image-brightness: .72; }
+/* Dark: the white-paper sketches read as warm, dimmed paper instead of flat grey; the background star stays faint behind the heading. */
+:root[data-theme='dark'] .poet-gallery-card img { filter: sepia(.42) saturate(.62) contrast(1.06) brightness(.66); }
+:root[data-theme='dark'] .poet-gallery-card:hover img { filter: sepia(.32) saturate(.7) contrast(1.06) brightness(.74); }
+:root[data-theme='dark'] .poet-gallery-card.is-revealed img { filter: sepia(.45) saturate(.5) brightness(.42); }
+:root[data-theme='dark'] .poet-gallery::before, :root[data-theme='dark'] .poet-gallery::after { color: color-mix(in srgb, var(--copper) 2.5%, transparent); }
