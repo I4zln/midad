@@ -1644,6 +1644,7 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .discover-stream { position: relative; outline: none; }
 .discover-stream:focus-visible { outline: 2px solid color-mix(in srgb, var(--copper) 55%, transparent); outline-offset: 3px; }
 .discover-item:focus { outline: none; }
+.discover-page[data-restored] .discover-item { animation: none; } /* back from a quote: the list reappears as it was left */
 .discover-item:focus-visible { outline: 2px solid color-mix(in srgb, var(--copper) 60%, transparent); outline-offset: -5px; }
 .card-author { margin: 0 0 0.625rem; color: var(--copper); font-family: var(--font-arabic); font-size: 0.9375rem; text-align: start; }
 

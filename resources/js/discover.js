@@ -11,8 +11,10 @@ const storage = {
     set(store, key, value) { try { window[store].setItem(key, value); return true; } catch (error) { return false; } },
 };
 
-export function initDiscover({ showToast, markClampedQuotes }, { restored = false } = {}) {
+export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
     const page = document.querySelector('[data-discover]');
+    // «اكتشف» places itself (a reload starts at the top; Back restores below); other pages keep the browser's behaviour.
+    if ('scrollRestoration' in history) history.scrollRestoration = page ? 'manual' : 'auto';
     if (!page || page.dataset.ready) return;
     page.dataset.ready = 'true';
 
@@ -47,26 +49,39 @@ export function initDiscover({ showToast, markClampedQuotes }, { restored = fals
     const currentItem = () => {
         const list = items();
         if (isFocus()) return list.find((item) => item.offsetTop + item.offsetHeight / 2 > stream.scrollTop) || list[0];
-        const band = page.querySelector('.discover-bar').getBoundingClientRect().bottom + 8;
-        return list.find((item) => item.getBoundingClientRect().bottom > band + 40) || list[list.length - 1];
+        // Timeline: the last card whose top has reached the line just under the sticky bar.
+        const line = timelineLine() + 24;
+        return list.filter((item) => item.getBoundingClientRect().top <= line).pop() || list[0];
     };
+    const timelineLine = () => page.querySelector('.discover-bar').getBoundingClientRect().height + 16;
 
     const reveal = (element, smooth = false) => {
         if (!element) return;
         const behavior = smooth && !reducedMotion() ? 'smooth' : 'instant';
         if (isFocus()) stream.scrollTo({ top: element.offsetTop, behavior });
-        else element.scrollIntoView({ block: 'start', behavior });
+        else window.scrollTo({ top: Math.max(0, element.getBoundingClientRect().top + window.scrollY - timelineLine()), behavior });
     };
 
     // Saved per history entry so Back returns to the same quote, with the batches already loaded.
     const stateKey = () => history.state?.discoverKey;
+    // Layout position in the document (ignores the cards' entry animation, which moves them while it plays).
+    const documentTop = (item) => stream.getBoundingClientRect().top + window.scrollY + item.offsetTop;
     const saveState = () => {
         if (!page.isConnected || !stateKey()) return;
+        const anchor = currentItem();
         storage.set('sessionStorage', STATE_PREFIX + stateKey(), JSON.stringify({
             at: Date.now(), url: window.location.href, csrf: csrf(), mode: page.dataset.mode, next,
             status: sentinel.dataset.status === 'loading' ? 'idle' : sentinel.dataset.status,
             html: items().map((item) => item.outerHTML).join(''), streamTop: stream.scrollTop, windowY: window.scrollY,
+            anchor: anchor?.dataset.quoteId, anchorTop: anchor ? documentTop(anchor) - window.scrollY : 0,
         }));
+    };
+    // Put the card that was on screen back at the same height (robust to small layout shifts while the page settles).
+    const placeSaved = (saved) => {
+        if (isFocus()) { stream.scrollTop = saved.streamTop; return; }
+        const anchor = saved.anchor && stream.querySelector(`.discover-item[data-quote-id="${CSS.escape(saved.anchor)}"]`);
+        const top = anchor ? documentTop(anchor) - saved.anchorTop : saved.windowY;
+        window.scrollTo({ top, behavior: 'instant' });
     };
     let saveTimer;
     const saveSoon = () => { window.clearTimeout(saveTimer); saveTimer = window.setTimeout(saveState, 250); };
@@ -168,6 +183,7 @@ export function initDiscover({ showToast, markClampedQuotes }, { restored = fals
         if (saved === 'focus' || saved === 'timeline') page.dataset.mode = saved;
     }
     if (state) {
+        page.dataset.restored = 'true';
         items().forEach((item) => item.remove());
         shown.clear();
         append(state.html);
@@ -177,8 +193,9 @@ export function initDiscover({ showToast, markClampedQuotes }, { restored = fals
     }
     applyMode(page.dataset.mode);
     if (state) {
-        window.scrollTo({ top: state.windowY, behavior: 'instant' });
-        stream.scrollTop = state.streamTop;
+        placeSaved(state);
+        requestAnimationFrame(() => placeSaved(state));
+        document.fonts?.ready.then(() => { if (page.isConnected) placeSaved(state); });
     }
 
     page.addEventListener('click', (event) => {

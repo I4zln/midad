@@ -279,6 +279,18 @@ test('a feed batch runs the same few queries however many quotes it holds (no N+
         ->and($bigRanked)->toBeLessThanOrEqual(6)->and($bigLatest)->toBeLessThanOrEqual(4);
 });
 
+test('scrolling the feed does not use up the sign-in allowance', function () {
+    discoverQuotes(3);
+    $user = User::factory()->create(['email' => 'busy@example.test', 'password' => 'password-123']);
+
+    for ($i = 0; $i < 15; $i++) {
+        $this->getJson(route('discover.feed', ['tab' => 'latest']))->assertOk();
+    }
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password-123'])->assertRedirect();
+    $this->assertAuthenticatedAs($user);
+});
+
 test('the existing quotes page still lists 12 per page with its search and filters', function () {
     discoverQuotes(30);
 

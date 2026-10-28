@@ -13,6 +13,7 @@ erDiagram
         string cover_path
         json skills
         json social_links
+        string discover_mode "focus | timeline, nullable"
         string username UK
         boolean is_admin
         timestamp created_at
@@ -20,9 +21,9 @@ erDiagram
     }
     QUOTES {
         bigint id PK
-        bigint user_id FK "nullable, nullOnDelete"
+        bigint user_id FK "nullable, nullOnDelete, idx(user_id, created_at)"
         text text "3-155 chars on create/edit"
-        string author
+        string author "idx(author)"
         string source
         string category "idx(category, created_at)"
         timestamp created_at "idx(created_at, id)"
@@ -31,14 +32,14 @@ erDiagram
     QUOTE_LIKES {
         bigint id PK
         bigint quote_id FK "UK(quote_id, user_id), cascadeOnDelete"
-        bigint user_id FK
+        bigint user_id FK "idx(user_id)"
         timestamp created_at
         timestamp updated_at
     }
     QUOTE_FAVORITES {
         bigint id PK
         bigint quote_id FK "UK(quote_id, user_id), cascadeOnDelete"
-        bigint user_id FK
+        bigint user_id FK "idx(user_id)"
         timestamp created_at
         timestamp updated_at
     }
@@ -53,7 +54,7 @@ erDiagram
     USER_FOLLOWS {
         bigint id PK
         bigint follower_id FK "UK(follower_id, followed_id)"
-        bigint followed_id FK
+        bigint followed_id FK "idx(followed_id)"
         timestamp created_at
         timestamp updated_at
     }

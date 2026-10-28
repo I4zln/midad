@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
 Route::get('/discover', [DiscoverController::class, 'index'])->name('discover');
-Route::get('/discover/feed', [DiscoverController::class, 'feed'])->middleware('throttle:60,1')->name('discover.feed');
+Route::get('/discover/feed', [DiscoverController::class, 'feed'])->middleware('throttle:discover-feed')->name('discover.feed');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
 // The former «عنّي» page is now the maker section of «من نحن»; keep old links working.
@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/quotes/{quote}/favorite', [CommunityController::class, 'favorite'])->name('quotes.favorite');
     Route::post('/quotes/{quote}/comments', [CommunityController::class, 'comment'])->name('quotes.comments.store');
     Route::post('/users/{user}/follow', [CommunityController::class, 'follow'])->name('users.follow');
-    Route::post('/discover/mode', [DiscoverController::class, 'mode'])->middleware('throttle:30,1')->name('discover.mode');
+    Route::post('/discover/mode', [DiscoverController::class, 'mode'])->middleware('throttle:discover-mode')->name('discover.mode');
 });
 
 Route::middleware('auth')->group(function () {
