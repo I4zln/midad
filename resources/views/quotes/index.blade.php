@@ -4,7 +4,7 @@
 <main class="inner-page quotes-index-page">
     <header class="quotes-index-heading">
         <div><div class="eyebrow"><span class="eyebrow-line"></span> مكتبة مِداد</div><h1>كل <em>الاقتباسات.</em></h1><p>تصفّح الكلمات التي شاركها القرّاء، مرتبة من الأحدث إلى الأقدم.</p><span class="quotes-total">{{ number_format($totalQuotes) }} اقتباسًا في المكتبة</span></div>
-        <x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا</x-button>
+        <x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا <x-fountain-pen class="pen-icon" /></x-button>
     </header>
     <form class="quotes-filters" method="GET" action="{{ route('quotes.index') }}">
         @if ($activeCategory)<input type="hidden" name="category" value="{{ $activeCategory }}">@endif
@@ -20,7 +20,7 @@
         @forelse ($quotes as $index => $quote)
             <x-quote-card :quote="$quote" :index="$index" />
         @empty
-            <div class="empty-state quotes-empty"><span class="empty-mark">“</span><h2>{{ $search || $activeCategory ? 'لا توجد نتائج مطابقة.' : 'المكتبة تبدأ بكلمة.' }}</h2><p>{{ $search || $activeCategory ? 'امسح البحث أو غيّر التصنيف وحاول مجددًا.' : 'لا توجد اقتباسات منشورة بعد. كن أول من يشارك كلمة.' }}</p><x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا</x-button></div>
+            <div class="empty-state quotes-empty"><span class="empty-mark">“</span><h2>{{ $search || $activeCategory ? 'لا توجد نتائج مطابقة.' : 'المكتبة تبدأ بكلمة.' }}</h2><p>{{ $search || $activeCategory ? 'امسح البحث أو غيّر التصنيف وحاول مجددًا.' : 'لا توجد اقتباسات منشورة بعد. كن أول من يشارك كلمة.' }}</p><x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا <x-fountain-pen class="pen-icon" /></x-button></div>
         @endforelse
     </div>
     @if ($quotes->hasPages())<nav class="pagination-links" aria-label="ترقيم صفحات الاقتباسات">{{ $quotes->links() }}</nav>@endif

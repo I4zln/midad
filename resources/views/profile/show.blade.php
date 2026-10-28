@@ -31,7 +31,7 @@
             </div>
             <div class="member-actions">
                 @if ($isOwner)
-                    <x-button href="{{ route('quotes.create') }}">＋ أضف اقتباسًا</x-button>
+                    <x-button href="{{ route('quotes.create') }}">＋ أضف اقتباسًا <x-fountain-pen class="pen-icon" /></x-button>
                     <x-button href="{{ route('profile.edit') }}" variant="outline">تعديل الملف</x-button>
                 @elseif (auth()->check())
                     <form method="POST" action="{{ route('users.follow', $profile) }}">@csrf<x-button :variant="$isFollowing ? 'outline' : 'dark'">{{ $isFollowing ? 'إلغاء المتابعة' : 'متابعة' }}</x-button></form>
@@ -91,7 +91,7 @@
                     <x-button href="{{ route('quotes.index') }}" variant="outline">تصفّح الاقتباسات</x-button>
                 @elseif ($isOwner)
                     <h2>لم تنشر اقتباسًا بعد.</h2><p>اكتب كلمة تركت فيك أثرًا؛ تحتاج دقيقة واحدة.</p>
-                    <x-button href="{{ route('quotes.create') }}">＋ أضف اقتباسًا</x-button>
+                    <x-button href="{{ route('quotes.create') }}">＋ أضف اقتباسًا <x-fountain-pen class="pen-icon" /></x-button>
                 @else
                     <h2>لا توجد اقتباسات منشورة في هذا الملف بعد.</h2><p>عُد لاحقًا، أو تصفّح ما شاركه القرّاء الآخرون.</p>
                     <x-button href="{{ route('quotes.index') }}" variant="outline">تصفّح الاقتباسات</x-button>

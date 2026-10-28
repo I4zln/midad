@@ -106,3 +106,10 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Browser e2e regression (demo DB): create (inline error, counter, first on home, toast), edit, like/unlike via AJAX, save + المحفوظات page, search + clear, delete via dialog (cancel/confirm), 404 after delete, other user's edit → 403 — 18/18 PASS. PHP tests 49/49.
 - Final numbers (warm, cache disabled): home TTFB 76–99ms / load 311–326ms (was 454/819); /quotes 56–67ms / 164–181ms (was 357/446). In-site nav 59–101ms, hover-then-click 13–29ms.
 - Not refreshed: `deliverables/` (SRS PDF, zip) still reflect Task 1.
+
+## T2 extra — Fountain pen + Gmail-ready email · DONE
+- `components/fountain-pen.blade.php`: inline SVG vintage pen (ink barrel, copper nib/rings/clip), colours via CSS vars.
+- Ink welcome: pen rides the copper stroke (same 1.75s delay/easing), lifts and fades by ~3s; only while `.is-animating` (once per session, never with reduced motion); absolutely positioned, transform/opacity only, pointer-events none.
+- Measured (Edge headless, guest light + signed-in dark, 390/1440): pen tip within 1% of the drawn stroke at every sample; fades to 0 by 3.4s; CLS ≤ 0.0038; no overflow; no pen on 2nd visit; reduced motion: no pen, title fully visible.
+- Static pen icon in the «＋ أضف اقتباسًا» buttons (quotes page, profile, home hero + empty state).
+- Email: `.env` + `.env.example` set for Gmail SMTP (smtp.gmail.com:587) but `MAIL_MAILER=log` until MAIL_USERNAME/MAIL_PASSWORD are filled; sender falls back to the Gmail username (`config/mail.php`); `php artisan midad:mail-test <email>` checks the setup. `.env` backup at `.env.backup-before-gmail` (git-ignored). No real email sent.

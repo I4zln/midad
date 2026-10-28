@@ -1045,7 +1045,8 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .ink-line { display: block; width: fit-content; max-width: 100%; }
 .ink-name { color: var(--copper); }
 .ink-line-second { font-size: .82em; }
-.ink-stroke { display: block; width: min(78%, 420px); height: 16px; margin: -4px 0 10px; overflow: visible; }
+.ink-stroke-wrap { position: relative; width: min(78%, 420px); height: 16px; margin: -4px 0 10px; container-type: inline-size; }
+.ink-stroke { display: block; width: 100%; height: 100%; overflow: visible; }
 .ink-stroke path { fill: none; stroke: var(--copper); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; opacity: .85; }
 .ink-welcome-line { width: fit-content; max-width: 470px; margin: 0; color: var(--ink-soft); font-family: var(--font-arabic); font-size: clamp(17px, 1.7vw, 21px); line-height: 2; text-align: start; }
 .editorial-hero-copy > .ink-welcome + p { margin-top: 14px; font-size: 15px; }
@@ -1062,7 +1063,7 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 }
 .ink-welcome.is-animating .ink-line-second { animation-delay: .55s, .55s; }
 .ink-welcome.is-animating .ink-welcome-line { animation-duration: 1.5s, 1.9s; animation-delay: 1.35s, 1.35s; }
-.ink-welcome.is-animating .ink-stroke path { animation: ink-stroke 1.5s cubic-bezier(.45, .05, .3, 1) 1.1s both; }
+.ink-welcome.is-animating .ink-stroke path { animation: ink-stroke 1.75s cubic-bezier(.42, 0, .32, 1) .2s both; }
 @keyframes ink-write { from { -webkit-mask-position: 0 0; mask-position: 0 0; } to { -webkit-mask-position: 100% 0; mask-position: 100% 0; } }
 @keyframes ink-settle { from { opacity: .15; filter: blur(7px); transform: translateY(5px); } 55% { opacity: .9; filter: blur(1.2px); } to { opacity: 1; filter: blur(0); transform: none; } }
 @keyframes ink-stroke { from { stroke-dashoffset: 1; opacity: 0; } 15% { opacity: .85; } to { stroke-dashoffset: 0; opacity: .85; } }
@@ -1194,3 +1195,36 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .site-shell:has(.field-error) > .global-alert { display: none; }
 .search-box:focus-within { border-color: var(--copper); box-shadow: 0 0 0 2px color-mix(in srgb, var(--copper) 25%, transparent); }
 .search-box input:focus-visible { outline: none; }
+
+/* Fountain pen (components/fountain-pen.blade.php) */
+.fountain-pen { --pen-body: #24231f; --pen-edge: transparent; --pen-trim: #b8875a; --pen-nib: #c99c66; --pen-line: #24231f; --pen-shine: #ffffff38; overflow: visible; }
+.fountain-pen .pen-body { fill: var(--pen-body); stroke: var(--pen-edge); stroke-width: 1.2; }
+.fountain-pen .pen-trim { fill: var(--pen-trim); }
+.fountain-pen .pen-nib { fill: var(--pen-nib); }
+.fountain-pen .pen-nib-slit { fill: none; stroke: var(--pen-line); stroke-width: 1.1; stroke-linecap: round; }
+.fountain-pen .pen-nib-hole { fill: var(--pen-line); }
+.fountain-pen .pen-shine { fill: none; stroke: var(--pen-shine); stroke-width: 2; stroke-linecap: round; }
+:root[data-theme='dark'] .fountain-pen { --pen-body: #2b2a26; --pen-edge: #f5f2eb59; --pen-line: #1d1e1c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .fountain-pen { --pen-body: #2b2a26; --pen-edge: #f5f2eb59; --pen-line: #1d1e1c; } }
+
+/* The welcome pen rides the copper stroke while it is drawn (same delay, duration and easing), lifts, and fades. */
+.ink-pen-track { --pen-w: 72px; position: absolute; top: 8px; left: 100%; display: none; width: 0; height: 0; pointer-events: none; z-index: 2; translate: -1cqw 0; }
+.ink-pen { position: absolute; left: calc(var(--pen-w) * -8 / 132); top: calc(var(--pen-w) * -112 / 132); width: var(--pen-w); height: calc(var(--pen-w) * 120 / 132); opacity: 0; transform-origin: 6.06% 93.33%; filter: drop-shadow(0 2px 2px #24231f26); }
+.ink-welcome.is-animating .ink-pen-track { display: block; animation: ink-pen-glide 1.75s cubic-bezier(.42, 0, .32, 1) .2s both; }
+.ink-welcome.is-animating .ink-pen { animation: ink-pen-life 3s ease-in-out both; }
+/* Two stops only, so one easing curve spans the run exactly like the stroke it draws. */
+@keyframes ink-pen-glide { from { translate: -1cqw 0; } to { translate: -99cqw 1px; } }
+@keyframes ink-pen-life {
+    0% { opacity: 0; translate: 0 -6px; rotate: 0deg; }
+    6% { opacity: 1; translate: 0 0; rotate: 0deg; }
+    65% { opacity: 1; translate: 0 0; rotate: 0deg; }
+    78% { opacity: 1; translate: 3px -7px; rotate: 7deg; }
+    100% { opacity: 0; translate: 5px -12px; rotate: 9deg; }
+}
+@media (max-width: 760px) { .ink-pen-track { --pen-w: 50px; top: 7px; } }
+@media (prefers-reduced-motion: reduce) { .ink-pen-track { display: none !important; } }
+
+/* Small static pen beside «أضف اقتباسًا»: follows the button's text colour */
+.pen-icon { --pen-body: currentColor; --pen-line: currentColor; --pen-shine: transparent; width: 17px; height: 15px; flex: 0 0 auto; margin-inline-start: 2px; vertical-align: -2px; }
+.button-dark .pen-icon { --pen-line: #24231f; }
+:root[data-theme='dark'] .pen-icon { --pen-edge: transparent; }

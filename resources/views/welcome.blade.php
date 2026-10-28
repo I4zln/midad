@@ -12,7 +12,7 @@
             <div class="eyebrow"><span class="eyebrow-line"></span> مجلة أدبية عربية · MIDAD</div>
             <x-ink-welcome />
             <p>مِداد مساحةٌ للكلمة: نقرأ الشعر على مهل، ونحفظ من الكلمات ما يضيء الذاكرة.</p>
-            <div class="editorial-hero-actions"><a class="button button-dark" href="#quotes">اكتشف المكتبة <span aria-hidden="true">←</span></a>@auth<button class="button button-outline" type="button" data-open-composer>أضف اقتباسًا <span aria-hidden="true">＋</span></button>@else<a class="button button-outline" href="{{ route('register') }}">أنشئ حسابًا وانشر اقتباسًا</a>@endauth<a class="button button-outline" href="{{ route('poets.index') }}">استكشف الشعراء</a></div>
+            <div class="editorial-hero-actions"><a class="button button-dark" href="#quotes">اكتشف المكتبة <span aria-hidden="true">←</span></a>@auth<button class="button button-outline" type="button" data-open-composer>أضف اقتباسًا <span aria-hidden="true">＋</span> <x-fountain-pen class="pen-icon" /></button>@else<a class="button button-outline" href="{{ route('register') }}">أنشئ حسابًا وانشر اقتباسًا</a>@endauth<a class="button button-outline" href="{{ route('poets.index') }}">استكشف الشعراء</a></div>
         </div>
         <aside class="editorial-feature" aria-label="عن مكتبة مِداد">
             <span class="editorial-feature-mark" aria-hidden="true">❞</span>
@@ -77,7 +77,7 @@
             @forelse ($quotes as $index => $quote)
                 <x-quote-card :quote="$quote" :index="$index" />
             @empty
-                <div class="empty-state quotes-empty"><span class="empty-mark">“</span><h3>المكتبة تبدأ بكلمة.</h3><p>لا توجد اقتباسات منشورة بعد. شارك أول كلمة في مِداد.</p><x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا</x-button></div>
+                <div class="empty-state quotes-empty"><span class="empty-mark">“</span><h3>المكتبة تبدأ بكلمة.</h3><p>لا توجد اقتباسات منشورة بعد. شارك أول كلمة في مِداد.</p><x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا <x-fountain-pen class="pen-icon" /></x-button></div>
             @endforelse
         </div>
         <div class="latest-quotes-footer"><span>تعرض أحدث {{ $quotes->count() }} من الاقتباسات</span><a class="text-button" href="{{ route('quotes.index') }}">إلى صفحة الاقتباسات الكاملة ↗</a></div>
