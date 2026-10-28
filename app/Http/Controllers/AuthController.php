@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SpecialProfileMessage;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,7 +66,9 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         // The special card needs a verified address, but the rest of the site never waits for it: go to the profile, which explains.
-        if ($this->isSpecialProfileEmail($user->email) && ! $user->hasVerifiedEmail()) {
+        // Until the private message has been shown, the special account goes straight to its profile, where it appears.
+        if ($this->isSpecialProfileEmail($user->email)
+            && (! $user->hasVerifiedEmail() || ! SpecialProfileMessage::query()->where('user_id', $user->id)->whereNotNull('shown_at')->exists())) {
             return redirect()->route('profile.show', $user)->with('status', 'مرحبًا بعودتك يا '.$user->name.'. لديك رسالة خاصة في ملفك.');
         }
 

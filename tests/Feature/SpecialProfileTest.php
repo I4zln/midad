@@ -65,3 +65,14 @@ test('resending the link reports in Arabic, not internal codes', function () {
         ->assertRedirect(route('profile.show', $user))
         ->assertSessionHas('status', AuthController::LINK_FAILED);
 });
+
+test('a verified special account goes to its profile until the message has been shown, then signs in normally', function () {
+    $user = User::factory()->create(['email' => 'special-reader@example.test', 'password' => 'secret-pass-1']);
+    $credentials = ['email' => 'special-reader@example.test', 'password' => 'secret-pass-1'];
+
+    $this->post(route('login.store'), $credentials)->assertRedirect(route('profile.show', $user));
+    $this->get(route('profile.show', $user))->assertSee('رسالة خاصة لك');
+
+    auth()->logout();
+    $this->post(route('login.store'), $credentials)->assertRedirect(route('home'));
+});
