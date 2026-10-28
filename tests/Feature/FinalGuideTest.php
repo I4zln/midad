@@ -143,7 +143,8 @@ test('every quote listing renders the single shared quote-card component', funct
 test('every page view extends the shared layout', function () {
     $views = collect(\Illuminate\Support\Facades\File::allFiles(resource_path('views')))
         ->filter(fn ($file) => str_ends_with($file->getFilename(), '.blade.php'))
-        ->reject(fn ($file) => preg_match('#^(components|mail|pagination|layouts|errors)(/|$)#', str_replace('\\', '/', $file->getRelativePath())));
+        ->reject(fn ($file) => preg_match('#^(components|mail|pagination|layouts|errors)(/|$)#', str_replace('\\', '/', $file->getRelativePath())))
+        ->reject(fn ($file) => str_starts_with($file->getFilename(), '_')); // partials such as discover/_items are included by pages
 
     expect($views)->not->toBeEmpty();
     foreach ($views as $file) {

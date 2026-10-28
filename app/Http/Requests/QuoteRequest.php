@@ -8,6 +8,8 @@ use Illuminate\Foundation\Http\FormRequest;
 class QuoteRequest extends FormRequest
 {
     public const CATEGORIES = ['تأمل', 'حياة', 'حب', 'أمل'];
+    // How each category is written on screen (with its shadda).
+    public const CATEGORY_LABELS = ['تأمل' => 'تأمّل', 'حياة' => 'حياة', 'حب' => 'حب', 'أمل' => 'أمل'];
 
     public function authorize(): bool
     {

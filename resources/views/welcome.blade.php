@@ -104,7 +104,7 @@
     <section class="library-section" id="quotes" aria-labelledby="latest-quotes-title">
         <header class="section-heading latest-quotes-heading">
             <div><div class="eyebrow"><span class="eyebrow-line"></span> المكتبة</div><h2 id="latest-quotes-title">أحدث <em>الاقتباسات.</em></h2><p>خمس كلمات وصلت حديثًا إلى مِداد.</p></div>
-            <x-button href="{{ route('quotes.index') }}" variant="outline">عرض كل الاقتباسات <span aria-hidden="true">←</span></x-button>
+            <div class="latest-quotes-actions"><x-button href="{{ route('discover') }}" variant="outline">اكتشف واحدًا تلو الآخر</x-button><x-button href="{{ route('quotes.index') }}" variant="outline">عرض كل الاقتباسات <span aria-hidden="true">←</span></x-button></div>
         </header>
         <div class="quote-grid" id="quote-grid">
             @forelse ($quotes as $index => $quote)

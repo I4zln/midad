@@ -1,3 +1,5 @@
+import { initDiscover } from './discover';
+
 const root = document.documentElement;
 const toast = document.querySelector('#toast');
 const audioToggle = document.querySelector('#ethraa-audio-toggle');
@@ -281,47 +283,90 @@ document.addEventListener('keydown', (event) => {
 
 
 
+// Wraps each written line (poems keep their line breaks) to the card width.
 function wrapCanvasText(context, text, maxWidth) {
     const lines = [];
-    let line = '';
 
-    for (const word of text.split(/\s+/)) {
-        const candidate = line ? `${line} ${word}` : word;
-        if (line && context.measureText(candidate).width > maxWidth) {
-            lines.push(line);
-            line = word;
-        } else {
-            line = candidate;
+    for (const paragraph of text.split(/\r?\n/)) {
+        let line = '';
+        for (const word of paragraph.split(/\s+/).filter(Boolean)) {
+            const candidate = line ? `${line} ${word}` : word;
+            if (line && context.measureText(candidate).width > maxWidth) {
+                lines.push(line);
+                line = word;
+            } else {
+                line = candidate;
+            }
         }
+        if (line) lines.push(line);
     }
-    if (line) lines.push(line);
     return lines;
 }
 
 document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-export-quote]');
     if (button) exportQuote(button);
+    const imageShare = event.target.closest('[data-image-share]');
+    if (imageShare) shareQuoteImage(imageShare);
 });
 
 async function exportQuote(button) {
-        await document.fonts.ready;
-        const quote = button.dataset;
+    const canvas = await drawQuoteCard(button.dataset);
+    if (!canvas) {
+        showToast('تعذّر تجهيز الصورة على هذا الجهاز.');
+        return;
+    }
+    const link = document.createElement('a');
+    link.download = 'midad-quote.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('تم تجهيز صورة الاقتباس.');
+}
+
+// «شارك كصورة» in «اكتشف»: the device's share sheet when it can share files, otherwise a download.
+async function shareQuoteImage(button) {
+    if (button.getAttribute('aria-busy') === 'true') return;
+    button.setAttribute('aria-busy', 'true');
+    try {
+        const canvas = await drawQuoteCard(button.dataset);
+        const blob = canvas && await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        if (!blob) throw new Error('no image');
+        const file = new File([blob], 'midad-quote.png', { type: 'image/png' });
+        if (navigator.canShare?.({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], title: 'اقتباس من مِداد' });
+                return;
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+            }
+        }
+        const link = document.createElement('a');
+        link.download = 'midad-quote.png';
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+        showToast('حُفظت صورة الاقتباس على جهازك.');
+    } catch (error) {
+        showToast('تعذّر تجهيز صورة الاقتباس على هذا الجهاز.');
+    } finally {
+        button.removeAttribute('aria-busy');
+    }
+}
+
+// The quote as a 1200px ivory card: only its own text, author and source, with the «مِداد» mark. Null if canvas is unavailable.
+async function drawQuoteCard(quote) {
+        await Promise.all(['500 54px "Thmanyah Serif Text"', '400 23px "Thmanyah Serif Text"', '600 27px "Thmanyah Sans"']
+            .map((font) => document.fonts?.load(font).catch(() => null)));
         const canvas = document.createElement('canvas');
         canvas.width = 1200;
         canvas.height = 1500;
         let context = canvas.getContext('2d');
-        if (!context) {
-            showToast('تعذّر تجهيز الصورة على هذا الجهاز.');
-            return;
-        }
+        if (!context) return null;
         context.font = '500 54px "Thmanyah Serif Text", serif';
-        const lines = wrapCanvasText(context, quote.text, 850);
+        const lines = wrapCanvasText(context, quote.text || '', 850);
         canvas.height = Math.max(1500, 920 + lines.length * 100);
         context = canvas.getContext('2d');
-        if (!context) {
-            showToast('تعذّر تجهيز الصورة على هذا الجهاز.');
-            return;
-        }
+        if (!context) return null;
         context.fillStyle = '#f5f2eb';
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.strokeStyle = '#d8d0c4';
@@ -340,26 +385,24 @@ async function exportQuote(button) {
         context.font = '500 54px "Thmanyah Serif Text", serif';
         lines.forEach((line, index) => context.fillText(line, 600, 520 + index * 100));
         const bylineY = 520 + lines.length * 100 + 90;
-        context.strokeStyle = '#cdbba8';
-        context.beginPath();
-        context.moveTo(360, bylineY - 45);
-        context.lineTo(840, bylineY - 45);
-        context.stroke();
+        if (quote.author || quote.source) {
+            context.strokeStyle = '#cdbba8';
+            context.beginPath();
+            context.moveTo(360, bylineY - 45);
+            context.lineTo(840, bylineY - 45);
+            context.stroke();
+        }
         context.fillStyle = '#24231f';
         context.font = '500 28px "Thmanyah Serif Text", serif';
-        context.fillText(quote.author, 600, bylineY);
+        if (quote.author) context.fillText(quote.author, 600, bylineY);
         context.fillStyle = '#817b70';
         context.font = '400 23px "Thmanyah Serif Text", serif';
-        context.fillText(quote.source, 600, bylineY + 44);
+        if (quote.source) context.fillText(quote.source, 600, quote.author ? bylineY + 44 : bylineY);
         context.direction = 'ltr';
         context.fillStyle = '#a66e48';
         context.font = '600 18px "Thmanyah Sans", sans-serif';
         context.fillText('WORDS THAT STAY', 600, canvas.height - 120);
-        const link = document.createElement('a');
-        link.download = 'midad-quote.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('تم تجهيز صورة الاقتباس.');
+        return canvas;
 }
 
 // Pages fetched on hover/touch, reused if the click follows within a few seconds.
@@ -427,7 +470,7 @@ async function loadPage(url, push = true) {
         if (status) showToast(status);
         if (nextDialog?.dataset.quoteFormErrors === 'true') nextDialog.showModal();
         markClampedQuotes();
-        document.dispatchEvent(new CustomEvent('midad:page-loaded'));
+        document.dispatchEvent(new CustomEvent('midad:page-loaded', { detail: { restored: !push } }));
     } catch (error) { window.location.href = url; } finally { setNavigating(false); }
 }
 
@@ -808,3 +851,7 @@ document.addEventListener('error', (event) => {
 const checkFailedImages = () => document.querySelectorAll('img[data-fallback-src]').forEach((img) => { if (img.complete && img.naturalWidth === 0) useImageFallback(img); });
 checkFailedImages();
 document.addEventListener('midad:page-loaded', checkFailedImages);
+
+const discoverHelpers = { showToast, markClampedQuotes };
+initDiscover(discoverHelpers);
+document.addEventListener('midad:page-loaded', (event) => initDiscover(discoverHelpers, event.detail || {}));

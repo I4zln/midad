@@ -3,7 +3,7 @@
 @section('content')
 <main class="inner-page quotes-index-page">
     <header class="quotes-index-heading">
-        <div><div class="eyebrow"><span class="eyebrow-line"></span> مكتبة مِداد</div><h1>كل <em>الاقتباسات.</em></h1><p>تصفّح الكلمات التي شاركها القرّاء، مرتبة من الأحدث إلى الأقدم.</p><span class="quotes-total">{{ number_format($totalQuotes) }} اقتباسًا في المكتبة</span></div>
+        <div><div class="eyebrow"><span class="eyebrow-line"></span> مكتبة مِداد</div><h1>كل <em>الاقتباسات.</em></h1><p>تصفّح الكلمات التي شاركها القرّاء، مرتبة من الأحدث إلى الأقدم.</p><span class="quotes-total">{{ number_format($totalQuotes) }} اقتباسًا في المكتبة</span><a class="text-button quotes-discover-link" href="{{ route('discover') }}">أو تصفّحها في «اكتشف»، اقتباسًا تلو الآخر ←</a></div>
         <x-button href="{{ auth()->check() ? route('quotes.create') : route('register') }}">＋ أضف اقتباسًا <x-fountain-pen class="pen-icon" /></x-button>
     </header>
     <form class="quotes-filters" method="GET" action="{{ route('quotes.index') }}">

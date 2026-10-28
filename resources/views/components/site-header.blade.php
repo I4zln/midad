@@ -5,6 +5,7 @@
             <nav class="main-nav" aria-label="التنقل الرئيسي">
                 <a class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">الرئيسية</a>
                 <a class="nav-link {{ request()->routeIs('quotes.*') ? 'is-active' : '' }}" href="{{ route('quotes.index') }}">الاقتباسات</a>
+                <a class="nav-link {{ request()->routeIs('discover') ? 'is-active' : '' }}" href="{{ route('discover') }}">اكتشف</a>
                 <a class="nav-link {{ request()->routeIs('poets.*') || request()->routeIs('muallaqat.*') ? 'is-active' : '' }}" href="{{ route('poets.index') }}">الشعراء</a>
                 <a class="nav-link {{ request()->routeIs('about') ? 'is-active' : '' }}" href="{{ route('about') }}">من نحن</a>
             </nav>

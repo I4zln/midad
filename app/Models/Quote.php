@@ -16,8 +16,11 @@ class Quote extends Model
 
     protected static function booted(): void
     {
-        // Any added, edited or deleted quote can change the per-author counts.
-        $forget = fn () => Cache::forget(self::AUTHOR_COUNTS_CACHE);
+        // Any added, edited or deleted quote can change the per-author counts and the «اكتشف» candidate pool.
+        $forget = function () {
+            Cache::forget(self::AUTHOR_COUNTS_CACHE);
+            Cache::forget(\App\Services\DiscoverFeed::CANDIDATES_CACHE);
+        };
         static::saved($forget);
         static::deleted($forget);
     }
