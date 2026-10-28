@@ -86,4 +86,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new EthraaResetPasswordNotification($token));
     }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new \App\Notifications\MidadVerifyEmail);
+    }
 }

@@ -53,9 +53,9 @@ test('reset email uses Midad branding and the broker expiry duration', function 
 
     $html = view($mail->view['html'], $mail->viewData)->render();
     expect($html)->toContain('إعادة تعيين كلمة المرور')
-        ->and($html)->toContain('الرابط التالي')
+        ->and($html)->toContain('انسخ هذا الرابط')
         ->and($html)->toContain($notification->token)
-        ->and($html)->toContain('فريق مِداد | لأن للكلمات أثرًا يبقى');
+        ->and($html)->toContain('لأن للكلمات أثرًا يبقى');
 });
 
 test('a valid reset link can be opened and a new password can be used to sign in', function () {

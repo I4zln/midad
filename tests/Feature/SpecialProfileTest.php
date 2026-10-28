@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\MidadVerifyEmail;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(fn () => config(['ethraa.special_profile_email' => 'special-reader@example.test']));
@@ -54,7 +54,7 @@ test('registering with the special email sends one verification link only when m
     User::query()->delete();
     config(['mail.default' => 'smtp']);
     $this->post(route('register.store'), ['name' => 'قارئ خاص', 'email' => 'special-reader@example.test', 'password' => 'secret-pass-1', 'password_confirmation' => 'secret-pass-1']);
-    Notification::assertSentTimes(VerifyEmail::class, 1);
+    Notification::assertSentTimes(MidadVerifyEmail::class, 1);
 });
 
 test('resending the link reports in Arabic, not internal codes', function () {
