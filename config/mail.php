@@ -111,7 +111,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        // Gmail only sends as the signed-in account, so default to the SMTP username.
+        'address' => env('MAIL_FROM_ADDRESS') ?: (env('MAIL_USERNAME') ?: 'no-reply@midad.local'),
         'name' => env('MAIL_FROM_NAME', 'مِداد | MIDAD'),
     ],
 

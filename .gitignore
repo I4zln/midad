@@ -28,3 +28,4 @@ Thumbs.db
 /graphify-out
 /tmp-utf8.txt
 /deliverables
+/.env.backup-*
