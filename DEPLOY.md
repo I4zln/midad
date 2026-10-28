@@ -28,13 +28,13 @@ Laravel Cloud is the official host from the Laravel team. It builds from GitHub,
 2. In the project folder:
    ```sh
    git remote add origin https://github.com/<your-user>/midad.git
-   git push -u origin master
+   git push -u origin main
    ```
    `.env`, the SQLite database and logs are ignored and will **not** be uploaded.
 
 ### A2. Create the app **[YOU]**
 1. Sign up at **cloud.laravel.com** (billing details, if your plan needs them, are entered there by you).
-2. *New application* → connect GitHub → pick the `midad` repository and the `master` branch.
+2. *New application* → connect GitHub → pick the `midad` repository and the `main` branch.
 3. Add a **database** (MySQL or PostgreSQL) to the environment. Cloud fills the `DB_*` variables for you; if not, copy them from the database panel.
 
 ### A3. Build & deploy commands

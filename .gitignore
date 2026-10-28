@@ -29,3 +29,4 @@ Thumbs.db
 /tmp-utf8.txt
 /deliverables
 /.env.backup-*
+/storage/framework/prod-cache/
