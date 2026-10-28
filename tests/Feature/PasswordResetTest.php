@@ -69,8 +69,10 @@ test('a valid reset link can be opened and a new password can be used to sign in
         'email' => $user->email,
         'password' => 'new-password-456',
         'password_confirmation' => 'new-password-456',
-    ])->assertRedirect(route('login'))
+    ])->assertRedirect(route('home'))
         ->assertSessionHas('status');
+    $this->assertAuthenticatedAs($user);
+    auth()->logout();
 
     $user->refresh();
     expect(Hash::check('new-password-456', $user->password))->toBeTrue()
@@ -118,7 +120,8 @@ test('expired and previously used reset links cannot be opened or reused', funct
         'email' => $user->email,
         'password' => 'new-password-456',
         'password_confirmation' => 'new-password-456',
-    ])->assertRedirect(route('login'));
+    ])->assertRedirect(route('home'));
+    auth()->logout();
 
     $this->get(route('password.reset', ['token' => $freshToken, 'email' => $user->email]))
         ->assertRedirect(route('password.request'));
@@ -147,11 +150,11 @@ test('failed SMTP delivery is not reported as sent and its unusable token is rem
 
     $this->from(route('password.request'))->post(route('password.email'), ['email' => $user->email])
         ->assertRedirect(route('password.request'))
-        ->assertSessionHas('status', 'إن كان البريد مسجّلًا لدينا فستصلك رسالة خلال دقائق.')
+        ->assertSessionHas('status', \App\Http\Controllers\PasswordResetController::LINK_SENT)
         ->assertSessionMissing('errors');
 
     expect(DB::table('password_reset_tokens')->where('email', $user->email)->exists())->toBeFalse();
-    Log::shouldHaveReceived('warning')->once()->with('Midad password reset notification delivery failed.');
+    Log::shouldHaveReceived('warning')->once()->withArgs(fn ($message, $context = []) => $message === 'Midad password reset email could not be delivered.' && ! str_contains(json_encode($context), '@'));
 });
 
 test('password reset POST requests are rate limited', function () {

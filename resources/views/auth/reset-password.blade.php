@@ -5,7 +5,7 @@
     <div class="auth-card">
         <div class="eyebrow"><span class="eyebrow-line"></span> خطوة أخيرة</div>
         <h1>اختر كلمة<br><em>مرور جديدة.</em></h1>
-        <p>بعد الحفظ ستعود إلى تسجيل الدخول بكلمتك الجديدة.</p>
+        <p>بعد الحفظ تدخل إلى حسابك مباشرة.</p>
         @if (session('status'))<div class="form-alert auth-status" role="status">{{ session('status') }}</div>@endif
         <form method="POST" action="{{ route('password.update') }}" class="account-form" data-validate>
             @csrf

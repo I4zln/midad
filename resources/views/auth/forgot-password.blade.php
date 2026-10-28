@@ -14,7 +14,6 @@
             </x-form-field>
             <x-button class="auth-submit">أرسل رابط الاستعادة <span aria-hidden="true">←</span></x-button>
         </form>
-        @if (config('mail.default') === 'log')<p class="mail-setup-note">وضع التطوير: الرسائل تُحفظ في <code dir="ltr">storage/logs/mail.log</code> ولا تصل إلى البريد حتى تُضبط خدمة الإرسال.</p>@endif
         <p class="auth-switch">تذكّرتها؟ <a href="{{ route('login') }}">العودة إلى تسجيل الدخول</a></p>
     </div>
     <div class="auth-aside"><span class="quote-mark">“</span><p>تظل الكلمات محفوظة، ونساعدك على استعادة طريقك إليها.</p><span>مِداد · استعادة الحساب</span></div>

@@ -80,7 +80,7 @@ test('forgot password gives the same neutral answer for known and unknown addres
 
     foreach (['known@example.test', 'unknown@example.test'] as $email) {
         $this->from(route('password.request'))->post(route('password.email'), ['email' => $email])
-            ->assertSessionHas('status', 'إن كان البريد مسجّلًا لدينا فستصلك رسالة خلال دقائق.');
+            ->assertSessionHas('status', \App\Http\Controllers\PasswordResetController::LINK_SENT);
     }
 
     $token = null;
@@ -93,7 +93,9 @@ test('forgot password gives the same neutral answer for known and unknown addres
 
     $this->get(route('password.reset', ['token' => $token, 'email' => $reader->email]))->assertOk();
     $this->post(route('password.update'), ['token' => $token, 'email' => $reader->email, 'password' => 'new-pass-456', 'password_confirmation' => 'new-pass-456'])
-        ->assertRedirect(route('login'))->assertSessionHas('status');
+        ->assertRedirect(route('home'))->assertSessionHas('status');
+    $this->assertAuthenticatedAs($reader);
+    auth()->logout();
     $this->post(route('login.store'), ['email' => $reader->email, 'password' => 'new-pass-456'])->assertRedirect(route('home'));
 });
 

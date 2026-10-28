@@ -41,6 +41,8 @@ class AuthController extends Controller
         if (! $request->filled('email') && $request->filled('identifier')) {
             $request->merge(['email' => $request->input('identifier')]);
         }
+        // Addresses are stored lowercase; accept them however they are typed.
+        $request->merge(['email' => PasswordResetController::normalizeEmail($request->input('email'))]);
 
         $credentials = $request->validate([
             'email' => ['required', 'email', 'max:255'],
@@ -84,6 +86,8 @@ class AuthController extends Controller
 
     public function register(Request $request): RedirectResponse
     {
+        // Lowercase before the unique check, so "Name@Mail.com" cannot become a second account.
+        $request->merge(['email' => PasswordResetController::normalizeEmail($request->input('email'))]);
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:50'],
             'email' => ['required', 'email:rfc', 'max:255', 'unique:users,email'],
