@@ -742,3 +742,58 @@ function initAboutPage() {
 }
 initAboutPage();
 document.addEventListener('midad:page-loaded', initAboutPage);
+
+// Saving to «المحفوظات» updates in place like likes: optimistic toggle, server confirms, rolled back on failure.
+document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form[data-favorite-form]');
+    if (!form) return;
+    event.preventDefault();
+    const button = form.querySelector('button[type="submit"]');
+    if (!button || button.disabled) return;
+
+    const wasSaved = button.classList.contains('is-favorited');
+    const render = (saved) => {
+        button.classList.toggle('is-favorited', saved);
+        button.setAttribute('aria-pressed', String(saved));
+        if (button.classList.contains('icon-button')) {
+            const label = saved ? 'إزالة من المحفوظات' : 'حفظ الاقتباس';
+            button.setAttribute('aria-label', label);
+            button.setAttribute('title', label);
+        } else {
+            button.textContent = saved ? 'محفوظ ✓ إزالة من المحفوظات' : 'حفظ في المحفوظات';
+        }
+    };
+
+    button.disabled = true;
+    render(!wasSaved);
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            },
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        const result = await response.json();
+        render(result.saved);
+        showToast(result.message);
+        // On the saved list, an unsaved quote leaves the list.
+        const onSavedList = window.location.pathname === '/favorites' || new URLSearchParams(window.location.search).get('tab') === 'saved';
+        const card = form.closest('.quote-card');
+        if (onSavedList && !result.saved && card) {
+            card.style.transition = 'opacity .25s ease';
+            card.style.opacity = '0';
+            window.setTimeout(() => card.remove(), 260);
+        }
+    } catch (error) {
+        render(wasSaved);
+        showToast(error.message === '401'
+            ? 'انتهت جلستك. سجّل الدخول ثم حاول الحفظ من جديد.'
+            : 'تعذّر تحديث المحفوظات. تحقق من الاتصال ثم حاول مرة أخرى.');
+    } finally {
+        button.disabled = false;
+    }
+}, true); // capture: runs before the full-page form guard below marks the form as submitting

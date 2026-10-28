@@ -53,7 +53,7 @@ class CommunityController extends Controller
         return back()->with('status', $liked ? 'أضفت إعجابك إلى الاقتباس.' : 'أُزيل إعجابك.');
     }
 
-    public function favorite(Quote $quote): RedirectResponse
+    public function favorite(Request $request, Quote $quote): RedirectResponse|JsonResponse
     {
         // Same locked toggle as likes, so a double submit cannot hit the unique (quote_id, user_id) index.
         $saved = DB::transaction(function () use ($quote): bool {
@@ -71,7 +71,12 @@ class CommunityController extends Controller
             return true;
         });
 
-        return back()->with('status', $saved ? 'حُفظ الاقتباس في محفوظاتك.' : 'أُزيل الاقتباس من محفوظاتك.');
+        $message = $saved ? 'حُفظ الاقتباس في محفوظاتك.' : 'أُزيل الاقتباس من محفوظاتك.';
+
+        // The card button updates in place (app.js); without JavaScript the form still posts and returns.
+        return $request->expectsJson()
+            ? response()->json(['saved' => $saved, 'message' => $message])
+            : back()->with('status', $message);
     }
 
     public function comment(Request $request, Quote $quote): RedirectResponse

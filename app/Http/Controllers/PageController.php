@@ -45,12 +45,7 @@ class PageController extends Controller
     public function poets(): View
     {
         $priority = ['المتنبي', 'أبو الطيب المتنبي', 'أبو العلاء المعري', 'عنترة بن شداد', 'زهير بن أبي سلمى', 'أبو فراس الحمداني'];
-        $poets = Quote::query()
-            ->selectRaw('author, COUNT(*) as quotes_count')
-            ->whereNotNull('author')
-            ->where('author', '!=', '')
-            ->groupBy('author')
-            ->get()
+        $poets = Quote::authorCounts()
             ->sortBy(function ($poet) use ($priority) {
                 foreach ($priority as $index => $name) {
                     if (mb_strpos($poet->author, $name) !== false || mb_strpos($name, $poet->author) !== false) {
@@ -115,7 +110,7 @@ class PageController extends Controller
         $quotes = $quotes->paginate(9)->withQueryString();
 
         $stats = [
-            'quotes' => $user->quotes()->count(),
+            'quotes' => $tab === 'quotes' ? $quotes->total() : $user->quotes()->count(),
             'likes_received' => QuoteLike::query()->whereHas('quote', fn ($quote) => $quote->where('user_id', $user->id))->count(),
             'liked' => $isOwner ? $user->likes()->count() : null,
             'saved' => $isOwner ? $user->favorites()->count() : null,

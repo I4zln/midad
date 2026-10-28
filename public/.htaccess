@@ -23,3 +23,28 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# --- Performance (Apache): compression and long-lived caching of static files ---
+# Text responses compressed with Brotli where available, otherwise gzip.
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml application/xml
+</IfModule>
+<IfModule !mod_brotli.c>
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml application/xml
+    </IfModule>
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Vite file names carry a content hash, so a changed file always gets a new name.
+    <If "%{REQUEST_URI} =~ m#^/build/assets/#">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </If>
+    # Fonts, images and audio rarely change and are not hashed: a month.
+    <ElseIf "%{REQUEST_URI} =~ m#^/(fonts|images|audio)/#">
+        Header set Cache-Control "public, max-age=2592000"
+    </ElseIf>
+    <FilesMatch "\.(woff2|webp|jpg|png|svg|ico|mp3)$">
+        Header unset ETag
+    </FilesMatch>
+</IfModule>

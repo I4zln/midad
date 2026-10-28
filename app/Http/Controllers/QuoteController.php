@@ -18,13 +18,15 @@ class QuoteController extends Controller
         $query = Quote::query()->withCardData()->latest('created_at')->latest('id');
 
         if ($request->routeIs('quotes.index')) {
-            $this->applyLibraryFilters($query, $category, $search);
+            $filtered = $this->applyLibraryFilters($query, $category, $search);
+            $quotes = $query->paginate(12)->withQueryString();
 
             return view('quotes.index', [
-                'quotes' => $query->paginate(12)->withQueryString(),
+                'quotes' => $quotes,
                 'activeCategory' => $category,
                 'search' => $search,
-                'totalQuotes' => Quote::query()->count(),
+                // Unfiltered, the paginator already counted the whole library.
+                'totalQuotes' => $filtered ? Quote::query()->count() : $quotes->total(),
                 'categories' => ['تأمل' => 'تأمّل', 'حياة' => 'حياة', 'حب' => 'حب', 'أمل' => 'أمل'],
             ]);
         }
@@ -33,9 +35,7 @@ class QuoteController extends Controller
 
         $leaderboardQuery = Quote::query()->with('user')->withCount(['likes', 'comments']);
 
-        $poets = Quote::query()->selectRaw('author, COUNT(*) as quotes_count')
-            ->whereNotNull('author')->where('author', '!=', '')
-            ->groupBy('author')->orderByDesc('quotes_count')->limit(12)->get();
+        $poets = Quote::authorCounts()->take(12);
 
         return view('welcome', [
             'quotes' => $latestQuotes,
@@ -47,19 +47,25 @@ class QuoteController extends Controller
         ]);
     }
 
-    private function applyLibraryFilters($query, string $category, string $search): void
+    /** Applies the category and search filters; returns whether any filter narrowed the list. */
+    private function applyLibraryFilters($query, string $category, string $search): bool
     {
+        $filtered = false;
         if (in_array($category, QuoteRequest::CATEGORIES, true)) {
             $query->where('category', $category);
+            $filtered = true;
         }
 
         if ($search !== '') {
+            $filtered = true;
             $query->where(function ($builder) use ($search) {
                 $builder->where('text', 'like', "%{$search}%")
                     ->orWhere('author', 'like', "%{$search}%")
                     ->orWhere('source', 'like', "%{$search}%");
             });
         }
+
+        return $filtered;
     }
 
     public function create(): View

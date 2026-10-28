@@ -12,6 +12,9 @@
     @stack('head')
     {{-- Resolve the theme before first paint: saved choice (light/dark) or the system setting (default). --}}
     <script>(function () { var r = document.documentElement, c = 'system'; try { c = localStorage.getItem('athar-theme') || c; } catch (e) {} if (c !== 'light' && c !== 'dark') c = 'system'; var dark = c === 'dark' || (c === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); r.dataset.theme = dark ? 'dark' : 'light'; r.dataset.themeChoice = c; var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#1b1a17' : '#f5f2eb'; })();</script>
+    {{-- The two faces every page paints with first; the rest load on demand (font-display: swap). --}}
+    <link rel="preload" href="/fonts/thmanyah/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/thmanyah/thmanyahseriftext-Regular.woff2" as="font" type="font/woff2" crossorigin>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>

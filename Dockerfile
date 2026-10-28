@@ -25,7 +25,7 @@ RUN apt-get update \
     && docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install pdo_pgsql pdo_mysql zip gd intl bcmath opcache \
     && rm -rf /var/lib/apt/lists/* \
-    && a2enmod rewrite headers \
+    && a2enmod rewrite headers deflate brotli \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && printf '<Directory /var/www/html/public>\n    AllowOverride All\n</Directory>\n' > /etc/apache2/conf-available/midad.conf \
     && a2enconf midad \
