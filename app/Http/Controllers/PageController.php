@@ -1,0 +1,197 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\QuoteFavorite;
+use App\Models\Quote;
+use App\Models\User;
+use App\Models\UserFollow;
+use App\Models\UserNotification;
+use App\Models\SpecialProfileMessage;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+
+class PageController extends Controller
+{
+    public function about(): View
+    {
+        return view('pages.about');
+    }
+
+    public function creator(): View
+    {
+        return view('pages.creator');
+    }
+
+    public function muallaqat(): View
+    {
+        return view('pages.muallaqat', ['muallaqat' => config('muallaqat')]);
+    }
+
+    public function muallaqa(string $slug): View
+    {
+        $muallaqa = collect(config('muallaqat'))->firstWhere('slug', $slug);
+        abort_unless($muallaqa, 404);
+
+        $poems = collect(config('muallaqat'));
+        $index = $poems->search(fn ($poem) => $poem['slug'] === $slug);
+
+        return view('pages.muallaqa', [
+            'muallaqa' => $muallaqa,
+            'previous' => $poems->get(($index - 1 + $poems->count()) % $poems->count()),
+            'next' => $poems->get(($index + 1) % $poems->count()),
+        ]);
+    }
+
+    public function poets(): View
+    {
+        $priority = ['المتنبي', 'أبو الطيب المتنبي', 'أبو العلاء المعري', 'عنترة بن شداد', 'زهير بن أبي سلمى', 'أبو فراس الحمداني'];
+        $poets = Quote::query()
+            ->selectRaw('author, COUNT(*) as quotes_count')
+            ->whereNotNull('author')
+            ->where('author', '!=', '')
+            ->groupBy('author')
+            ->get()
+            ->sortBy(function ($poet) use ($priority) {
+                foreach ($priority as $index => $name) {
+                    if (mb_strpos($poet->author, $name) !== false || mb_strpos($name, $poet->author) !== false) {
+                        return $index;
+                    }
+                }
+
+                return count($priority) + (1000 - $poet->quotes_count);
+            })
+            ->values();
+
+        return view('pages.poets', ['poets' => $poets]);
+    }
+
+    public function favorites(): View
+    {
+        $quotes = QuoteFavorite::query()
+            ->where('user_id', Auth::id())
+            ->with(['quote.user'])
+            ->latest()
+            ->paginate(12);
+
+        return view('pages.favorites', ['quotes' => $quotes]);
+    }
+
+    public function notifications(): View
+    {
+        $notifications = UserNotification::query()
+            ->where('user_id', Auth::id())
+            ->with(['actor', 'quote'])
+            ->latest()
+            ->paginate(20);
+
+        return view('pages.notifications', ['notifications' => $notifications]);
+    }
+
+    public function markNotificationsRead(): RedirectResponse
+    {
+        UserNotification::query()
+            ->where('user_id', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return back()->with('status', 'تم تعليم الإشعارات كمقروءة.');
+    }
+
+    public function profile(User $user): View
+    {
+        $quotes = $user->quotes()->withCount(['likes', 'comments'])->latest()->paginate(9);
+        $specialMessage = null;
+        $specialEmail = (string) config('ethraa.special_profile_email', '');
+
+        if (Auth::check() && Auth::user()->is($user) && $user->hasVerifiedEmail()
+            && $specialEmail !== '' && hash_equals(mb_strtolower($specialEmail), mb_strtolower($user->email))) {
+            $specialMessage = SpecialProfileMessage::query()->firstOrCreate(
+                ['user_id' => $user->id, 'message_key' => 'jarir-welcome-2026'],
+                [
+                    'title' => 'إلى زياد إمام، رئيس نادي طويق',
+                    'body' => "أَلَسْتُمْ خَيْرَ مَنْ رَكِبَ الْمَطَايَا\nوَأَنْدَى الْعَالَمِينَ بُطُونَ رَاحِ\nوَقَوْمٍ قَدْ سَمَوْتَ لَهُمْ فَدَانُوا\nبِدُهْمٍ فِي مُلَمْلَمَةٍ رَدَاحِ",
+                    'sender_name' => 'عبدالعزيز المطرفي',
+                    'sender_role' => 'مدير مِداد',
+                ],
+            );
+
+            if ($specialMessage->shown_at) {
+                $specialMessage = null;
+            } else {
+                $specialMessage->forceFill(['shown_at' => now()])->save();
+            }
+        }
+
+        return view('profile.show', [
+            'profile' => $user,
+            'quotes' => $quotes,
+            'followers' => UserFollow::query()->where('followed_id', $user->id)->count(),
+            'following' => UserFollow::query()->where('follower_id', $user->id)->count(),
+            'isFollowing' => Auth::check() && UserFollow::query()
+                ->where('follower_id', Auth::id())
+                ->where('followed_id', $user->id)
+                ->exists(),
+            'specialMessage' => $specialMessage,
+        ]);
+    }
+
+    public function editProfile(): View
+    {
+        return view('profile.edit', ['profile' => Auth::user()]);
+    }
+
+    public function updateProfile(Request $request): RedirectResponse
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'bio' => ['nullable', 'string', 'max:600'],
+            'location' => ['nullable', 'string', 'max:120'],
+            'education' => ['nullable', 'string', 'max:180'],
+            'skills' => ['nullable', 'string', 'max:500'],
+            'social_links.linkedin' => ['nullable', 'url', 'max:255'],
+            'social_links.github' => ['nullable', 'url', 'max:255'],
+            'social_links.instagram' => ['nullable', 'url', 'max:255'],
+            'social_links.x' => ['nullable', 'url', 'max:255'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_avatar' => ['nullable', 'boolean'],
+            'remove_cover' => ['nullable', 'boolean'],
+        ]);
+
+        $user->fill([
+            'name' => $validated['name'],
+            'bio' => $validated['bio'] ?? null,
+            'location' => $validated['location'] ?? null,
+            'education' => $validated['education'] ?? null,
+            'skills' => isset($validated['skills'])
+                ? array_values(array_filter(array_map('trim', explode(',', $validated['skills']))))
+                : [],
+            'social_links' => array_filter($validated['social_links'] ?? []),
+        ]);
+
+        foreach (['avatar' => 'avatar_path', 'cover' => 'cover_path'] as $input => $column) {
+            if ($request->boolean('remove_'.$input)) {
+                if ($user->{$column}) {
+                    Storage::disk('public')->delete($user->{$column});
+                }
+                $user->{$column} = null;
+            }
+
+            if ($request->hasFile($input)) {
+                if ($user->{$column}) {
+                    Storage::disk('public')->delete($user->{$column});
+                }
+                $user->{$column} = $request->file($input)->store('profiles/'.$input.'s', 'public');
+            }
+        }
+
+        $user->save();
+
+        return redirect()->route('profile.show', $user)->with('status', 'تم تحديث ملفك الشخصي.');
+    }
+}

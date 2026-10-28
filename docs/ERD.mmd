@@ -1,0 +1,150 @@
+erDiagram
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        timestamp email_verified_at
+        string password
+        string remember_token
+        text bio
+        string location
+        string education
+        string avatar_path
+        string cover_path
+        json skills
+        json social_links
+        string username UK
+        boolean is_admin
+        timestamp created_at
+        timestamp updated_at
+    }
+    QUOTES {
+        bigint id PK
+        bigint user_id FK "nullable, nullOnDelete"
+        text text
+        string author
+        string source
+        string category
+        timestamp created_at
+        timestamp updated_at
+    }
+    QUOTE_LIKES {
+        bigint id PK
+        bigint quote_id FK
+        bigint user_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    QUOTE_FAVORITES {
+        bigint id PK
+        bigint quote_id FK
+        bigint user_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    QUOTE_COMMENTS {
+        bigint id PK
+        bigint quote_id FK
+        bigint user_id FK
+        text body
+        timestamp created_at
+        timestamp updated_at
+    }
+    USER_FOLLOWS {
+        bigint id PK
+        bigint follower_id FK
+        bigint followed_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    USER_NOTIFICATIONS {
+        bigint id PK
+        bigint user_id FK
+        bigint actor_id FK "nullable, nullOnDelete"
+        bigint quote_id FK "nullable, cascadeOnDelete"
+        string type
+        text message
+        timestamp read_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    SPECIAL_PROFILE_MESSAGES {
+        bigint id PK
+        bigint user_id FK
+        string message_key
+        string title
+        text body
+        string sender_name
+        string sender_role
+        timestamp shown_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    PASSWORD_RESET_TOKENS {
+        string email PK
+        string token
+        timestamp created_at
+    }
+    SESSIONS {
+        string id PK
+        bigint user_id "nullable, indexed; no FK declared"
+        string ip_address
+        text user_agent
+        longtext payload
+        int last_activity "indexed"
+    }
+    CACHE {
+        string key PK
+        mediumtext value
+        int expiration "indexed"
+    }
+    CACHE_LOCKS {
+        string key PK
+        string owner
+        int expiration "indexed"
+    }
+    JOBS {
+        bigint id PK
+        string queue "indexed"
+        longtext payload
+        tinyint attempts
+        int reserved_at
+        int available_at
+        int created_at
+    }
+    JOB_BATCHES {
+        string id PK
+        string name
+        int total_jobs
+        int pending_jobs
+        int failed_jobs
+        longtext failed_job_ids
+        mediumtext options
+        int cancelled_at
+        int created_at
+        int finished_at
+    }
+    FAILED_JOBS {
+        bigint id PK
+        string uuid UK
+        text connection
+        text queue
+        longtext payload
+        longtext exception
+        timestamp failed_at
+    }
+
+    USERS o|--o{ QUOTES : publishes
+    USERS ||--o{ QUOTE_LIKES : likes
+    QUOTES ||--o{ QUOTE_LIKES : receives
+    USERS ||--o{ QUOTE_FAVORITES : saves
+    QUOTES ||--o{ QUOTE_FAVORITES : saved_as
+    USERS ||--o{ QUOTE_COMMENTS : writes
+    QUOTES ||--o{ QUOTE_COMMENTS : has
+    USERS ||--o{ USER_FOLLOWS : follows
+    USERS ||--o{ USER_FOLLOWS : followed_by
+    USERS ||--o{ USER_NOTIFICATIONS : receives
+    USERS o|--o{ USER_NOTIFICATIONS : actor
+    QUOTES o|--o{ USER_NOTIFICATIONS : refers_to
+    USERS ||--o{ SPECIAL_PROFILE_MESSAGES : receives
+
