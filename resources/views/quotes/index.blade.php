@@ -8,7 +8,7 @@
     </header>
     <form class="quotes-filters" method="GET" action="{{ route('quotes.index') }}">
         @if ($activeCategory)<input type="hidden" name="category" value="{{ $activeCategory }}">@endif
-        <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="quote-search" name="q" type="search" value="{{ $search }}" placeholder="ابحث في النص أو الكاتب أو المصدر" aria-label="ابحث في الاقتباسات"><button class="search-submit" type="submit" aria-label="بحث">↵</button></label>
+        <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="quote-search" name="q" type="search" value="{{ $search }}" placeholder="ابحث بكلمة أو باسم كاتب" aria-label="ابحث في الاقتباسات"><button class="search-submit" type="submit" aria-label="بحث">↵</button></label>
         <div class="category-list" role="group" aria-label="التصنيف">
             <a class="category-chip {{ $activeCategory === '' ? 'is-selected' : '' }}" href="{{ route('quotes.index', array_filter(['q' => $search])) }}">الكل</a>
             @foreach ($categories as $key => $label)<a class="category-chip {{ $activeCategory === $key ? 'is-selected' : '' }}" href="{{ route('quotes.index', array_filter(['q' => $search, 'category' => $key])) }}">{{ $label }}</a>@endforeach

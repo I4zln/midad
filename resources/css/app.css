@@ -1228,3 +1228,100 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .pen-icon { --pen-body: currentColor; --pen-line: currentColor; --pen-shine: transparent; width: 17px; height: 15px; flex: 0 0 auto; margin-inline-start: 2px; vertical-align: -2px; }
 .button-dark .pen-icon { --pen-line: #24231f; }
 :root[data-theme='dark'] .pen-icon { --pen-edge: transparent; }
+
+/* ===== Mobile comfort layer (≤680px): 44px touch targets, readable text, room for thumbs ===== */
+@media (max-width: 680px) {
+    /* Header & footer controls */
+    .brand { min-height: 44px; align-items: center; }
+    #theme-toggle, .ambient-summary, .account-summary { width: 44px; min-width: 44px; height: 44px; min-height: 44px; }
+    .account-summary { justify-content: center; padding: 0; }
+    .account-initial { width: 34px; height: 34px; }
+    .topbar-actions { gap: 6px; }
+    .topbar-actions > .text-button, .topbar-actions > .button { min-height: 44px; padding-inline: 12px; font-size: 13px; }
+    .site-footer .footer-links { gap: 4px 6px; }
+    .site-footer .footer-links a, .footer-brand { display: inline-flex; min-height: 44px; align-items: center; padding-inline: 8px; font-size: 13px; }
+    .site-footer p, .site-footer .copyright { font-size: 12px; }
+    .main-nav .nav-link { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; }
+
+    /* Buttons & links that act as buttons */
+    .button, .text-button { min-height: 44px; font-size: 13px; }
+    .text-button { display: inline-flex; align-items: center; }
+    .button-small { min-height: 44px; }
+    .forgot-password-link { display: inline-flex; min-height: 44px; align-items: center; font-size: 13px; }
+    .remember-option { min-height: 44px; font-size: 13px; }
+    .remember-option input { width: 20px; height: 20px; }
+    .password-visibility { min-width: 56px; min-height: 44px; font-size: 12px; }
+    .account-form input:not([type=checkbox]), .quote-form input, .quote-form select { height: 48px; font-size: 16px; } /* 16px stops iOS zoom-on-focus */
+    .account-form textarea, .quote-form textarea, .comment-form textarea, .profile-edit-form :is(input, textarea) { font-size: 16px; }
+
+    /* Quote cards: big, easy like / save / copy / share */
+    .quote-card-actions { flex-wrap: wrap; gap: 8px; }
+    .quote-card-actions .like-button { min-height: 44px; padding: 0 14px; font-size: 13px; }
+    .quote-card-actions .like-button svg { width: 18px; height: 18px; }
+    .quote-card-actions .icon-button, .card-owner-actions .icon-button { width: 44px; height: 44px; }
+    .card-owner-actions { gap: 8px; }
+    .card-topline, .card-category, .quote-card time { font-size: 12px; }
+    .quote-card-publisher strong { font-size: 13px; }
+    .quote-card-publisher small, .quote-read-more { font-size: 12px; }
+    .like-button-detail { min-height: 48px; }
+
+    /* Library: search, chips, pagination */
+    .search-box input { height: 44px; font-size: 16px; }
+    .search-submit { width: 44px; height: 44px; }
+    .category-list { gap: 8px; }
+    .category-chip { display: inline-flex; min-width: 48px; min-height: 44px; align-items: center; justify-content: center; font-size: 13px; }
+    .clear-filters { display: inline-flex; min-height: 44px; align-items: center; font-size: 13px; }
+    .pagination-links .midad-page, .midad-page { min-width: 44px; min-height: 44px; font-size: 14px; }
+    .midad-pagination-summary, .quotes-result-count, .quotes-total { font-size: 12px; }
+
+    /* Readable small print everywhere */
+    .eyebrow, small, time, .composer-field-hint, .field-error, .admin-badge, .card-category, .leaderboard-category, .leaderboard-author,
+    .poet-source-note, .muallaqa-source-note, .muallaqat-caveat, figcaption, .creator-timeline-date, .mail-setup-note, .auth-switch,
+    .character-count, .member-stats dt, .member-meta, .editorial-feature-label, .poet-directory-count, .poet-directory-index, .muallaqa-number { font-size: 12px; }
+    .brand-latin { font-size: 10px; }
+    .profile-file-button { min-height: 44px; font-size: 13px; }
+
+    /* Muallaqat & poets lists */
+    .muallaqa-read-link, .muallaqa-back { display: inline-flex; min-height: 44px; align-items: center; font-size: 13px; }
+    .muallaqat-search input, #muallaqat-search { height: 44px; font-size: 16px; }
+
+    /* Menus */
+    .account-panel a, .account-logout { min-height: 48px; }
+}
+@media (max-width: 380px) {
+    .topbar-actions > .button { padding-inline: 10px; }
+    .quote-card { padding-inline: 15px; }
+}
+
+/* Mobile comfort layer, round 2: selectors prefixed with :root to win over page-specific rules */
+@media (max-width: 680px) {
+    :root .site-footer .footer-links a { min-width: 44px; justify-content: center; }
+    :root .breadcrumbs { gap: 2px 6px; flex-wrap: wrap; font-size: 12px; }
+    :root .breadcrumbs a, :root .breadcrumbs span { display: inline-flex; min-height: 44px; align-items: center; font-size: 12px; }
+    :root .breadcrumbs a { min-width: 44px; justify-content: center; }
+    :root .search-submit { width: 44px; min-width: 44px; height: 44px; }
+    :root .detail-social .button, :root .detail-owner-actions .button { min-height: 44px; font-size: 13px; }
+    :root .like-button-detail span { font-size: 13px; }
+    :root .muallaqa-card h2 a, :root .muallaqat-list h2 a, :root h2 > a { display: inline-flex; min-height: 44px; align-items: center; }
+    :root .muallaqa-pagination > a { min-height: 44px; justify-content: center; }
+    :root .muallaqa-source-note a, :root figcaption a { display: inline-flex; min-height: 44px; align-items: center; }
+    :root .profile-edit-actions .text-button { min-width: 44px; justify-content: center; }
+
+    :root .quote-form .composer-field-hint, :root .profile-edit-form .composer-field-hint, :root .profile-edit-form .field-label,
+    :root .profile-edit-heading p, :root .profile-upload-field small, :root .auth-switch, :root .auth-switch a, :root .auth-aside span,
+    :root .mail-setup-note, :root .mail-setup-note code, :root .detail-overline span, :root .quote-detail .detail-byline small,
+    :root .editorial-hero-foot span, :root .poet-gallery-label small, :root .poet-gallery-label em, :root .poet-verse-panel small,
+    :root .library-author-link strong, :root .library-author-link small, :root .leaderboard-rank, :root .leaderboard-stats span,
+    :root .latest-quotes-footer span, :root .contribute-number, :root .contribute-number span, :root .editorial-feature-source strong,
+    :root .editorial-feature-source small, :root .muallaqat-page .eyebrow, :root .muallaqa-pagination small, :root .about-steps article span,
+    :root .creator-intro p, :root .creator-skills span, :root .creator-links span { font-size: 12px; }
+    :root .profile-edit-form .field-label { font-size: 13px; }
+}
+@media (max-width: 680px) {
+    :root .detail-byline a { display: inline-flex; min-height: 44px; align-items: center; }
+    :root .auth-switch, :root .mail-setup-note, :root .muallaqa-reading-art figcaption, :root .muallaqa-reading-art figcaption a { font-size: 12px !important; }
+}
+@media (max-width: 680px) {
+    :root .card-owner-actions { width: 100%; margin-inline-start: 0; padding: 8px 0 0; border-inline-start: 0; border-top: 1px solid var(--line); }
+    :root .quote-card .card-quote-text { text-align: start; }
+}
