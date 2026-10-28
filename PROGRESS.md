@@ -136,3 +136,12 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Motion only on the first visit per session and never with reduced motion: ink-bleed hero and seal, dividers draw, sections settle, timeline draws with scroll. Skills show what was built with them (hover/focus/tap); journey items open on hover (mouse) or tap/Enter (native details).
 - Tests: `AboutPageTest` (redirect, nav/footer, section order, link safety, login-aware button). Browser checks at 1440 and 390 (layout, links, interactions, keyboard, reduced motion, scroll drawing, dark theme).
 - Found, not fixed (other page): `profile/show.blade.php:39` passes a pre-escaped URL to x-button, so the follow login link loses `reason`.
+
+## TASK 5 — Colour balance and theme consistency
+
+- Audit: ~70 hard-coded colours in `app.css` (white text, fixed ivory/ink panels, shadows, danger red), the poets gallery kept a fixed ivory gradient in dark mode, dark panels used fixed hex, the default theme was hard-coded to light, and light-mode meta text (3.08:1) and copper text (3.80:1) were below WCAG AA.
+- One token system at the top of `app.css` (light on `:root`, dark on `[data-theme='dark']`): three surface levels + sunken band, ink / ink-soft / stone, copper, danger, button, ink-panel ("night") set, shadow, backdrop, brass (pen), image brightness. Every component colour now uses a token (a test enforces it); only the two mask gradients keep `#000` for alpha.
+- Dark: warm deep ink surfaces (#1b1a17 → #22211d → #292824), soft ivory text, desaturated copper, low-contrast hairlines, softer primary button, images dimmed (sketches more). Light: same ivory/ink, copper and stone darkened just enough for AA.
+- Theme switch: light / dark / follow system (default), saved in localStorage, resolved by an inline script before first paint, live system changes, short colour fade (none with reduced motion), Arabic menu in the navbar, browser bar colour follows.
+- Not tokenized on purpose: emails (inline hex, email clients ignore CSS variables; copper/stone updated to the AA values) and the quote-image canvas (exports a fixed ivory PNG).
+- Tested: `ThemeTest` + full suite; contrast script for every token pair; browser audit of 17 pages × 2 themes × 390/1440 (text and placeholder contrast, bright blocks in dark, pure white/black, theme attribute) — 68/68 clean; switch behaviour checks 26/26.

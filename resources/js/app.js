@@ -1,5 +1,4 @@
 const root = document.documentElement;
-const themeToggle = document.querySelector('#theme-toggle');
 const toast = document.querySelector('#toast');
 const audioToggle = document.querySelector('#ethraa-audio-toggle');
 const audioMute = document.querySelector('#ethraa-audio-mute');
@@ -18,18 +17,44 @@ function showToast(message, isError = /^تعذّر|انتهت/.test(message || '
     toastTimeout = window.setTimeout(() => toast.classList.remove('is-visible'), 2800);
 }
 
-if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-        root.dataset.theme = theme;
-        try {
-            window.localStorage.setItem('athar-theme', theme);
-        } catch (error) {
-            console.error('Unable to save the selected theme.', error);
-            showToast('تعذّر حفظ اختيار المظهر لهذا المتصفح.');
-        }
-    });
+// Theme: light / dark / follow the system (default). The inline script in the layout applies it before first paint.
+const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+const themeLabels = { light: 'فاتح', dark: 'داكن', system: 'حسب النظام' };
+function savedThemeChoice() {
+    try {
+        const choice = window.localStorage.getItem('athar-theme');
+        return choice === 'light' || choice === 'dark' ? choice : 'system';
+    } catch (error) { return 'system'; }
 }
+function applyTheme(choice, fade = false) {
+    if (fade && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        root.classList.add('theme-changing');
+        window.setTimeout(() => root.classList.remove('theme-changing'), 350);
+    }
+    root.dataset.theme = choice === 'system' ? (systemDark.matches ? 'dark' : 'light') : choice;
+    root.dataset.themeChoice = choice;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', getComputedStyle(root).getPropertyValue('--paper').trim());
+    document.querySelectorAll('[data-theme-option]').forEach((option) => option.setAttribute('aria-pressed', String(option.dataset.themeOption === choice)));
+    document.querySelectorAll('[data-theme-current]').forEach((label) => { label.textContent = themeLabels[choice]; });
+}
+applyTheme(savedThemeChoice());
+systemDark.addEventListener('change', () => { if (savedThemeChoice() === 'system') applyTheme('system', true); });
+document.addEventListener('midad:page-loaded', () => applyTheme(savedThemeChoice()));
+document.addEventListener('click', (event) => {
+    const option = event.target.closest('[data-theme-option]');
+    if (!option) return;
+    const choice = option.dataset.themeOption;
+    try {
+        if (choice === 'system') window.localStorage.removeItem('athar-theme');
+        else window.localStorage.setItem('athar-theme', choice);
+    } catch (error) {
+        console.error('Unable to save the selected theme.', error);
+        showToast('تعذّر حفظ اختيار المظهر لهذا المتصفح.');
+    }
+    applyTheme(choice, true);
+    const menu = option.closest('details');
+    if (menu) { menu.open = false; menu.querySelector('summary')?.focus(); }
+});
 
 if (audio && audioChoice && audioToggle) {
     const choiceKey = 'ethraa-audio-choice';
@@ -219,12 +244,6 @@ document.addEventListener('keydown', (event) => {
     });
 });
 
-try {
-    const savedTheme = window.localStorage.getItem('athar-theme');
-    if (savedTheme === 'dark' || savedTheme === 'light') root.dataset.theme = savedTheme;
-} catch (error) {
-    console.error('Unable to read the saved theme.', error);
-}
 
 let composerDialog = document.querySelector('#composer-dialog');
 document.addEventListener('click', (event) => {
@@ -362,7 +381,7 @@ function prefetchPage(url) {
 
 function setNavigating(active) {
     root.classList.toggle('is-navigating', active);
-    if (active) document.querySelectorAll('.ambient-menu[open], .account-menu[open]').forEach((menu) => { menu.open = false; });
+    if (active) document.querySelectorAll('.ambient-menu[open], .account-menu[open], .theme-menu[open]').forEach((menu) => { menu.open = false; });
 }
 
 async function loadPage(url, push = true) {
@@ -394,7 +413,7 @@ async function loadPage(url, push = true) {
         if (nextDialog) document.body.append(nextDialog);
         composerDialog = nextDialog;
         document.title = nextDocument.title;
-        ['csrf-token', 'flash-status', 'theme-color'].forEach((name) => {
+        ['csrf-token', 'flash-status'].forEach((name) => {
             const incoming = nextDocument.querySelector(`meta[name="${name}"]`);
             if (incoming) document.querySelector(`meta[name="${name}"]`)?.setAttribute('content', incoming.content);
         });
@@ -537,11 +556,11 @@ window.addEventListener('resize', () => {
 
 // Close the navbar audio menu on outside click or Escape.
 document.addEventListener('click', (event) => {
-    document.querySelectorAll('.ambient-menu[open], .account-menu[open]').forEach((menu) => { if (!menu.contains(event.target)) menu.open = false; });
+    document.querySelectorAll('.ambient-menu[open], .account-menu[open], .theme-menu[open]').forEach((menu) => { if (!menu.contains(event.target)) menu.open = false; });
 });
 document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    document.querySelectorAll('.ambient-menu[open], .account-menu[open]').forEach((menu) => { menu.open = false; menu.querySelector('summary')?.focus(); });
+    document.querySelectorAll('.ambient-menu[open], .account-menu[open], .theme-menu[open]').forEach((menu) => { menu.open = false; menu.querySelector('summary')?.focus(); });
 });
 
 // In-page navigation inserts the homepage without running its inline script; apply the same once-per-session rule.

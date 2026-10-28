@@ -10,7 +10,8 @@
     <meta name="flash-status" content="{{ session('status') }}">
     <title>@yield('title', 'مِداد | MIDAD')</title>
     @stack('head')
-    <script>try { var t = localStorage.getItem('athar-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}</script>
+    {{-- Resolve the theme before first paint: saved choice (light/dark) or the system setting (default). --}}
+    <script>(function () { var r = document.documentElement, c = 'system'; try { c = localStorage.getItem('athar-theme') || c; } catch (e) {} if (c !== 'light' && c !== 'dark') c = 'system'; var dark = c === 'dark' || (c === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); r.dataset.theme = dark ? 'dark' : 'light'; r.dataset.themeChoice = c; var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#1b1a17' : '#f5f2eb'; })();</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>

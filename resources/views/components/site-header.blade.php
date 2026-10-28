@@ -32,10 +32,19 @@
                     <audio id="ethraa-audio" preload="none" loop></audio>
                 </div>
                 </details>
-                <button class="icon-button" id="theme-toggle" type="button" aria-label="تبديل الوضع الداكن" title="تبديل المظهر">
-                    <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
-                    <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.5A8.5 8.5 0 0 1 8.5 3.8 8.5 8.5 0 1 0 20.2 15.5Z"/></svg>
-                </button>
+                <details class="theme-menu">
+                    <summary class="icon-button theme-summary" id="theme-toggle" title="المظهر">
+                        <svg class="theme-icon theme-icon-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+                        <svg class="theme-icon theme-icon-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.5A8.5 8.5 0 0 1 8.5 3.8 8.5 8.5 0 1 0 20.2 15.5Z"/></svg>
+                        <svg class="theme-icon theme-icon-system" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17Z" fill="currentColor"/></svg>
+                        <span class="sr-only">المظهر: <span data-theme-current>حسب النظام</span></span>
+                    </summary>
+                    <div class="theme-panel" role="group" aria-label="اختر المظهر">
+                        <button type="button" data-theme-option="light" aria-pressed="false">فاتح</button>
+                        <button type="button" data-theme-option="dark" aria-pressed="false">داكن</button>
+                        <button type="button" data-theme-option="system" aria-pressed="true">حسب النظام</button>
+                    </div>
+                </details>
                 @auth
                     @php($unread = \App\Models\UserNotification::query()->where('user_id', auth()->id())->whereNull('read_at')->count())
                     <details class="account-menu">
