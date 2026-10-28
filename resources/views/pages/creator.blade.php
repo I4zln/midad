@@ -1,46 +1,58 @@
 @extends('layouts.app')
 @section('title', 'عنّي — عبدالعزيز المطرفي | مِداد')
 @section('content')
-<main class="inner-page creator-page">
-    <nav class="breadcrumbs" aria-label="مسار التنقل"><a href="{{ route('home') }}">مِداد</a><span>←</span><span>عنّي</span></nav>
-    <section class="creator-hero">
-        <div class="creator-avatar" aria-label="الأحرف الأولى من اسم عبدالعزيز المطرفي">ع</div>
-        <div class="creator-intro">
-            <div class="eyebrow"><span class="eyebrow-line"></span> الشخص الذي يقف خلف مِداد</div>
-            <h1>عبدالعزيز تركي <em>المطرفي</em></h1>
-            <p>طالب هندسة برمجيات ومطوّر ويب · مكة المكرمة</p>
-            <div class="creator-socials" aria-label="حساباتي">
-                <a href="https://www.linkedin.com/in/abdulaziz-al-matrafi-bbb238358/" target="_blank" rel="noopener noreferrer"><strong>LinkedIn</strong><span>Abdulaziz Al-Matrafi ↗</span></a>
-                <a href="https://github.com/I4zln" target="_blank" rel="noopener noreferrer"><strong>GitHub</strong><span>I4zln ↗</span></a>
-                <a href="https://www.instagram.com/i1zln/" target="_blank" rel="noopener noreferrer"><strong>Instagram</strong><span>@i1zln ↗</span></a>
-                <a href="https://x.com/i4zl4" target="_blank" rel="noopener noreferrer"><strong>X</strong><span>@i4zl4 ↗</span></a>
-            </div>
-        </div>
-        <span class="creator-seal" aria-hidden="true">ع</span>
+@php
+    $links = [
+        ['LinkedIn', 'Abdulaziz Al-Matrafi', 'https://www.linkedin.com/in/abdulaziz-al-matrafi-bbb238358/'],
+        ['GitHub', 'I4zln', 'https://github.com/I4zln'],
+        ['Instagram', '@i1zln', 'https://www.instagram.com/i1zln/'],
+        ['X', '@i4zl4', 'https://x.com/i4zl4'],
+    ];
+    $features = [
+        ['تصفّح', 'اقرأ اقتباسات القرّاء من الأحدث، وابحث بكلمة أو صنّفها حسب المعنى.', route('quotes.index'), 'إلى الاقتباسات'],
+        ['انشر', 'أنشئ حسابًا وأضف اقتباسًا من 3 إلى 155 حرفًا، يظهر باسمك وتاريخ نشره.', auth()->check() ? route('quotes.create') : route('register'), auth()->check() ? 'أضف اقتباسًا' : 'أنشئ حسابًا'],
+        ['عدّل واحذف', 'اقتباساتك ملكك: تعدّلها أو تحذفها متى شئت، ولا يستطيع غيرك ذلك.', auth()->check() ? route('profile.show', auth()->user()) : route('login'), 'اقتباساتي'],
+        ['أعجب واحفظ', 'أعجب بما يلامسك، واحفظ ما تريد العودة إليه في «المحفوظات».', auth()->check() ? route('favorites') : route('login'), 'المحفوظات'],
+    ];
+@endphp
+<main class="inner-page midad-about">
+    <nav class="breadcrumbs" aria-label="مسار التنقل"><a href="{{ route('home') }}">الرئيسية</a><span>←</span><span>عنّي</span></nav>
+
+    <header class="midad-about-intro">
+        <span class="eyebrow"><span class="eyebrow-line"></span> عن مِداد</span>
+        <h1>المِداد <em>حبرُ الكلمة.</em></h1>
+        <p class="midad-about-lead">«المِداد» في العربية هو الحبر الذي تُكتب به الكلمات. ومن هنا جاء الاسم: مكتبة عربية صغيرة نحفظ فيها الاقتباسات التي تركت فينا أثرًا، وننسبها إلى أصحابها، ونشاركها مع من يقرأ على مهل.</p>
+    </header>
+
+    <section class="midad-about-features" aria-labelledby="midad-about-features-title">
+        <h2 id="midad-about-features-title">ماذا يمكنك أن تفعل هنا؟</h2>
+        <ol>
+            @foreach ($features as $index => [$title, $text, $href, $cta])
+                <li>
+                    <span class="midad-about-number" aria-hidden="true">{{ ['١', '٢', '٣', '٤'][$index] }}</span>
+                    <div><h3>{{ $title }}</h3><p>{{ $text }}</p><a href="{{ $href }}">{{ $cta }} <span aria-hidden="true">←</span></a></div>
+                </li>
+            @endforeach
+        </ol>
     </section>
 
-    <section class="creator-about">
-        <div><span class="eyebrow"><span class="eyebrow-line"></span> نبذة عنّي</span><h2>من الدعم التقني<br>إلى <em>البرمجيات.</em></h2></div>
-        <div><p>مرحبًا، أنا عبدالعزيز. تخرجت بدبلوم علوم الحاسب والبرمجة، وأدرس الآن هندسة البرمجيات في جامعة أم القرى بمكة المكرمة.</p><p>أحب بناء أشياء يستفيد منها الناس فعلًا. تعلّمت من الدعم التقني أن وراء كل مشكلة شخصًا يحتاج حلًا واضحًا؛ ومن هنا بدأ اهتمامي بتطوير الويب وصناعة تجارب سهلة ومفيدة.</p><div class="creator-skills"><span>React.js</span><span>Laravel</span><span>PHP</span><span>SQL</span></div></div>
-    </section>
-
-    <section class="creator-work">
-        <div class="creator-section-title"><span class="eyebrow"><span class="eyebrow-line"></span> ما أعمل عليه</span><h2>أبني حلولًا <em>تخدم الناس.</em></h2></div>
-        <div class="creator-work-grid">
-            <article><span class="creator-work-icon" aria-hidden="true">⌘</span><h3>تطوير الويب المتكامل</h3><p>بناء تطبيقات الويب من قاعدة البيانات حتى الواجهة، مع تركيز على الوضوح وسهولة الاستخدام.</p></article>
-            <article><span class="creator-work-icon" aria-hidden="true">⌕</span><h3>حل المشكلات</h3><p>تحويل احتياج المستخدم إلى خطوات عملية، واختبار الحل حتى يعمل كما ينبغي.</p></article>
-            <article><span class="creator-work-icon" aria-hidden="true">↗</span><h3>العمل الجماعي</h3><p>التعلّم مع الفريق، ومشاركة المعرفة، وإنجاز المشاريع بروح تعاونية.</p></article>
-        </div>
-        <div class="creator-current"><strong>حاليًا</strong><span>أطوّر مِداد، وأتعمق في هندسة البرمجيات وتصميم تجارب عربية أجمل.</span></div>
-    </section>
-
-    <section class="creator-education">
-        <div class="creator-section-title"><span class="eyebrow"><span class="eyebrow-line"></span> رحلة التعلّم</span><h2>التعليم <em>والتجربة.</em></h2></div>
-        <div class="creator-timeline">
-            <article><span class="creator-timeline-date">٢٠٢٥ — ٢٠٢٩</span><div><h3>بكالوريوس هندسة البرمجيات</h3><p>جامعة أم القرى · مكة المكرمة</p><small>أدرس هندسة المتطلبات، وهياكل البيانات، والبرمجة كائنية التوجه وتصميم البرمجيات.</small></div></article>
-            <article><span class="creator-timeline-date">٢٠٢٢ — ٢٠٢٥</span><div><h3>دبلوم علوم الحاسب والبرمجة</h3><p>جامعة أم القرى</p><small>أساس متين في علوم الحاسب والبرمجة والدعم التقني.</small></div></article>
+    <section class="midad-about-owner" aria-labelledby="midad-about-owner-title">
+        <span class="midad-about-initial" aria-hidden="true">ع</span>
+        <div>
+            <span class="eyebrow"><span class="eyebrow-line"></span> صانع مِداد</span>
+            <h2 id="midad-about-owner-title">عبدالعزيز تركي المطرفي</h2>
+            <p>صمّمت مِداد وبنيتها مشروعًا نهائيًا في معسكر القمّة بنادي طويق، لتجمع بين التقنية وجمال الكلمة العربية.</p>
+            <ul class="midad-about-links" aria-label="حساباتي">
+                @foreach ($links as [$network, $handle, $url])
+                    <li><a href="{{ $url }}" target="_blank" rel="noopener noreferrer"><strong>{{ $network }}</strong><span dir="ltr">{{ $handle }}</span><span class="sr-only">(يفتح في نافذة جديدة)</span></a></li>
+                @endforeach
+            </ul>
         </div>
     </section>
-    <section class="about-note"><span class="eyebrow"><span class="eyebrow-line"></span> مساحة منّي</span><p>مِداد مشروع أعمل عليه ليجمع بين التقنية والكلمة العربية.</p><a class="button button-dark" href="{{ route('home') }}">اكتشف مِداد <span aria-hidden="true">←</span></a></section>
+
+    <section class="midad-about-close">
+        <p>ابدأ من كلمة؛ قد تجد اقتباسًا يشبهك، أو تترك واحدًا يبقى مع قارئ آخر.</p>
+        <x-button href="{{ route('quotes.index') }}">اكتشف الاقتباسات <span aria-hidden="true">←</span></x-button>
+    </section>
 </main>
 @endsection
