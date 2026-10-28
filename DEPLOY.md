@@ -182,3 +182,21 @@ php artisan migrate --force
 php artisan optimize        # caches config, routes, events, views
 ```
 If something looks stale: `php artisan optimize:clear` then `php artisan optimize`.
+
+---
+
+## This PC: Apache from XAMPP behind a Cloudflare Tunnel
+
+`deploy/windows/midad-httpd.conf` is a self-contained Apache config: it listens on `127.0.0.1:8127` only, serves only `public/`, refuses dotfiles, enables Brotli/gzip and the cache rules in `public/.htaccess`, and sets the production variables (caches in `storage/framework/prod-cache/`, so `php artisan test` is unaffected). XAMPP's own `httpd.conf` and `htdocs` are not used.
+
+```sh
+# after pulling changes: refresh the production caches with the same variables
+APP_ENV=production APP_DEBUG=false FORCE_HTTPS=true \
+APP_CONFIG_CACHE=storage/framework/prod-cache/config.php APP_ROUTES_CACHE=storage/framework/prod-cache/routes.php \
+APP_EVENTS_CACHE=storage/framework/prod-cache/events.php php artisan optimize
+
+# run (or install as a Windows service once, as Administrator: httpd.exe -k install -n MidadApache -f "<same path>")
+C:\xampp\apache\bin\httpd.exe -f "C:/Users/aziz4/quotiet/deploy/windows/midad-httpd.conf"
+```
+
+The config turns off PHP's JIT (`opcache.jit`, `pcre.jit`) for Apache on Windows: there it cannot get executable memory and made pages about 4× slower; OPcache stays on.
