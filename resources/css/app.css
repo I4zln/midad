@@ -74,9 +74,13 @@ body { font-family: var(--font-ui); }
 p, .hero-description, .poet-copy p, .card-quote-text { text-align: justify; text-justify: inter-word; }
 
 .poet-gallery { position: relative; overflow: hidden; padding: 58px 8% 64px; isolation: isolate; background: linear-gradient(115deg, var(--surface-sunken) 0%, var(--paper) 48%, var(--surface-sunken) 100%); }
-.poet-gallery::before, .poet-gallery::after { position: absolute; z-index: -1; color: color-mix(in srgb, var(--copper) 5%, transparent); font-family: var(--font-display); font-size: clamp(160px, 24vw, 340px); line-height: 1; pointer-events: none; }
-.poet-gallery::before { content: '۞'; top: -28px; inset-inline-start: -35px; }
-.poet-gallery::after { content: 'ـ'; right: 12%; bottom: -130px; font-size: 430px; }
+/* Mashrabiya-style lattice (eight-point star-and-cross tiling) framing both outer edges of the section, inside the side margins so it never sits behind text; tinted with the theme copper and fading downward. */
+.poet-gallery::before, .poet-gallery::after { position: absolute; z-index: -1; top: 0; bottom: 0; width: min(7%, 104px); background: var(--copper); content: ''; opacity: .2; pointer-events: none;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2740%27%20height%3D%2740%27%20viewBox%3D%270%200%2040%2040%27%3E%3Cpath%20d%3D%27M40%2020%2034.14%2025.86%2034.14%2034.14%2025.86%2034.14%2020%2040%2014.14%2034.14%205.86%2034.14%205.86%2025.86%200%2020%205.86%2014.14%205.86%205.86%2014.14%205.86%2020%200%2025.86%205.86%2034.14%205.86%2034.14%2014.14Z%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%27.9%27%2F%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%2720%27%20r%3D%273.2%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%27.9%27%2F%3E%3C%2Fsvg%3E"), linear-gradient(to bottom, #000 0%, transparent 92%); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2740%27%20height%3D%2740%27%20viewBox%3D%270%200%2040%2040%27%3E%3Cpath%20d%3D%27M40%2020%2034.14%2025.86%2034.14%2034.14%2025.86%2034.14%2020%2040%2014.14%2034.14%205.86%2034.14%205.86%2025.86%200%2020%205.86%2014.14%205.86%205.86%2014.14%205.86%2020%200%2025.86%205.86%2034.14%205.86%2034.14%2014.14Z%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%27.9%27%2F%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%2720%27%20r%3D%273.2%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%27.9%27%2F%3E%3C%2Fsvg%3E"), linear-gradient(to bottom, #000 0%, transparent 92%);
+    -webkit-mask-size: 34px 34px, 100% 100%; mask-size: 34px 34px, 100% 100%; -webkit-mask-repeat: repeat, no-repeat; mask-repeat: repeat, no-repeat; -webkit-mask-composite: source-in; mask-composite: intersect; }
+.poet-gallery::before { inset-inline-start: 0; -webkit-mask-position: right top, 0 0; mask-position: right top, 0 0; }
+.poet-gallery::after { inset-inline-end: 0; -webkit-mask-position: left top, 0 0; mask-position: left top, 0 0; }
+@media (max-width: 680px) { .poet-gallery::before, .poet-gallery::after { display: none; } }
 .poet-gallery-heading { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 25px; }
 .poet-gallery-heading h2 { margin: 9px 0 0; font-family: var(--font-display); font-size: clamp(30px, 4vw, 44px); font-weight: 500; line-height: 1.5; }
 .poet-gallery-heading h2 em { color: var(--copper); font-style: normal; }
@@ -1530,4 +1534,4 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 :root[data-theme='dark'] .poet-gallery-card img { filter: sepia(.42) saturate(.62) contrast(1.06) brightness(.66); }
 :root[data-theme='dark'] .poet-gallery-card:hover img { filter: sepia(.32) saturate(.7) contrast(1.06) brightness(.74); }
 :root[data-theme='dark'] .poet-gallery-card.is-revealed img { filter: sepia(.45) saturate(.5) brightness(.42); }
-:root[data-theme='dark'] .poet-gallery::before, :root[data-theme='dark'] .poet-gallery::after { color: color-mix(in srgb, var(--copper) 2.5%, transparent); }
+:root[data-theme='dark'] .poet-gallery::before, :root[data-theme='dark'] .poet-gallery::after { opacity: .14; }
