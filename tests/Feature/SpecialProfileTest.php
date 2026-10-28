@@ -85,3 +85,11 @@ test('the private message stays on the owner profile after a refresh and is neve
     $this->actingAs(User::factory()->create())->get(route('profile.show', $user))->assertDontSee('member-idcard-name');
     $this->get(route('profile.show', $user))->assertDontSee('member-idcard-name');
 });
+
+test('the identity card carries the owner-written verses and credits them to the sender', function () {
+    $user = User::factory()->create(['email' => 'special-reader@example.test']);
+
+    $this->actingAs($user)->get(route('profile.show', $user))->assertOk()
+        ->assertSeeInOrder(['إِذا قَصَدَ الرِّجالُ حِماكَ يَوْمًا', 'تُلاقيهِمْ بِبِشرٍ وَارتِياحِ', 'وَنَجمَ هِدايَةٍ نَحوَ الفَلاحِ', 'من عبدالعزيز المطرفي · مدير مِداد', 'الأبيات من نظم عبدالعزيز المطرفي'])
+        ->assertDontSee('جرير');
+});

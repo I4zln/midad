@@ -78,7 +78,7 @@
                 </div>
                 <footer class="member-idcard-foot">
                     <span>من {{ $specialMessage->sender_name }} · {{ $specialMessage->sender_role }}</span>
-                    <small>الأبيات للشاعر جرير · <a href="https://dorar.net/arabia/6057/%D8%A7%D9%84%D9%85%D8%B7%D9%84%D8%A8-%D8%A7%D9%84%D8%A3%D9%88%D9%84-%D8%AC%D8%B1%D9%8A%D8%B1" target="_blank" rel="noopener noreferrer">مرجع النص</a></small>
+                    <small>الأبيات من نظم {{ $specialMessage->sender_name }}</small>
                 </footer>
             </aside>
         @elseif ($specialPending ?? false)
