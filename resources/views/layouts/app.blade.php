@@ -24,6 +24,7 @@
 
         <x-site-footer />
     </div>
+    <x-confirm-dialog />
     @stack('dialogs')
     @stack('scripts')
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

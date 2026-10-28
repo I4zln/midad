@@ -9,6 +9,6 @@
         <x-quote-fields :quote="$quote" />
         <x-button>حفظ التعديلات <span aria-hidden="true">←</span></x-button>
     </form>
-    <form method="POST" action="{{ route('quotes.destroy', $quote) }}" class="quote-delete-form" onsubmit="return confirm('هل تريد حذف هذا الاقتباس؟')">@csrf @method('DELETE')<x-button variant="outline">حذف الاقتباس</x-button></form>
+    <form method="POST" action="{{ route('quotes.destroy', $quote) }}" class="quote-delete-form" data-confirm="حذف هذا الاقتباس نهائيًا؟ لا يمكن التراجع.">@csrf @method('DELETE')<x-button variant="outline">حذف الاقتباس</x-button></form>
 </main>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuoteFavorite;
+use App\Models\QuoteLike;
 use App\Models\Quote;
 use App\Models\User;
 use App\Models\UserFollow;
@@ -103,9 +104,27 @@ class PageController extends Controller
         return back()->with('status', 'تم تعليم الإشعارات كمقروءة.');
     }
 
-    public function profile(User $user): View
+    public function profile(Request $request, User $user): View
     {
-        $quotes = $user->quotes()->withCardData()->latest()->latest('id')->paginate(9);
+        $isOwner = Auth::check() && Auth::user()->is($user);
+        // Liked and saved lists are private to their owner.
+        $tab = in_array($request->query('tab'), ['liked', 'saved'], true) && $isOwner ? $request->query('tab') : 'quotes';
+
+        $quotes = match ($tab) {
+            'liked' => Quote::query()->whereHas('likes', fn ($likes) => $likes->where('user_id', $user->id))->withCardData()
+                ->orderByDesc(QuoteLike::query()->select('created_at')->whereColumn('quote_id', 'quotes.id')->where('user_id', $user->id)->limit(1)),
+            'saved' => Quote::query()->whereHas('favorites', fn ($favorites) => $favorites->where('user_id', $user->id))->withCardData()
+                ->orderByDesc(QuoteFavorite::query()->select('created_at')->whereColumn('quote_id', 'quotes.id')->where('user_id', $user->id)->limit(1)),
+            default => $user->quotes()->withCardData()->latest()->latest('id'),
+        };
+        $quotes = $quotes->paginate(9)->withQueryString();
+
+        $stats = [
+            'quotes' => $user->quotes()->count(),
+            'likes_received' => QuoteLike::query()->whereHas('quote', fn ($quote) => $quote->where('user_id', $user->id))->count(),
+            'liked' => $isOwner ? $user->likes()->count() : null,
+            'saved' => $isOwner ? $user->favorites()->count() : null,
+        ];
         $specialMessage = null;
         $specialEmail = (string) config('ethraa.special_profile_email', '');
 
@@ -131,6 +150,9 @@ class PageController extends Controller
         return view('profile.show', [
             'profile' => $user,
             'quotes' => $quotes,
+            'tab' => $tab,
+            'isOwner' => $isOwner,
+            'stats' => $stats,
             'followers' => UserFollow::query()->where('followed_id', $user->id)->count(),
             'following' => UserFollow::query()->where('follower_id', $user->id)->count(),
             'isFollowing' => Auth::check() && UserFollow::query()
@@ -150,7 +172,7 @@ class PageController extends Controller
     {
         $user = Auth::user();
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
+            'name' => ['required', 'string', 'min:2', 'max:50'],
             'bio' => ['nullable', 'string', 'max:600'],
             'location' => ['nullable', 'string', 'max:120'],
             'education' => ['nullable', 'string', 'max:180'],

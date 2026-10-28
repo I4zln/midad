@@ -90,9 +90,15 @@ class QuoteController extends Controller
 
     public function destroy(Quote $quote): RedirectResponse
     {
+        $previous = url()->previous();
         $quote->delete();
 
-        return redirect()->route('quotes.index')->with('status', 'تم حذف اقتباسك.');
+        // The quote's own pages no longer exist; send the owner to their quotes. Otherwise stay where they were.
+        $wasOnQuotePage = in_array(strtok($previous, '?#'), [route('quotes.show', $quote), route('quotes.edit', $quote)], true);
+        $sameSite = str_starts_with($previous, url('/'));
+
+        return ($wasOnQuotePage || ! $sameSite ? redirect()->route('profile.show', Auth::user()) : redirect()->to($previous))
+            ->with('status', 'حُذف اقتباسك.');
     }
 
     public function show(Quote $quote): View

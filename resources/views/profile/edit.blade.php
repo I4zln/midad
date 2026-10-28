@@ -4,9 +4,9 @@
 <main class="inner-page profile-edit-page">
     <nav class="breadcrumbs" aria-label="مسار التنقل"><a href="{{ route('home') }}">الرئيسية</a><span>←</span><a href="{{ route('profile.show', $profile) }}">ملفي الشخصي</a><span>←</span><span>تعديل</span></nav>
     <div class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> مساحتك في مِداد</div><h1>ملفك <em>الشخصي.</em></h1><p>أضف نبذة وموقعًا ومهاراتك، لتظهر للقراء حين يزورون ملفك.</p></div>
-    <form class="profile-edit-form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+    <form class="profile-edit-form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" data-validate>
         @csrf @method('PATCH')
-        @if ($errors->any())<div class="form-alert" role="alert">{{ $errors->first() }}</div>@endif
+        @if ($errors->any())<div class="form-alert" role="alert">راجع الحقول المعلَّمة أدناه ثم احفظ مرة أخرى.</div>@endif
         <section class="profile-edit-section">
             <div class="profile-edit-heading"><span class="eyebrow"><span class="eyebrow-line"></span> الصورة والغلاف</span><p>JPG أو PNG أو WebP. الصورة حتى 2MB والغلاف حتى 4MB.</p></div>
             <div class="profile-image-fields">
@@ -16,19 +16,31 @@
         </section>
         <section class="profile-edit-section">
             <div class="profile-edit-heading"><span class="eyebrow"><span class="eyebrow-line"></span> معلوماتك</span></div>
-            <label class="field-label" for="profile-name">الاسم الظاهر<input id="profile-name" name="name" maxlength="120" required value="{{ old('name', $profile->name) }}"></label>
-            <label class="field-label" for="profile-bio">نبذة قصيرة<textarea id="profile-bio" name="bio" maxlength="600" rows="4" placeholder="ما الكلمات التي تحب أن يعرفها الآخرون عنك؟">{{ old('bio', $profile->bio) }}</textarea><small>حتى 600 حرف</small></label>
+            <x-form-field for="profile-name" name="name" label="الاسم الظاهر" help="من 2 إلى 50 حرفًا، ويظهر مع اقتباساتك.">
+                <input id="profile-name" name="name" minlength="2" maxlength="50" required value="{{ old('name', $profile->name) }}" autocomplete="name">
+            </x-form-field>
+            <x-form-field for="profile-bio" name="bio" label="نبذة قصيرة" help="اختيارية، حتى 600 حرف.">
+                <textarea id="profile-bio" name="bio" maxlength="600" rows="4" placeholder="ما الكلمات التي تحب أن يعرفها الآخرون عنك؟">{{ old('bio', $profile->bio) }}</textarea>
+            </x-form-field>
             <div class="field-row">
-                <label class="field-label" for="profile-location">المدينة أو الموقع<input id="profile-location" name="location" maxlength="120" value="{{ old('location', $profile->location) }}" placeholder="مكة المكرمة"></label>
-                <label class="field-label" for="profile-education">الدراسة أو التخصص<input id="profile-education" name="education" maxlength="180" value="{{ old('education', $profile->education) }}" placeholder="هندسة البرمجيات"></label>
+                <x-form-field for="profile-location" name="location" label="المدينة أو الموقع" help="اختياري.">
+                    <input id="profile-location" name="location" maxlength="120" value="{{ old('location', $profile->location) }}" placeholder="مكة المكرمة">
+                </x-form-field>
+                <x-form-field for="profile-education" name="education" label="الدراسة أو التخصص" help="اختياري.">
+                    <input id="profile-education" name="education" maxlength="180" value="{{ old('education', $profile->education) }}" placeholder="هندسة البرمجيات">
+                </x-form-field>
             </div>
-            <label class="field-label" for="profile-skills">المهارات <small>افصل بينها بفاصلة</small><input id="profile-skills" name="skills" maxlength="500" value="{{ old('skills', implode(', ', $profile->skills ?? [])) }}" placeholder="الكتابة، القراءة، الترجمة"></label>
+            <x-form-field for="profile-skills" name="skills" label="المهارات" help="اختيارية، افصل بينها بفاصلة.">
+                <input id="profile-skills" name="skills" maxlength="500" value="{{ old('skills', implode(', ', $profile->skills ?? [])) }}" placeholder="الكتابة، القراءة، الترجمة">
+            </x-form-field>
         </section>
         <section class="profile-edit-section">
             <div class="profile-edit-heading"><span class="eyebrow"><span class="eyebrow-line"></span> روابطك</span><p>أضف الروابط التي تريد مشاركتها مع زوار ملفك.</p></div>
             <div class="profile-link-grid">
                 @foreach (['linkedin' => 'LinkedIn', 'github' => 'GitHub', 'instagram' => 'Instagram', 'x' => 'X'] as $network => $label)
-                    <label class="field-label" for="social-{{ $network }}">{{ $label }}<input id="social-{{ $network }}" type="url" name="social_links[{{ $network }}]" maxlength="255" value="{{ old('social_links.'.$network, $profile->social_links[$network] ?? '') }}" placeholder="https://"></label>
+                    <x-form-field for="social-{{ $network }}" name="social_links.{{ $network }}" :label="$label">
+                        <input id="social-{{ $network }}" type="url" name="social_links[{{ $network }}]" maxlength="255" dir="ltr" value="{{ old('social_links.'.$network, $profile->social_links[$network] ?? '') }}" placeholder="https://">
+                    </x-form-field>
                 @endforeach
             </div>
         </section>

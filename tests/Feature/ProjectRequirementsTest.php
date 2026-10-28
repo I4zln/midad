@@ -87,7 +87,8 @@ test('only a quote owner can update or delete it and owners can use both actions
     $this->actingAs($owner)->put(route('quotes.update', $quote), ['text' => 'تعديل صحيح.', 'category' => 'حياة'])->assertRedirect(route('quotes.show', $quote));
     $this->assertDatabaseHas('quotes', ['id' => $quote->id, 'text' => 'تعديل صحيح.']);
     $this->from(route('quotes.edit', $quote))->put(route('quotes.update', $quote), ['text' => str_repeat('ا', 156), 'category' => 'حياة'])->assertSessionHasErrors('text');
-    $this->delete(route('quotes.destroy', $quote))->assertRedirect(route('quotes.index'));
+    // Deleted from its own edit page → back to the owner's quotes.
+    $this->delete(route('quotes.destroy', $quote))->assertRedirect(route('profile.show', $owner));
     $this->assertDatabaseMissing('quotes', ['id' => $quote->id]);
 });
 

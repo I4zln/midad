@@ -16,8 +16,11 @@
         @endauth
         <button class="icon-button" type="button" data-copy-text="{{ $quote->text }}" aria-label="نسخ الاقتباس" title="نسخ"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/></svg></button>
         <button class="icon-button" type="button" data-share-url="{{ route('quotes.show', $quote) }}" data-share-title="اقتباس من مِداد" data-share-text="{{ $quote->text }}" aria-label="مشاركة الاقتباس" title="مشاركة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4m-6.6 7 6.6 4.3"/></svg></button>
-        @if (auth()->check() && auth()->id() === $quote->user_id)
-            <a class="icon-button" href="{{ route('quotes.edit', $quote) }}" aria-label="تعديل اقتباسك" title="تعديل">✎</a>
-        @endif
+        @can('update', $quote)
+            <span class="card-owner-actions">
+                <a class="icon-button" href="{{ route('quotes.edit', $quote) }}" aria-label="تعديل اقتباسك" title="تعديل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></a>
+                <form method="POST" action="{{ route('quotes.destroy', $quote) }}" data-confirm="حذف هذا الاقتباس نهائيًا؟ لا يمكن التراجع.">@csrf @method('DELETE')<button class="icon-button card-delete" type="submit" aria-label="حذف اقتباسك" title="حذف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></form>
+            </span>
+        @endcan
     </div>
 </article>

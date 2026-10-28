@@ -88,3 +88,11 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Inline Arabic validation for `form[data-validate]` (blur/input/submit, replaces browser bubbles), aria-describedby/invalid.
 - Found while testing on 390px: logout + profile link were `display:none` on mobile; favorites/notifications had no link anywhere → new account menu (`site-header`) with profile, add quote, saved, notifications (+unread badge), edit profile, admin, logout. `scroll-padding-bottom` so the fixed bottom nav never covers focused fields/buttons.
 - Tests: 5 new (wrong login, next/reason, unsafe next, protected page, reset flow). 47/47. Browser e2e on copied DB via log mailer: register inline errors, register, logout via menu, wrong password, neutral message ×2, one mail in mail.log (subject/sender/60 min/ignore/signature), invalid link, mismatch, reset, reused link rejected, login with new password, no token in laravel.log — all PASS (when runs are >1 min apart; rate limits otherwise trip, as intended).
+
+## T2 Phase 5 — Profile redesign · DONE
+- `PageController@profile`: tabs `quotes` / `liked` / `saved` (liked+saved owner-only; visitors fall back to quotes), real stats (quotes, likes received, followers, following; liked/saved counts on owner tabs), 9 per page with query string.
+- `profile/show.blade.php` rebuilt: ivory cover band (no dark gradient block), avatar above the cover (no clipping), name/role/@handle/«عضو منذ أكتوبر 2026», actions (owner: add quote + edit; visitor: follow), stats row, tabs, shared `x-quote-card`, friendly empty states. Gender-neutral labels.
+- Quote card: owner-only edit + delete (`@can`, server still enforces via policy). Delete returns to the page you were on (profile) or to the profile when deleted from the quote's own page.
+- Shared `x-confirm-dialog` replaces all `confirm()` (5 forms).
+- Profile edit: name 2–50 with hint, all fields via `x-form-field` (errors under each), inline validation. No password-change feature exists → not added.
+- Tests: 2 new (tabs/privacy/stats/owner actions/403; delete from profile + name rules). 49/49. Screenshots: 1440 light/dark, 390, owner view — no overflow.

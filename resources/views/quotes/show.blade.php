@@ -21,7 +21,7 @@
             </span>
         </div>
         @can('update', $quote)
-            <div class="detail-owner-actions"><a class="button button-outline" href="{{ route('quotes.edit', $quote) }}">تعديل الاقتباس</a><form method="POST" action="{{ route('quotes.destroy', $quote) }}" onsubmit="return confirm('هل تريد حذف هذا الاقتباس؟')">@csrf @method('DELETE')<button class="button button-outline" type="submit">حذف الاقتباس</button></form></div>
+            <div class="detail-owner-actions"><a class="button button-outline" href="{{ route('quotes.edit', $quote) }}">تعديل الاقتباس</a><form method="POST" action="{{ route('quotes.destroy', $quote) }}" data-confirm="حذف هذا الاقتباس نهائيًا؟ لا يمكن التراجع.">@csrf @method('DELETE')<button class="button button-outline" type="submit">حذف الاقتباس</button></form></div>
         @endcan
         <div class="detail-social">
             @auth

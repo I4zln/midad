@@ -628,3 +628,22 @@ document.addEventListener('submit', (event) => {
 }, true);
 linkFieldDescriptions();
 document.addEventListener('midad:page-loaded', () => linkFieldDescriptions());
+
+// Forms with data-confirm ask first in the shared dialog (components/confirm-dialog.blade.php).
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || !form.dataset.confirm) return;
+    if (form.dataset.confirmed === 'true') { delete form.dataset.confirmed; return; }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const dialog = document.querySelector('#confirm-dialog');
+    if (!dialog?.showModal) { if (window.confirm(form.dataset.confirm)) { form.dataset.confirmed = 'true'; form.requestSubmit(); } return; }
+    dialog.querySelector('#confirm-dialog-message').textContent = form.dataset.confirm;
+    dialog.addEventListener('close', () => {
+        if (dialog.returnValue !== 'confirm') return;
+        form.dataset.confirmed = 'true';
+        form.requestSubmit();
+    }, { once: true });
+    dialog.returnValue = '';
+    dialog.showModal();
+}, true);

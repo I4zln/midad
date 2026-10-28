@@ -96,3 +96,49 @@ test('forgot password gives the same neutral answer for known and unknown addres
         ->assertRedirect(route('login'))->assertSessionHas('status');
     $this->post(route('login.store'), ['email' => $reader->email, 'password' => 'new-pass-456'])->assertRedirect(route('home'));
 });
+
+test('profile shows real counts, private liked/saved tabs for the owner only, and owner-only card actions', function () {
+    $owner = \App\Models\User::factory()->create(['name' => 'سارة']);
+    $visitor = \App\Models\User::factory()->create();
+    $mine = \App\Models\Quote::query()->create(['user_id' => $owner->id, 'text' => 'اقتباس صاحبة الملف.', 'category' => 'أمل']);
+    $other = \App\Models\Quote::query()->create(['user_id' => $visitor->id, 'text' => 'اقتباس أعجبها.', 'category' => 'حب']);
+    $mine->likes()->create(['user_id' => $visitor->id]);
+    $other->likes()->create(['user_id' => $owner->id]);
+    $other->favorites()->create(['user_id' => $owner->id]);
+
+    $page = $this->actingAs($owner)->get(route('profile.show', $owner))->assertOk()
+        ->assertSee('اقتباساتي')->assertSee('المعجب بها')->assertSee('المحفوظات')
+        ->assertSee('اقتباس صاحبة الملف.')
+        ->assertSee(route('quotes.edit', $mine), false)
+        ->assertSee('data-confirm=', false);
+    expect($page->viewData('stats'))->toMatchArray(['quotes' => 1, 'likes_received' => 1, 'liked' => 1, 'saved' => 1]);
+
+    $this->get(route('profile.show', [$owner, 'tab' => 'liked']))->assertSee('اقتباس أعجبها.')->assertDontSee('اقتباس صاحبة الملف.');
+    $this->get(route('profile.show', [$owner, 'tab' => 'saved']))->assertSee('اقتباس أعجبها.');
+
+    // A visitor sees neither private tab nor the owner's edit/delete controls, and ?tab=saved falls back to quotes.
+    $this->actingAs($visitor)->get(route('profile.show', [$owner, 'tab' => 'saved']))->assertOk()
+        ->assertDontSee('tab=saved', false)->assertDontSee('tab=liked', false)->assertDontSee('المعجب بها')
+        ->assertSee('اقتباس صاحبة الملف.')->assertDontSee('اقتباس أعجبها.')
+        ->assertDontSee(route('quotes.edit', $mine), false);
+    $this->delete(route('quotes.destroy', $mine))->assertForbidden();
+});
+
+test('owner deletes a quote from the profile and stays there; profile name is limited to 2–50 characters', function () {
+    $owner = \App\Models\User::factory()->create(['name' => 'سارة']);
+    $quote = \App\Models\Quote::query()->create(['user_id' => $owner->id, 'text' => 'سيُحذف من الملف.', 'category' => 'أمل']);
+    $this->actingAs($owner);
+
+    $this->from(route('profile.show', $owner))->delete(route('quotes.destroy', $quote))
+        ->assertRedirect(route('profile.show', $owner))->assertSessionHas('status', 'حُذف اقتباسك.');
+    $this->assertDatabaseMissing('quotes', ['id' => $quote->id]);
+    $this->get(route('profile.show', $owner))->assertSee('لم تنشر اقتباسًا بعد.')->assertSee('أضف اقتباسًا');
+
+    $this->from(route('profile.edit'))->patch(route('profile.update'), ['name' => 'س'])
+        ->assertSessionHasErrors(['name' => 'عدد أحرف الاسم يجب ألا يقل عن 2.']);
+    $this->from(route('profile.edit'))->patch(route('profile.update'), ['name' => str_repeat('س', 51)])->assertSessionHasErrors('name');
+    $this->get(route('profile.edit'))->assertSee('id="profile-name-error"', false)->assertSee('من 2 إلى 50 حرفًا');
+    $this->patch(route('profile.update'), ['name' => 'سارة الكاتبة'])->assertRedirect(route('profile.show', $owner))
+        ->assertSessionHas('status', 'تم تحديث ملفك الشخصي.');
+    expect($owner->fresh()->name)->toBe('سارة الكاتبة');
+});
