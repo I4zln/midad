@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', 'مفضلتي — مِداد')
+@section('title', 'محفوظاتي — مِداد')
 @section('content')
 <main class="inner-page">
-    <div class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> مختاراتك الخاصة</div><h1>مفضلتي <em>في أثر.</em></h1><p>الكلمات التي اخترت أن تعود إليها.</p></div>
+    <div class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> مختاراتك الخاصة</div><h1>محفوظاتي <em>في مِداد.</em></h1><p>الكلمات التي اخترت أن تعود إليها.</p></div>
     <div class="quote-grid">
         @forelse ($quotes as $index => $quote)
             <x-quote-card :quote="$quote" :index="$index" />

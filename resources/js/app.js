@@ -8,9 +8,11 @@ const audioChoice = document.querySelector('#ethraa-audio-choice');
 const audio = document.querySelector('#ethraa-audio');
 let toastTimeout;
 
-function showToast(message) {
+function showToast(message, isError = /^تعذّر|انتهت/.test(message || '')) {
     if (!toast || !message) return;
     toast.textContent = message;
+    toast.classList.toggle('is-error', isError);
+    toast.setAttribute('role', isError ? 'alert' : 'status');
     toast.classList.add('is-visible');
     window.clearTimeout(toastTimeout);
     toastTimeout = window.setTimeout(() => toast.classList.remove('is-visible'), 2800);
@@ -489,7 +491,7 @@ document.addEventListener('click', (event) => {
 // Full-page POST forms: show progress and ignore repeat submits until the next page arrives.
 document.addEventListener('submit', (event) => {
     const form = event.target;
-    if (event.defaultPrevented || !(form instanceof HTMLFormElement) || form.method.toLowerCase() === 'get') return;
+    if (event.defaultPrevented || !(form instanceof HTMLFormElement) || ['get', 'dialog'].includes(form.method.toLowerCase())) return;
     if (form.dataset.submitting === 'true') { event.preventDefault(); return; }
     form.dataset.submitting = 'true';
     form.setAttribute('aria-busy', 'true');

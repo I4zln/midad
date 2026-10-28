@@ -164,11 +164,11 @@ test('likes and bookmarks toggle, appear on the favorites page and are unique pe
     $quote = Quote::query()->create(['text' => 'اقتباس يستحق الحفظ.', 'category' => 'أمل']);
     $this->actingAs($reader);
 
-    $this->post(route('quotes.favorite', $quote))->assertSessionHas('status', 'حُفظ الاقتباس في مفضلتك.');
+    $this->post(route('quotes.favorite', $quote))->assertSessionHas('status', 'حُفظ الاقتباس في محفوظاتك.');
     $this->get(route('favorites'))->assertOk()->assertSee('اقتباس يستحق الحفظ.');
     expect($reader->favorites()->count())->toBe(1)->and($reader->favorites()->first()->quote->is($quote))->toBeTrue();
 
-    $this->post(route('quotes.favorite', $quote))->assertSessionHas('status', 'أُزيل الاقتباس من مفضلتك.');
+    $this->post(route('quotes.favorite', $quote))->assertSessionHas('status', 'أُزيل الاقتباس من محفوظاتك.');
     $this->get(route('favorites'))->assertDontSee('اقتباس يستحق الحفظ.');
 
     $reader->likes()->create(['quote_id' => $quote->id]);

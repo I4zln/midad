@@ -95,7 +95,7 @@
 @auth
 @push('dialogs')
 <dialog class="composer-dialog" id="composer-dialog" aria-labelledby="composer-title" data-quote-form-errors="{{ $errors->has('text') || $errors->has('author') || $errors->has('source') || $errors->has('category') ? 'true' : 'false' }}">
-    <form method="POST" action="{{ route('quotes.store') }}" class="composer-form">
+    <form method="POST" action="{{ route('quotes.store') }}" class="composer-form" data-validate>
         @csrf
         <div class="dialog-heading"><div><span class="eyebrow">مساحة القرّاء</span><h2 id="composer-title">أضف اقتباسًا <em>إلى مِداد.</em></h2></div><button class="icon-button dialog-close" type="button" data-close-dialog aria-label="إغلاق">×</button></div>
         <p class="composer-intro">اكتب النص كما تحب أن يقرؤه الآخرون. سيظهر اسم حسابك بوصفك صاحب المشاركة، واكتب في خانة القائل اسم الشاعر أو الكاتب إن كان معروفًا.</p>

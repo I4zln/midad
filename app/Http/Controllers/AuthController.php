@@ -20,7 +20,7 @@ class AuthController extends Controller
     // Why a guest was sent to log in, keyed by the ?reason= value used on guest action links.
     private const LOGIN_REASONS = [
         'like' => 'سجّل الدخول لتتمكن من الإعجاب بالاقتباس، وسنعيدك إلى حيث كنت.',
-        'save' => 'سجّل الدخول لحفظ الاقتباس في مفضلتك، وسنعيدك إلى حيث كنت.',
+        'save' => 'سجّل الدخول لحفظ الاقتباس في محفوظاتك، وسنعيدك إلى حيث كنت.',
         'add' => 'سجّل الدخول لإضافة اقتباسك إلى المكتبة.',
         'comment' => 'سجّل الدخول لتشارك في التعليقات، وسنعيدك إلى الاقتباس نفسه.',
         'follow' => 'سجّل الدخول لمتابعة هذا القارئ، وسنعيدك إلى ملفه.',

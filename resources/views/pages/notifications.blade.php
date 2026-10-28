@@ -3,7 +3,7 @@
 @section('content')
 <main class="inner-page notifications-page">
     <div class="notifications-heading">
-        <div class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> جديدك في أثر</div><h1>الإشعارات.</h1><p>تفاعلات القراء مع كلماتك ومساهماتك.</p></div>
+        <div class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> جديدك في مِداد</div><h1>الإشعارات.</h1><p>تفاعلات القراء مع كلماتك ومساهماتك.</p></div>
         @if ($notifications->whereNull('read_at')->count())
             <form method="POST" action="{{ route('notifications.read') }}">@csrf<button class="button button-outline" type="submit">تعليم الكل كمقروء</button></form>
         @endif

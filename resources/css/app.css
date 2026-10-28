@@ -1176,3 +1176,21 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .confirm-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .button-danger { border: 1px solid #a44b42; background: #a44b42; color: #fff; }
 .button-danger:hover, .button-danger:focus-visible { background: #8d3e36; }
+
+/* Form fields always span the full form width (label grids otherwise shrink to their content) */
+.account-form .field-label, .quote-form .field-label, .profile-edit-form .field-label { grid-template-columns: minmax(0, 1fr); }
+.account-form .field-label > :is(input, textarea, select, .password-field), .quote-form .field-label > :is(input, textarea, select) { width: 100%; }
+
+/* Consistent keyboard focus for interactive elements that had none */
+:is(a, button, summary, select, input[type='checkbox'], input[type='range']):focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.icon-button:focus-visible, .like-button:focus-visible, .category-chip:focus-visible, .midad-page:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.button-outline.is-favorited { border-color: var(--copper); color: var(--copper); }
+
+/* Toasts: above the mobile bottom nav, high contrast, success vs error marker */
+.toast { z-index: 220; min-height: 44px; display: flex; align-items: center; border-inline-start: 3px solid var(--copper); background: #24231f; color: #fbf9f4; font-size: 13px; line-height: 1.7; box-shadow: 0 8px 24px #24231f33; }
+.toast.is-error { border-inline-start-color: #e09a8f; }
+@media (max-width: 680px) { .toast { bottom: 76px; } }
+/* The top-of-page error is only for errors that no field displays */
+.site-shell:has(.field-error) > .global-alert { display: none; }
+.search-box:focus-within { border-color: var(--copper); box-shadow: 0 0 0 2px color-mix(in srgb, var(--copper) 25%, transparent); }
+.search-box input:focus-visible { outline: none; }

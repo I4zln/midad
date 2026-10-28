@@ -71,7 +71,7 @@ class CommunityController extends Controller
             return true;
         });
 
-        return back()->with('status', $saved ? 'حُفظ الاقتباس في مفضلتك.' : 'أُزيل الاقتباس من مفضلتك.');
+        return back()->with('status', $saved ? 'حُفظ الاقتباس في محفوظاتك.' : 'أُزيل الاقتباس من محفوظاتك.');
     }
 
     public function comment(Request $request, Quote $quote): RedirectResponse

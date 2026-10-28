@@ -96,3 +96,13 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Shared `x-confirm-dialog` replaces all `confirm()` (5 forms).
 - Profile edit: name 2–50 with hint, all fields via `x-form-field` (errors under each), inline validation. No password-change feature exists → not added.
 - Tests: 2 new (tabs/privacy/stats/owner actions/403; delete from profile + name rules). 49/49. Screenshots: 1440 light/dark, 390, owner view — no overflow.
+
+## T2 Phase 6 — UX consistency · DONE
+- Old brand «أثر» removed from 4 views; one term for bookmarks everywhere: «المحفوظات» (menu, tab, page title, toasts, login reason); quote page save button shows its state.
+- Forms: field labels/inputs always full width (label grid was shrinking to 219px on phones); inline validation on create/edit/composer/comment; duplicate top-of-page error hidden when field errors are shown.
+- Toasts above the mobile bottom nav, high contrast, error variant (role=alert). Focus-visible outlines for links/buttons/summary/chips/pagination; search box focus ring.
+- Bug found by e2e and fixed: the POST double-submit guard also caught `method="dialog"` forms, so after one «إلغاء» the confirm dialog's «نعم، احذف» did nothing.
+- Browser audit (11 guest + 7 signed-in pages × 390/1440 + keyboard Tab walk): no overflow, no unnamed controls, no unlabeled inputs, no clipped text.
+- Browser e2e regression (demo DB): create (inline error, counter, first on home, toast), edit, like/unlike via AJAX, save + المحفوظات page, search + clear, delete via dialog (cancel/confirm), 404 after delete, other user's edit → 403 — 18/18 PASS. PHP tests 49/49.
+- Final numbers (warm, cache disabled): home TTFB 76–99ms / load 311–326ms (was 454/819); /quotes 56–67ms / 164–181ms (was 357/446). In-site nav 59–101ms, hover-then-click 13–29ms.
+- Not refreshed: `deliverables/` (SRS PDF, zip) still reflect Task 1.
