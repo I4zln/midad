@@ -1,0 +1,51 @@
+# Render Blueprint: one free web service (Docker) + one free PostgreSQL database.
+# Render → New → Blueprint → pick this repository. No secrets live in this file.
+services:
+  - type: web
+    name: midad
+    runtime: docker
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: FORCE_HTTPS
+        value: "true"
+      - key: APP_LOCALE
+        value: ar
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: warning
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: midad-db
+          property: connectionString
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_ENCRYPT
+        value: "true"
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      # Reset emails are written to the log until you add Gmail values in the dashboard (MAIL_MAILER=smtp).
+      - key: MAIL_MAILER
+        value: log
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+
+databases:
+  - name: midad-db
+    plan: free
+    databaseName: midad

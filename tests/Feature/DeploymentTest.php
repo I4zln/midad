@@ -19,6 +19,13 @@ test('production redirects http to https with 301 and sends HSTS over https', fu
         ->assertHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 });
 
+test('production answers the plain-http health check on /up instead of redirecting', function () {
+    app()->detectEnvironment(fn () => 'production');
+    config(['app.force_https' => true]);
+
+    $this->get('http://localhost/up')->assertOk();
+});
+
 test('production with FORCE_HTTPS=false serves plain http (local production-mode testing)', function () {
     app()->detectEnvironment(fn () => 'production');
     config(['app.force_https' => false]);

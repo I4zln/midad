@@ -13,7 +13,8 @@ class SecureResponses
     {
         $production = app()->environment('production');
 
-        if ($production && ! $request->isSecure() && config('app.force_https')) {
+        // The host's health checker probes /up over plain http inside its network; answer it directly.
+        if ($production && ! $request->isSecure() && config('app.force_https') && ! $request->is('up')) {
             return redirect()->secure($request->getRequestUri(), 301);
         }
 
