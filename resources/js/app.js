@@ -6,7 +6,6 @@ const audioMute = document.querySelector('#ethraa-audio-mute');
 const audioVolume = document.querySelector('#ethraa-audio-volume');
 const audioChoice = document.querySelector('#ethraa-audio-choice');
 const audio = document.querySelector('#ethraa-audio');
-const welcomeDialog = document.querySelector('#ethraa-welcome');
 let toastTimeout;
 
 function showToast(message) {
@@ -33,7 +32,6 @@ if (themeToggle) {
 if (audio && audioChoice && audioToggle) {
     const choiceKey = 'ethraa-audio-choice';
     const playingKey = 'ethraa-audio-playing';
-    const welcomeKey = 'ethraa-welcome-seen';
     const volumeKey = 'ethraa-audio-volume';
     const muteKey = 'ethraa-audio-muted';
     let selectedTrack = '';
@@ -158,7 +156,8 @@ if (audio && audioChoice && audioToggle) {
         writeStorage(playingKey, String(Boolean(selectedTrack) && !audio.paused));
     });
 
-    if (selectedTrack && readStorage(playingKey) === 'true' && readStorage(welcomeKey) === 'true') {
+    // Never autoplay: a track that was playing resumes only after the visitor's first interaction.
+    if (selectedTrack && readStorage(playingKey) === 'true') {
         const resumeAfterNavigation = () => {
             if (!audio.paused || !selectedTrack) return;
             audio.play().then(() => updatePlayer(true)).catch(() => writeStorage(playingKey, 'false'));
@@ -167,74 +166,6 @@ if (audio && audioChoice && audioToggle) {
         };
         document.addEventListener('pointerdown', resumeAfterNavigation, { once: true });
         document.addEventListener('keydown', resumeAfterNavigation, { once: true });
-    }
-
-    if (welcomeDialog) {
-        const startButton = welcomeDialog.querySelector('[data-welcome-start]');
-        const closeButton = welcomeDialog.querySelector('[data-welcome-close]');
-        const hint = welcomeDialog.querySelector('[data-welcome-hint]');
-        const optionsPanel = welcomeDialog.querySelector('[data-welcome-options]');
-        const sourceParagraphs = [...welcomeDialog.querySelectorAll('.welcome-message-placeholder p')];
-        const outputParagraphs = [...welcomeDialog.querySelectorAll('.welcome-message-output p')];
-        const prefersLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let typeTimer = 0;
-        let choiceMade = false;
-
-        const graphemes = (text) => {
-            if (Intl.Segmenter) return [...new Intl.Segmenter('ar', { granularity: 'grapheme' }).segment(text)].map((part) => part.segment);
-            return [...text].reduce((clusters, character) => {
-                if (/\p{M}/u.test(character) && clusters.length) clusters[clusters.length - 1] += character;
-                else clusters.push(character);
-                return clusters;
-            }, []);
-        };
-        const finishTyping = () => {
-            window.clearTimeout(typeTimer);
-            outputParagraphs.forEach((paragraph, index) => { paragraph.textContent = sourceParagraphs[index]?.textContent || ''; });
-            if (optionsPanel) optionsPanel.hidden = false;
-            if (hint) hint.textContent = 'اختر أجواءك أو ابدأ التصفح بصمت.';
-        };
-        const closeWelcome = () => {
-            if (!choiceMade) setAudioChoice('silent', false);
-            writeStorage(welcomeKey, 'true');
-            welcomeDialog.close();
-        };
-        const typeParagraph = (paragraphIndex, characters, characterIndex = 0) => {
-            if (paragraphIndex >= sourceParagraphs.length) {
-                if (optionsPanel) optionsPanel.hidden = false;
-                if (hint) hint.textContent = 'اختر أجواءك أو ابدأ التصفح بصمت.';
-                return;
-            }
-            if (characterIndex >= characters.length) {
-                typeTimer = window.setTimeout(() => typeParagraph(paragraphIndex + 1, graphemes(sourceParagraphs[paragraphIndex + 1]?.textContent || '')), 240);
-                return;
-            }
-            outputParagraphs[paragraphIndex].textContent += characters[characterIndex];
-            const pause = /[،؛.!؟]/u.test(characters[characterIndex]) ? 115 : 27;
-            typeTimer = window.setTimeout(() => typeParagraph(paragraphIndex, characters, characterIndex + 1), pause);
-        };
-        const recordChoice = (key) => {
-            if (!setAudioChoice(key, key !== 'silent')) return;
-            choiceMade = true;
-            welcomeDialog.querySelectorAll('[data-welcome-audio]').forEach((button) => {
-                button.setAttribute('aria-pressed', String(button.dataset.welcomeAudio === key));
-            });
-            if (hint) hint.textContent = key === 'silent' ? 'تم اختيار التصفح بدون صوت.' : `تم اختيار ${trackName(key)}.`;
-        };
-
-        welcomeDialog.querySelectorAll('[data-welcome-audio]').forEach((button) => {
-            button.setAttribute('aria-pressed', 'false');
-            button.addEventListener('click', () => recordChoice(button.dataset.welcomeAudio));
-        });
-        startButton?.addEventListener('click', closeWelcome);
-        closeButton?.addEventListener('click', closeWelcome);
-        welcomeDialog.addEventListener('cancel', (event) => { event.preventDefault(); closeWelcome(); });
-
-        if (readStorage(welcomeKey) !== 'true') {
-            welcomeDialog.showModal();
-            if (prefersLessMotion) finishTyping();
-            else typeParagraph(0, graphemes(sourceParagraphs[0]?.textContent || ''));
-        }
     }
 }
 
@@ -600,3 +531,12 @@ window.addEventListener('resize', () => {
 
 
 
+
+// Close the navbar audio menu on outside click or Escape.
+document.addEventListener('click', (event) => {
+    document.querySelectorAll('.ambient-menu[open]').forEach((menu) => { if (!menu.contains(event.target)) menu.open = false; });
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('.ambient-menu[open]').forEach((menu) => { menu.open = false; menu.querySelector('summary')?.focus(); });
+});

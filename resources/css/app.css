@@ -913,39 +913,11 @@ dialog::backdrop { background: #151613a6; backdrop-filter: blur(4px); }
     .muallaqa-pagination strong { font-size: 12px; }
 }
 
-/* First visit welcome and user selected ambient audio. */
 .ambient-player { display: inline-flex; max-width: 100%; align-items: center; gap: 6px; }
 .audio-choice-label { color: var(--stone); font-size: 9px; }
 .audio-choice { width: 112px; min-width: 0; height: 35px; padding-inline: 8px; border: 1px solid var(--line); border-radius: 20px; outline: none; background: var(--paper-raised); color: var(--ink); font: 10px var(--font-ui); }
 .audio-choice:focus-visible, .audio-toggle:focus-visible, .audio-mute:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
 .audio-mute:disabled { cursor: not-allowed; opacity: .45; }
-.welcome-dialog { position: fixed; inset: 0; width: min(690px, calc(100vw - 28px)); max-width: none; max-height: min(92dvh, 780px); margin: auto; padding: 0; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-raised); color: var(--ink); }
-.welcome-dialog::backdrop { background: #171815a8; backdrop-filter: blur(3px); }
-.welcome-card { position: relative; display: flex; min-height: min(680px, 86dvh); flex-direction: column; justify-content: center; padding: clamp(25px, 5vw, 52px); background: var(--paper-raised); animation: welcome-appear .28s ease-out both; }
-.welcome-close { position: absolute; top: 15px; left: 16px; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--stone); cursor: pointer; font: 20px/1 var(--font-ui); }
-.welcome-close:hover { color: var(--ink); border-color: var(--copper-soft); }
-.welcome-card-heading { position: absolute; top: 24px; right: 0; left: 0; display: flex; justify-content: center; }
-.welcome-card-heading .eyebrow { margin: 0; color: var(--copper); font-size: 10px; }
-.welcome-seal { display: none; }
-.welcome-content { width: min(100%, 550px); margin: auto; text-align: center; }
-.welcome-typing-area { display: grid; width: 100%; direction: rtl; unicode-bidi: plaintext; }
-.welcome-message-placeholder, .welcome-message-output { grid-area: 1 / 1; width: 100%; margin: 0; text-align: center; }
-.welcome-message-placeholder { visibility: hidden; pointer-events: none; }
-.welcome-message-output { color: var(--ink-soft); font: 400 clamp(17px, 2.1vw, 21px)/2 var(--font-arabic); }
-.welcome-message-placeholder p, .welcome-message-output p { margin: 0 0 13px; text-align: center; }
-.welcome-message-placeholder p:last-child, .welcome-message-output p:last-child { margin-bottom: 0; }
-.welcome-signature { margin: 24px 0 0; color: var(--copper); font: 500 16px/1.8 var(--font-display); }
-.welcome-audio-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 23px 0 0; animation: welcome-appear .22s ease-out both; }
-.welcome-audio-options[hidden] { display: none; }
-.welcome-audio-option { display: flex; min-height: 48px; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); color: var(--ink); cursor: pointer; text-align: right; transition: border-color .16s, background .16s; }
-.welcome-audio-option:hover, .welcome-audio-option[aria-pressed='true'] { border-color: var(--copper); background: #f0e8dc; }
-.welcome-option-number { display: grid; width: 26px; height: 26px; flex: 0 0 26px; place-items: center; border: 1px solid var(--copper-soft); border-radius: 50%; color: var(--copper); font: 12px var(--font-display); }
-.welcome-audio-option strong { font: 500 12px var(--font-display); }
-.welcome-option-arrow { margin-inline-start: auto; color: var(--copper); }
-.welcome-card-footer { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 25px auto 0; }
-.welcome-card-footer .button { min-height: 42px; padding-inline: 23px; font-size: 12px; }
-.welcome-card-footer > span { display: none; }
-@keyframes welcome-appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 680px) {
     .topbar-actions { flex-wrap: wrap; }
     .ambient-player { gap: 4px; }
@@ -956,25 +928,10 @@ dialog::backdrop { background: #151613a6; backdrop-filter: blur(4px); }
     .ambient-player .audio-toggle span::after { content: '♪'; font-size: 13px; }
     .ambient-player .audio-mute { width: 25px; height: 25px; }
     .ambient-player .audio-volume { width: 35px; }
-    .welcome-dialog { width: calc(100vw - 18px); max-height: 94dvh; }
-    .welcome-card { min-height: min(660px, 90dvh); padding: 62px 22px 25px; }
-    .welcome-card-heading { top: 21px; }
-    .welcome-message-output { font-size: clamp(16px, 4vw, 19px); line-height: 1.9; }
-    .welcome-signature { margin-top: 20px; font-size: 15px; }
-    .welcome-audio-options { gap: 7px; margin-top: 20px; }
-    .welcome-audio-option { min-height: 46px; gap: 7px; padding: 8px; }
-    .welcome-audio-option strong { font-size: 11px; }
-    .welcome-card-footer { margin-top: 22px; }
 }
 @media (max-width: 390px) {
     .audio-choice { width: 80px; }
     .ambient-player .audio-volume { display: none; }
-    .welcome-card { padding-inline: 16px; }
-    .welcome-audio-options { grid-template-columns: 1fr; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .welcome-card, .welcome-audio-options { animation: none; }
-    .welcome-audio-option { transition: none; }
 }
 
 /* Organized quote library and owner-only quote forms. */
@@ -1057,3 +1014,26 @@ html.is-navigating .site-shell > :not(.topbar) { opacity: .72; transition: opaci
 @keyframes midad-progress { from { transform: scaleX(0); } 60% { transform: scaleX(.7); } to { transform: scaleX(.92); } }
 .button.is-loading, button.is-loading { cursor: progress; opacity: .7; }
 form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
+
+/* Compact ambient-audio menu in the navbar (replaces the inline player and the old welcome dialog) */
+.ambient-menu { position: relative; }
+.ambient-summary { display: inline-flex; min-height: 34px; align-items: center; gap: 6px; padding: 0 11px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink-soft); font-size: 11px; cursor: pointer; list-style: none; user-select: none; }
+.ambient-summary::-webkit-details-marker { display: none; }
+.ambient-summary svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ambient-summary:hover, .ambient-menu[open] .ambient-summary { border-color: var(--copper); color: var(--copper); }
+.ambient-summary:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.ambient-menu .ambient-player { max-width: none; position: absolute; z-index: 60; top: calc(100% + 8px); left: 0; display: grid; width: 230px; grid-template-columns: 1fr auto; gap: 10px; padding: 14px; border: 1px solid var(--line); background: var(--paper-raised); box-shadow: 0 10px 30px #24231f14; }
+.ambient-menu .ambient-note { grid-column: 1 / -1; margin: 0; text-align: start; color: var(--stone); font-size: 10px; line-height: 1.7; }
+.ambient-menu .audio-choice-label { grid-column: 1 / -1; display: block; color: var(--ink-soft); font-size: 11px; }
+.ambient-menu .audio-choice { grid-column: 1 / -1; width: 100%; height: 36px; font-size: 12px; }
+.ambient-menu .ambient-player .audio-toggle { min-width: 0; min-height: 34px; padding-inline: 12px; font-size: 11px; }
+.ambient-menu .ambient-player .audio-toggle span { font-size: inherit; }
+.ambient-menu .ambient-player .audio-toggle span::after { content: none; }
+.ambient-menu .ambient-player .audio-mute { width: 32px; height: 32px; }
+.ambient-menu .audio-volume-label { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1 / -1; display: block; margin-bottom: -6px; color: var(--stone); font-size: 10px; }
+.ambient-menu .ambient-player .audio-volume { display: block; grid-column: 1 / -1; width: 100%; }
+@media (max-width: 680px) {
+    .ambient-summary span { display: none; }
+    .ambient-summary { width: 34px; padding: 0; justify-content: center; }
+    .ambient-menu .ambient-player { position: fixed; top: auto; right: 12px; bottom: 70px; left: 12px; width: auto; }
+}

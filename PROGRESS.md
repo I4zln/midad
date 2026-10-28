@@ -69,3 +69,8 @@ Added: hover/touch/focus prefetch (10s TTL) in `loadPage`, copper progress line,
 Numbers: home load 819ms → 321ms; /quotes 446ms → 95ms; /muallaqat 464ms/3.35MB → 146ms/1.03MB.
 In-site navigation (click → new page): 42–71ms; hover-then-click 11–16ms.
 Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified files not in repo.
+
+## T2 Phase 2 — Opening message removed · DONE
+- Welcome `<dialog>` (typed "السلام عليكم…" message) removed from `layouts/app.blade.php`, its JS (~70 lines) and ~40 CSS rules.
+- Audio kept: navbar player folded into a compact «الأجواء» `<details>` menu (`site-header.blade.php`); closes on outside click/Escape; never autoplays (resume only after a user gesture).
+- Test `UxPolishTest`: no welcome text on 3 pages, audio menu present, no `autoplay`. 41/41 pass.

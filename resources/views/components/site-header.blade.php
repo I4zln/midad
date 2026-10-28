@@ -9,8 +9,11 @@
                 <a class="nav-link {{ request()->routeIs('about') ? 'is-active' : '' }}" href="{{ route('about') }}">من نحن</a>
             </nav>
             <div class="topbar-actions">
+                <details class="ambient-menu">
+                    <summary class="ambient-summary" aria-label="أجواء صوتية اختيارية" title="أجواء صوتية اختيارية"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>الأجواء</span></summary>
                 <div class="ambient-player" aria-label="مشغل الصوت الخلفي">
-                    <label class="audio-choice-label" for="ethraa-audio-choice">الأجواء</label>
+                    <p class="ambient-note">صوت اختياري، لا يعمل إلا إذا اخترته.</p>
+                    <label class="audio-choice-label" for="ethraa-audio-choice">اختر الأجواء</label>
                     <select id="ethraa-audio-choice" class="audio-choice" aria-label="اختر أجواء الاستماع">
                         <option value="">اختر صوتًا</option>
                         <option value="islamic" data-src="{{ asset('audio/islamic.mp3') }}">أصوات إسلامية</option>
@@ -28,6 +31,7 @@
                     <input id="ethraa-audio-volume" class="audio-volume" type="range" min="0" max="0.18" step="0.01" value="0.09" aria-label="مستوى الصوت" disabled>
                     <audio id="ethraa-audio" preload="none" loop></audio>
                 </div>
+                </details>
                 <button class="icon-button" id="theme-toggle" type="button" aria-label="تبديل الوضع الداكن" title="تبديل المظهر">
                     <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
                     <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.5A8.5 8.5 0 0 1 8.5 3.8 8.5 8.5 0 1 0 20.2 15.5Z"/></svg>
