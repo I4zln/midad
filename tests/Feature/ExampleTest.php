@@ -8,7 +8,7 @@ test('the application returns a successful response', function () {
 
     $response->assertOk()
         ->assertSee('أحدث')
-        ->assertSee('مِداد؛')
+        ->assertSee('أهلًا بك في مِـداد')
         ->assertSee('MIDAD')
         ->assertSee('أبو الطيب المتنبي')
         ->assertSee('ethraa-audio-volume');

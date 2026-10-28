@@ -74,3 +74,9 @@ Fonts (470–630KB cold, cached after) not subset: Thmanyah licence for modified
 - Welcome `<dialog>` (typed "السلام عليكم…" message) removed from `layouts/app.blade.php`, its JS (~70 lines) and ~40 CSS rules.
 - Audio kept: navbar player folded into a compact «الأجواء» `<details>` menu (`site-header.blade.php`); closes on outside click/Escape; never autoplays (resume only after a user gesture).
 - Test `UxPolishTest`: no welcome text on 3 pages, audio menu present, no `autoplay`. 41/41 pass.
+
+## T2 Phase 3 — Ink welcome · DONE
+- `components/ink-welcome.blade.php` in the hero: «أهلًا بك في مِـداد» (one kashida, kasra kept) / signed-in «أهلًا بك يا {name} في مِـداد» (escaped), original line «هنا يهدأُ الحبرُ على الورق، وتبقى الكلمةُ أثرًا لا يجفّ.» + inline SVG copper stroke.
+- Font: Amiri Bold Arabic self-hosted (`public/fonts/amiri`, OFL licence included, 98KB, preloaded on home only).
+- Animation ≈3.5s: RTL mask sweep + blur→sharp + slight drift; stroke draws right→left. Final state is the default; `.is-animating` added by inline script (full load) or `midad:page-loaded` (in-site nav), once per session (sessionStorage), skipped for reduced motion.
+- Browser check: animates on first visit only, not on 2nd visit or in-site nav; reduced motion static; CLS 0.0024 (1440) / 0 (390); no overflow. 42/42 tests.

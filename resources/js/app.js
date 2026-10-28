@@ -540,3 +540,14 @@ document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     document.querySelectorAll('.ambient-menu[open]').forEach((menu) => { menu.open = false; menu.querySelector('summary')?.focus(); });
 });
+
+// In-page navigation inserts the homepage without running its inline script; apply the same once-per-session rule.
+document.addEventListener('midad:page-loaded', () => {
+    const welcome = document.querySelector('[data-ink-welcome]');
+    if (!welcome) return;
+    try {
+        if (sessionStorage.getItem('midad-ink-played') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        welcome.classList.add('is-animating');
+        sessionStorage.setItem('midad-ink-played', '1');
+    } catch (error) { /* Without storage the greeting simply shows in its final state. */ }
+});

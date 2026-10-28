@@ -1,14 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'مِداد | MIDAD')
+@push('head')
+    <link rel="preload" href="{{ asset('fonts/amiri/amiri-bold-arabic.woff2') }}" as="font" type="font/woff2" crossorigin>
+@endpush
 
 @section('content')
 <main>
     <section class="editorial-hero" id="discover">
         <div class="editorial-hero-copy">
             <div class="eyebrow"><span class="eyebrow-line"></span> مجلة أدبية عربية · MIDAD</div>
-            <h1>مِداد؛ <em>للكلمة</em><br>مساحةٌ تشبهها.</h1>
-            <p>نقرأ الشعر على مهل، ونحفظ من الكلمات ما يضيء الذاكرة.</p>
+            <x-ink-welcome />
+            <p>مِداد مساحةٌ للكلمة: نقرأ الشعر على مهل، ونحفظ من الكلمات ما يضيء الذاكرة.</p>
             <div class="editorial-hero-actions"><a class="button button-dark" href="#quotes">اكتشف المكتبة <span aria-hidden="true">←</span></a>@auth<button class="button button-outline" type="button" data-open-composer>أضف اقتباسًا <span aria-hidden="true">＋</span></button>@else<a class="button button-outline" href="{{ route('register') }}">أنشئ حسابًا وانشر اقتباسًا</a>@endauth<a class="button button-outline" href="{{ route('poets.index') }}">استكشف الشعراء</a></div>
         </div>
         <aside class="editorial-feature" aria-label="عن مكتبة مِداد">

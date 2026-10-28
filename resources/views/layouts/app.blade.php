@@ -9,6 +9,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <meta name="flash-status" content="{{ session('status') }}">
     <title>@yield('title', 'مِداد | MIDAD')</title>
+    @stack('head')
     <script>try { var t = localStorage.getItem('athar-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
