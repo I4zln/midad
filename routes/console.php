@@ -21,6 +21,11 @@ Artisan::command('midad:mail-test {to}', function (string $to) {
 
         return 1;
     }
+    if ($mailer === 'brevo' && ! config('services.brevo.key')) {
+        $this->error('BREVO_API_KEY is empty.');
+
+        return 1;
+    }
 
     try {
         Mail::raw("هذه رسالة تجريبية من مِداد للتأكد من إعداد البريد.\n\nفريق مِداد | لأن للكلمات أثرًا يبقى", function ($message) use ($to) {

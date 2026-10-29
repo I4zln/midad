@@ -12,9 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(\App\Services\FeedRanker::class, fn () => \App\Services\FeedRanker::fromConfig());
+        // HTTP client for Brevo's mail API; a short timeout so an outage cannot hang sign-up or a password reset.
+        $this->app->bind('midad.brevo.http', fn () => HttpClient::create(['timeout' => 10]));
     }
 
     /**
@@ -38,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('discover-feed', fn (Request $request) => Limit::perMinute(60)->by('discover-feed|'.($request->user()?->id ?? $request->ip())));
         RateLimiter::for('discover-mode', fn (Request $request) => Limit::perMinute(30)->by('discover-mode|'.($request->user()?->id ?? $request->ip())));
         Paginator::defaultView('pagination.midad');
+        // MAIL_MAILER=brevo sends through Brevo's HTTPS API with BREVO_API_KEY (hosts that block SMTP, such as Render's free plan).
+        Mail::extend('brevo', fn () => (new BrevoTransportFactory(null, $this->app->make('midad.brevo.http')))
+            ->create(new Dsn('brevo+api', 'default', (string) config('services.brevo.key'))));
 
         if ($this->app->environment('production') && config('app.force_https')) {
             URL::forceScheme('https');

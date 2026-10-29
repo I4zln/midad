@@ -67,6 +67,11 @@ return [
             'transport' => 'resend',
         ],
 
+        // Brevo's HTTPS API (registered in AppServiceProvider): works where SMTP ports are blocked, e.g. Render's free plan.
+        'brevo' => [
+            'transport' => 'brevo',
+        ],
+
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
