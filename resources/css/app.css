@@ -590,6 +590,20 @@ dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(0.25rem); 
 .admin-member-text a:hover { color: var(--copper); }
 .admin-member-text .admin-badge { justify-self: start; margin-top: 0.125rem; }
 .admin-member-text small { color: var(--stone); font-size: max(var(--fs-floor), 0.75rem); }
+.admin-member-text small[dir='ltr'] { text-align: right; overflow-wrap: anywhere; }
+.admin-members li { flex-wrap: wrap; }
+.admin-member-text { flex: 1 1 8rem; }
+.admin-member-reset { min-height: 2rem; padding-inline: 0.75rem; font-size: max(var(--fs-floor), 0.75rem); }
+.admin-member-search { margin-bottom: 0.5rem; }
+.admin-member-search .search-box { width: 100%; }
+.admin-hint { margin: 0 0 0.875rem; color: var(--stone); font-size: max(var(--fs-floor), 0.75rem); line-height: 1.8; }
+.admin-panel .clear-filters { display: inline-block; margin-top: 0.875rem; }
+/* The one-time reset link, shown at the top after «رابط استعادة». */
+.admin-reset { margin-top: 1.25rem; padding: 1.125rem 1.25rem; border: 1px solid var(--copper-soft); background: color-mix(in srgb, var(--copper) 8%, var(--paper-raised)); }
+.admin-reset h2 { margin: 0 0 0.25rem; font: 500 1.125rem/1.5 var(--font-display); }
+.admin-reset p { margin: 0 0 0.75rem; color: var(--ink-soft); font-family: var(--font-arabic); font-size: 0.875rem; line-height: 1.8; }
+.admin-reset-link { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.admin-reset-link input { flex: 1 1 16rem; min-width: 0; min-height: 2.5rem; padding: 0 0.75rem; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: 0.8125rem var(--font-ui); }
 @media (max-width: 960px) { .admin-layout { grid-template-columns: minmax(0, 1fr); } .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .admin-row { flex-direction: column; align-items: stretch; gap: 0.5rem; } .admin-row-actions { justify-content: flex-end; } .admin-panel { padding: 1rem; } }
 .profile-quotes-heading { margin-block: 3.125rem 1.375rem; }

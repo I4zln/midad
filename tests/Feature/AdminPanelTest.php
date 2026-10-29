@@ -55,3 +55,36 @@ it('lets the admin delete any quote', function () {
 
     expect(Quote::query()->whereKey($quote->id)->exists())->toBeFalse();
 });
+
+it('gives the admin a one-time reset link that lets the member choose a new password', function () {
+    $admin = makeAdmin();
+    $member = User::factory()->create(['name' => 'عضو نسي كلمته', 'email' => 'forgot@example.test']);
+
+    $this->actingAs($admin)->get(route('admin.index', ['member' => 'forgot@']))->assertSee('forgot@example.test')->assertSee('رابط استعادة');
+
+    $response = $this->actingAs($admin)->from(route('admin.index'))->post(route('admin.users.reset-link', $member));
+    $response->assertRedirect(route('admin.index'));
+    $link = session('resetLink');
+    expect($link['name'])->toBe('عضو نسي كلمته')->and($link['url'])->toContain('/reset-password/')->and($link['minutes'])->toBe(60);
+
+    $this->get(route('admin.index'))->assertSee('رابط استعادة كلمة المرور لـ عضو نسي كلمته')->assertSee($link['url'], false);
+
+    // The member, signed out, follows the link and chooses a new password.
+    auth()->logout();
+    $this->get($link['url'])->assertOk();
+    parse_str(parse_url($link['url'], PHP_URL_QUERY), $query);
+    $token = basename(parse_url($link['url'], PHP_URL_PATH));
+    $this->post(route('password.update'), ['token' => $token, 'email' => $query['email'], 'password' => 'A-new-pass-2026!', 'password_confirmation' => 'A-new-pass-2026!'])
+        ->assertSessionHasNoErrors();
+
+    expect(\Illuminate\Support\Facades\Hash::check('A-new-pass-2026!', $member->fresh()->password))->toBeTrue();
+});
+
+it('does not let members create reset links', function () {
+    $member = User::factory()->create();
+    $other = User::factory()->create();
+
+    $this->actingAs($member)->post(route('admin.users.reset-link', $other))->assertForbidden();
+    $this->post(route('admin.users.reset-link', $other));
+    expect(\Illuminate\Support\Facades\DB::table('password_reset_tokens')->count())->toBe(0);
+});

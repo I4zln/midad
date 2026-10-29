@@ -208,6 +208,9 @@ document.addEventListener('change', (event) => {
     preview.classList.add('has-preview');
 });
 
+// A read-only field with a link to copy (admin reset link): one tap selects all of it.
+document.addEventListener('focusin', (event) => event.target.closest?.('[data-select-on-focus]')?.select());
+
 document.addEventListener('click', (event) => {
     const toggle = event.target.closest('[data-toggle-password]');
     if (!toggle) return;
@@ -255,7 +258,7 @@ document.addEventListener('click', (event) => {
     if (copyButton) navigator.clipboard.writeText(window.location.href).then(() => showToast('نُسخ رابط الصفحة.'), () => showToast('تعذّر نسخ الرابط. انسخه من شريط العنوان.'));
 
     const quoteCopyButton = event.target.closest('[data-copy-text]');
-    if (quoteCopyButton) navigator.clipboard.writeText(quoteCopyButton.dataset.copyText).then(() => showToast('نُسخ نص الاقتباس.'), () => showToast('تعذّر نسخ الاقتباس على هذا الجهاز.'));
+    if (quoteCopyButton) navigator.clipboard.writeText(quoteCopyButton.dataset.copyText).then(() => showToast(quoteCopyButton.dataset.copyMessage || 'نُسخ نص الاقتباس.'), () => showToast('تعذّر نسخ الاقتباس على هذا الجهاز.'));
 
     const shareButton = event.target.closest('[data-share-url]');
     if (shareButton) {

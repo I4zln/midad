@@ -14,6 +14,7 @@
             </x-form-field>
             <x-button class="auth-submit">أرسل رابط الاستعادة <span aria-hidden="true">←</span></x-button>
         </form>
+        <p class="auth-switch">لم تصلك الرسالة؟ <a href="{{ route('creator') }}">تواصل مع إدارة مِداد</a>، وسنرسل لك رابط الاستعادة بأنفسنا.</p>
         <p class="auth-switch">تذكّرتها؟ <a href="{{ route('login') }}">العودة إلى تسجيل الدخول</a></p>
     </div>
     <div class="auth-aside"><span class="quote-mark">“</span><p>تظل الكلمات محفوظة، ونساعدك على استعادة طريقك إليها.</p><span>مِداد · استعادة الحساب</span></div>

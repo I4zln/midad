@@ -14,6 +14,19 @@
         <span class="admin-badge admin-badge-large">مدير مِداد@if (auth()->user()->username) · <bdi dir="ltr">{{ '@'.auth()->user()->username }}</bdi>@endif</span>
     </header>
 
+    @if (session('resetLink'))
+        @php($reset = session('resetLink'))
+        {{-- Shown once: the link is not stored anywhere else and stops working after it is used or expires. --}}
+        <section class="admin-reset" role="status" aria-labelledby="admin-reset-title">
+            <h2 id="admin-reset-title">رابط استعادة كلمة المرور لـ {{ $reset['name'] }}</h2>
+            <p>أرسله له بنفسك (واتساب مثلًا). يعمل مرة واحدة خلال {{ $reset['minutes'] }} دقيقة، ثم ينتهي. لا ترسله لغيره.</p>
+            <div class="admin-reset-link">
+                <input type="text" value="{{ $reset['url'] }}" readonly dir="ltr" aria-label="رابط الاستعادة" data-select-on-focus>
+                <button class="button button-dark button-small" type="button" data-copy-text="{{ $reset['url'] }}" data-copy-message="نُسخ رابط الاستعادة.">نسخ الرابط</button>
+            </div>
+        </section>
+    @endif
+
     <dl class="admin-stats">
         <div><dt>الاقتباسات</dt><dd>{{ number_format($stats['quotes']) }}</dd></div>
         <div><dt>الأعضاء</dt><dd>{{ number_format($stats['members']) }}</dd></div>
@@ -79,16 +92,28 @@
                 @endif
             </section>
 
-            <section class="admin-panel" aria-labelledby="admin-members-title">
-                <div class="admin-panel-head"><h2 id="admin-members-title">أحدث الأعضاء</h2></div>
-                <ul class="admin-members">
-                    @foreach ($members as $member)
-                        <li>
-                            <span class="account-initial" aria-hidden="true">{{ mb_substr($member->name, 0, 1) }}</span>
-                            <span class="admin-member-text"><a href="{{ route('profile.show', $member) }}">{{ $member->name }}</a>@if ($member->is_admin) <span class="admin-badge">مدير</span>@endif<small>انضم {{ $member->created_at?->diffForHumans() }} · {{ $member->quotes_count }} اقتباس</small></span>
-                        </li>
-                    @endforeach
-                </ul>
+            <section class="admin-panel" id="admin-members" aria-labelledby="admin-members-title">
+                <div class="admin-panel-head"><h2 id="admin-members-title">{{ $memberSearch !== '' ? 'الأعضاء' : 'أحدث الأعضاء' }}</h2></div>
+                {{-- Find a member who asked for help signing in, then hand them a reset link (email cannot leave this host). --}}
+                <form class="admin-member-search" method="GET" action="{{ route('admin.index') }}#admin-members" role="search">
+                    @foreach (array_filter(['q' => $search, 'category' => $category]) as $name => $value)<input type="hidden" name="{{ $name }}" value="{{ $value }}">@endforeach
+                    <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input name="member" type="search" value="{{ $memberSearch }}" placeholder="ابحث بالاسم أو البريد" aria-label="ابحث عن عضو"><button class="search-submit" type="submit" aria-label="بحث">↵</button></label>
+                </form>
+                <p class="admin-hint">نسي أحدهم كلمة المرور؟ ابحث عنه، واضغط «رابط استعادة»، ثم أرسل له الرابط بنفسك.</p>
+                @if ($members->isEmpty())
+                    <p class="admin-empty">لا يوجد عضو بهذا الاسم أو البريد.</p>
+                @else
+                    <ul class="admin-members">
+                        @foreach ($members as $member)
+                            <li>
+                                <span class="account-initial" aria-hidden="true">{{ mb_substr($member->name, 0, 1) }}</span>
+                                <span class="admin-member-text"><a href="{{ route('profile.show', $member) }}">{{ $member->name }}</a>@if ($member->is_admin) <span class="admin-badge">مدير</span>@endif<small dir="ltr">{{ $member->email }}</small><small>انضم {{ $member->created_at?->diffForHumans() }} · {{ $member->quotes_count }} اقتباس</small></span>
+                                <form method="POST" action="{{ route('admin.users.reset-link', $member) }}">@csrf<button class="admin-action admin-member-reset" type="submit" aria-label="رابط استعادة كلمة المرور لـ {{ $member->name }}">رابط استعادة</button></form>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                @if ($memberSearch !== '')<a class="clear-filters" href="{{ route('admin.index', array_filter(['q' => $search, 'category' => $category])) }}#admin-members">عرض أحدث الأعضاء ×</a>@endif
             </section>
         </aside>
     </div>

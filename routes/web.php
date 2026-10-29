@@ -68,4 +68,6 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::delete('/quotes/{quote}', [AdminController::class, 'destroy'])->name('quotes.destroy');
+    // A password reset link the admin hands to a member (for hosts where email cannot be sent).
+    Route::post('/users/{user}/reset-link', [AdminController::class, 'resetLink'])->middleware('throttle:20,1')->name('users.reset-link');
 });
