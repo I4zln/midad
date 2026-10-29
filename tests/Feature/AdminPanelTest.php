@@ -88,3 +88,11 @@ it('does not let members create reset links', function () {
     $this->post(route('admin.users.reset-link', $other));
     expect(\Illuminate\Support\Facades\DB::table('password_reset_tokens')->count())->toBe(0);
 });
+
+it('links «نسيت كلمة المرور» to the admin WhatsApp with a prepared message', function () {
+    $this->get(route('password.request'))
+        ->assertOk()
+        ->assertSee('https://wa.me/966595167827?text=', false)
+        ->assertSee('data-whatsapp-help="966595167827"', false)
+        ->assertSee('تواصل مع إدارة مِداد على واتساب');
+});

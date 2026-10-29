@@ -208,6 +208,15 @@ document.addEventListener('change', (event) => {
     preview.classList.add('has-preview');
 });
 
+// «نسيت كلمة المرور» → WhatsApp: add the email typed on the page to the prepared message, so the admin knows who it is.
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('[data-whatsapp-help]');
+    if (!link) return;
+    const email = link.closest('main')?.querySelector('input[type="email"]')?.value.trim();
+    const text = link.dataset.helpText + (email ? ` بريدي: ${email}` : '');
+    link.href = `https://wa.me/${link.dataset.whatsappHelp}?text=${encodeURIComponent(text)}`;
+});
+
 // A read-only field with a link to copy (admin reset link): one tap selects all of it.
 document.addEventListener('focusin', (event) => event.target.closest?.('[data-select-on-focus]')?.select());
 
