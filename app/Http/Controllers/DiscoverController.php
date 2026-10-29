@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\QuoteRequest;
+use App\Models\Quote;
 use App\Services\DiscoverFeed;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,6 +29,8 @@ class DiscoverController extends Controller
             'tab' => $tab,
             'category' => $category,
             'categories' => array_intersect_key(QuoteRequest::CATEGORY_LABELS, array_flip($this->feed->categories())),
+            // «تأمّل» shows where the reader is: "3 من 31".
+            'total' => Quote::query()->when($category !== '', fn ($query) => $query->where('category', $category))->count(),
             'mode' => in_array($request->user()?->discover_mode, self::MODES, true) ? $request->user()->discover_mode : null,
         ]);
     }

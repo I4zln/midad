@@ -53,6 +53,14 @@
             </div>
         </div>
     </div>
+    @if ($total > 0)
+        {{-- «تأمّل»: where the reader is, with a step up and down (the same as ↑ ↓ and J K). --}}
+        <nav class="discover-stepper" data-discover-stepper aria-label="التنقّل بين الاقتباسات">
+            <button class="icon-button" type="button" data-discover-step="-1" aria-label="الاقتباس السابق" title="السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+            <p><span data-discover-position>1</span> من {{ number_format($total) }}</p>
+            <button class="icon-button" type="button" data-discover-step="1" aria-label="الاقتباس التالي" title="التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        </nav>
+    @endif
 
     @guest
         {{-- Asked before leaving the feed; without JavaScript the like/save links go straight to the login page. --}}

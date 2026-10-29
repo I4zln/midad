@@ -43,7 +43,9 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
         const bottom = nav && getComputedStyle(nav).position === 'fixed' ? nav.offsetHeight : 0;
         const bar = page.querySelector('.discover-bar');
         const top = bar.getBoundingClientRect().bottom + window.scrollY;
-        page.style.setProperty('--discover-stream-h', `${Math.max(380, window.innerHeight - top - bottom)}px`);
+        const stepper = page.querySelector('[data-discover-stepper]');
+        const below = isFocus() && stepper ? stepper.offsetHeight : 0;
+        page.style.setProperty('--discover-stream-h', `${Math.max(380, window.innerHeight - top - bottom - below)}px`);
         page.style.setProperty('--discover-bar-h', `${bar.offsetHeight}px`);
     };
 
@@ -84,6 +86,17 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
         const top = anchor ? documentTop(anchor) - saved.anchorTop : saved.windowY;
         window.scrollTo({ top, behavior: 'instant' });
     };
+    // «تأمّل»: "3 من 31" under the quote.
+    const position = page.querySelector('[data-discover-position]');
+    let positionFrame = 0;
+    const showPosition = () => {
+        if (!position || positionFrame) return;
+        positionFrame = requestAnimationFrame(() => {
+            positionFrame = 0;
+            position.textContent = String(Math.max(1, items().indexOf(currentItem()) + 1));
+        });
+    };
+
     let saveTimer;
     const saveSoon = () => { window.clearTimeout(saveTimer); saveTimer = window.setTimeout(saveState, 250); };
 
@@ -170,6 +183,7 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
         watch();
         inkWatch();
         if (keep) reveal(keep);
+        showPosition();
         if (!save) return;
         storage.set('localStorage', MODE_KEY, mode);
         if (page.dataset.modeUrl) {
@@ -218,6 +232,8 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
     page.addEventListener('click', (event) => {
         const modeButton = event.target.closest('[data-discover-mode]');
         if (modeButton) { applyMode(modeButton.dataset.discoverMode, true); return; }
+        const stepButton = event.target.closest('[data-discover-step]');
+        if (stepButton) { move(Number(stepButton.dataset.discoverStep), false); return; }
 
         if (event.target.closest('[data-discover-retry]')) {
             if (sentinel.dataset.restart) { window.location.reload(); return; }
@@ -246,6 +262,18 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
         if (event.target.closest('a[href]')) saveState();
     });
 
+    const move = (step, focusTarget = true) => {
+        const list = items();
+        const target = list[list.indexOf(currentItem()) + step];
+        if (target) {
+            reveal(target, true);
+            if (focusTarget) target.focus({ preventScroll: true });
+        } else if (step > 0) {
+            reveal(sentinel, true);
+            load();
+        }
+    };
+
     // ↑ ↓ (in «تأمّل») and J / K (both views, any keyboard layout) step one quote.
     const onKey = (event) => {
         if (!page.isConnected) { document.removeEventListener('keydown', onKey); return; }
@@ -255,20 +283,12 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
         const step = arrow ?? { KeyJ: 1, KeyK: -1 }[event.code];
         if (!step) return;
         event.preventDefault();
-        const list = items();
-        const target = list[list.indexOf(currentItem()) + step];
-        if (target) {
-            reveal(target, true);
-            target.focus({ preventScroll: true });
-        } else if (step > 0) {
-            reveal(sentinel, true);
-            load();
-        }
+        move(step);
     };
     document.addEventListener('keydown', onKey);
 
     const onScroll = () => { if (!page.isConnected) { window.removeEventListener('scroll', onScroll); return; } saveSoon(); };
-    stream.addEventListener('scroll', saveSoon, { passive: true });
+    stream.addEventListener('scroll', () => { saveSoon(); showPosition(); }, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
     const onResize = () => { if (!page.isConnected) { window.removeEventListener('resize', onResize); return; } sizeStream(); };
     window.addEventListener('resize', onResize);
