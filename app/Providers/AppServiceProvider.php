@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Quote::class, QuotePolicy::class);
-        Gate::define('admin', fn (User $user): bool => $user->is_admin);
+        Gate::define('admin', fn (User $user): bool => (bool) $user->is_admin);
         // Named limits keep their own counters: plain throttle:N,1 shares one counter per visitor across routes,
         // so scrolling «اكتشف» would otherwise use up the sign-in and sign-up allowance.
         RateLimiter::for('discover-feed', fn (Request $request) => Limit::perMinute(60)->by('discover-feed|'.($request->user()?->id ?? $request->ip())));
