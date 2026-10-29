@@ -6,6 +6,7 @@ use App\Http\Requests\QuoteRequest;
 use App\Models\Quote;
 use App\Models\QuoteLike;
 use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -43,7 +44,7 @@ class AdminController extends Controller
             'top' => Quote::query()->withCount('likes')->orderByDesc('likes_count')->latest()->latest('id')->take(5)->get(),
             // Newest members, or the ones matching a name, username or email (to hand someone a reset link).
             'memberSearch' => $memberSearch,
-            'members' => User::query()->withCount('quotes')
+            'members' => User::query()->withCount('quotes')->with('latestQuote')
                 ->when($memberSearch !== '', fn ($query) => $query->where(fn ($inner) => $inner
                     ->where('name', 'like', "%{$memberSearch}%")
                     ->orWhere('username', 'like', "%{$memberSearch}%")
@@ -59,6 +60,13 @@ class AdminController extends Controller
     public function resetLink(User $user): RedirectResponse
     {
         $token = Password::broker()->createToken($user);
+        // The owner sees this in «الإشعارات»: if someone else asked for the link, they know to tell the admin.
+        UserNotification::query()->create([
+            'user_id' => $user->id,
+            'actor_id' => auth()->id(),
+            'type' => 'security',
+            'message' => 'أنشأ رابطًا لاستعادة كلمة مرور حسابك. إن لم تطلبه فراسل الإدارة فورًا.',
+        ]);
 
         return back()->with('resetLink', [
             'name' => $user->name,

@@ -17,7 +17,7 @@
         @php($whatsapp = config('ethraa.admin_whatsapp'))
         @php($helpText = 'السلام عليكم، نسيت كلمة المرور في مِداد.')
         {{-- WhatsApp opens with the message written (and the email typed above, added by app.js); the member only taps Send. --}}
-        <p class="auth-switch">لم تصلك الرسالة؟ @if ($whatsapp)<a href="https://wa.me/{{ $whatsapp }}?text={{ rawurlencode($helpText) }}" target="_blank" rel="noopener noreferrer" data-whatsapp-help="{{ $whatsapp }}" data-help-text="{{ $helpText }}">تواصل مع إدارة مِداد على واتساب</a>@else<a href="{{ route('creator') }}">تواصل مع إدارة مِداد</a>@endif، وسنرسل لك رابط الاستعادة بأنفسنا.</p>
+        <p class="auth-switch">لم تصلك الرسالة؟ @if ($whatsapp)<a href="https://wa.me/{{ $whatsapp }}?text={{ rawurlencode($helpText) }}" target="_blank" rel="noopener noreferrer" data-whatsapp-help="{{ $whatsapp }}" data-help-text="{{ $helpText }}">تواصل مع إدارة مِداد على واتساب</a>@else<a href="{{ route('creator') }}">تواصل مع إدارة مِداد</a>@endif، وسنرسل لك رابط الاستعادة بأنفسنا. راسلنا من رقم الاستعادة إن كنت أضفته في ملفك، فهو ما نتحقق به أنك صاحب الحساب.</p>
         <p class="auth-switch">تذكّرتها؟ <a href="{{ route('login') }}">العودة إلى تسجيل الدخول</a></p>
     </div>
     <div class="auth-aside"><span class="quote-mark">“</span><p>تظل الكلمات محفوظة، ونساعدك على استعادة طريقك إليها.</p><span>مِداد · استعادة الحساب</span></div>

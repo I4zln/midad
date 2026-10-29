@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
@@ -102,6 +103,10 @@ class PasswordResetController extends Controller
 
         Auth::login($resetUser);
         $request->session()->regenerate();
+        // Whoever was signed in to this account elsewhere (perhaps the reason for the reset) is signed out.
+        if (config('session.driver') === 'database') {
+            DB::table(config('session.table', 'sessions'))->where('user_id', $resetUser->id)->where('id', '!=', $request->session()->getId())->delete();
+        }
 
         return redirect()->route('home')->with('status', 'تم تغيير كلمة المرور، وأنت الآن داخل حسابك.');
     }

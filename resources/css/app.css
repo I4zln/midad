@@ -593,6 +593,16 @@ dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(0.25rem); 
 .admin-member-text small[dir='ltr'] { text-align: right; overflow-wrap: anywhere; }
 .admin-members li { flex-wrap: wrap; }
 .admin-member-text { flex: 1 1 8rem; }
+.admin-verify { flex: 1 0 100%; padding-inline-start: 2.625rem; }
+.admin-verify summary { width: fit-content; color: var(--copper); cursor: pointer; font-size: max(var(--fs-floor), 0.8125rem); }
+.admin-verify summary:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.admin-verify dl { display: grid; gap: 0.375rem; margin: 0.625rem 0; }
+.admin-verify dl div { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: 0.5rem; }
+.admin-verify dt { color: var(--stone); font-size: max(var(--fs-floor), 0.75rem); }
+.admin-verify dd { margin: 0; color: var(--ink); font-size: max(var(--fs-floor), 0.8125rem); overflow-wrap: anywhere; }
+.admin-verify-strong { display: block; color: var(--copper); font-size: max(var(--fs-floor), 0.75rem); }
+.admin-verify-none { color: var(--stone); }
+.admin-verify > p { margin: 0 0 0.625rem; color: var(--ink-soft); font-size: max(var(--fs-floor), 0.75rem); line-height: 1.8; }
 .admin-member-reset { min-height: 2rem; padding-inline: 0.75rem; font-size: max(var(--fs-floor), 0.75rem); }
 .admin-member-search { margin-bottom: 0.5rem; }
 .admin-member-search .search-box { width: 100%; }

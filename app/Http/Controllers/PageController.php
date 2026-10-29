@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -175,11 +176,16 @@ class PageController extends Controller
             'social_links.github' => ['nullable', 'url:http,https', 'max:255'],
             'social_links.instagram' => ['nullable', 'url:http,https', 'max:255'],
             'social_links.x' => ['nullable', 'url:http,https', 'max:255'],
+            'recovery_phone' => ['nullable', 'string', 'max:25'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'remove_avatar' => ['nullable', 'boolean'],
             'remove_cover' => ['nullable', 'boolean'],
         ]);
+        $recoveryPhone = User::normalizeRecoveryPhone($validated['recovery_phone'] ?? null);
+        if (filled($validated['recovery_phone'] ?? null) && ! $recoveryPhone) {
+            throw ValidationException::withMessages(['recovery_phone' => 'اكتب الرقم كاملًا، مثل 05xxxxxxxx أو ‎+9665xxxxxxxx.']);
+        }
 
         $user->fill([
             'name' => $validated['name'],
@@ -190,6 +196,7 @@ class PageController extends Controller
                 ? array_values(array_filter(array_map('trim', explode(',', $validated['skills']))))
                 : [],
             'social_links' => array_filter($validated['social_links'] ?? []),
+            'recovery_phone' => $recoveryPhone,
         ]);
 
         foreach (['avatar' => 'avatar_path', 'cover' => 'cover_path'] as $input => $column) {

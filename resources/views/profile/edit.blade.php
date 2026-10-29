@@ -44,6 +44,12 @@
                 @endforeach
             </div>
         </section>
+        <section class="profile-edit-section">
+            <div class="profile-edit-heading"><span class="eyebrow"><span class="eyebrow-line"></span> استعادة الحساب</span><p>إن نسيت كلمة المرور وراسلت الإدارة على واتساب، نرسل لك رابط الاستعادة فقط حين تأتي الرسالة من هذا الرقم.</p></div>
+            <x-form-field for="profile-recovery-phone" name="recovery_phone" label="رقم واتساب للاستعادة" help="اختياري. لا يظهر لأي أحد، ولا تراه إلا إدارة مِداد عند استعادة حسابك.">
+                <input id="profile-recovery-phone" name="recovery_phone" type="tel" inputmode="tel" maxlength="25" dir="ltr" autocomplete="tel" value="{{ old('recovery_phone', $profile->recovery_phone) }}" placeholder="05xxxxxxxx">
+            </x-form-field>
+        </section>
         <div class="profile-edit-actions"><a class="text-button" href="{{ route('profile.show', $profile) }}">إلغاء</a><button class="button button-dark" type="submit">حفظ الملف الشخصي <span aria-hidden="true">←</span></button></div>
     </form>
 

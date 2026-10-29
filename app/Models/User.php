@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\EthraaResetPasswordNotification;
@@ -32,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'cover_path',
         'skills',
         'social_links',
+        'recovery_phone',
         // is_admin is deliberately not mass-assignable; grant it with forceFill from the console only.
     ];
 
@@ -44,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'remember_token',
+        'recovery_phone',
     ];
 
     /**
@@ -65,6 +68,30 @@ class User extends Authenticatable implements MustVerifyEmail
     public function quotes(): HasMany
     {
         return $this->hasMany(Quote::class);
+    }
+
+    public function latestQuote(): HasOne
+    {
+        return $this->hasOne(Quote::class)->latestOfMany();
+    }
+
+    /**
+     * A recovery number as +<country><number>, or null when it cannot be read. Saudi numbers may be typed locally
+     * (05xxxxxxxx or 5xxxxxxxx); spaces, dashes and brackets are ignored, and a leading 00 counts as +.
+     */
+    public static function normalizeRecoveryPhone(?string $phone): ?string
+    {
+        $digits = preg_replace('/[\s\-().]/u', '', (string) $phone);
+        $digits = preg_replace('/^00/', '+', $digits);
+        if (preg_match('/^05\d{8}$/', $digits)) {
+            $digits = '+966'.substr($digits, 1);
+        } elseif (preg_match('/^5\d{8}$/', $digits)) {
+            $digits = '+966'.$digits;
+        } elseif (preg_match('/^966\d{9}$/', $digits)) {
+            $digits = '+'.$digits;
+        }
+
+        return preg_match('/^\+[1-9]\d{7,14}$/', $digits) ? $digits : null;
     }
 
     public function comments(): HasMany
