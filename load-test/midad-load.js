@@ -18,6 +18,7 @@ const CATEGORIES = ['تأمل', 'حياة', 'حب', 'أمل'];
 const SEARCHES = ['الحياة', 'الحب', 'الأمل', 'الوطن'];
 
 export const options = {
+    noCookiesReset: true, // a visitor keeps its cookies (session, sign-in) from one round to the next, like a browser
     scenarios: {
         visitors: {
             executor: 'ramping-vus',
@@ -92,6 +93,9 @@ function discover() {
 
 function like(ids) {
     const id = pick(ids);
+    // Like from the quote's own page, with the token that page carries, as a reader would.
+    page(`/quotes/${id}`, 'GET /quotes/{id}');
+    sleep(0.5);
     const opts = { headers: headers({ Accept: 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' }), tags: { name: 'POST /quotes/{id}/like' } };
     // Like, then unlike after a moment, so the data stays as it was.
     const first = http.post(`${BASE}/quotes/${id}/like`, null, opts);
