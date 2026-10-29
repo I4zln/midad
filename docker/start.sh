@@ -18,6 +18,22 @@ PORT="${PORT:-10000}"
 sed -ri "s/^Listen .*/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -ri "s/<VirtualHost \*:[0-9]+>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf
 
+# As many PHP workers as the memory holds (each uses roughly 30-40 MB; Render's free and Starter plans have 512 MB).
+# Apache's default of 150 would run out of memory under a crowd; extra visitors now wait a moment in the queue instead.
+# A short keep-alive stops idle connections from holding those few workers.
+cat > /etc/apache2/conf-enabled/midad-workers.conf <<EOF
+<IfModule mpm_prefork_module>
+    StartServers 3
+    MinSpareServers 2
+    MaxSpareServers 6
+    MaxRequestWorkers ${APACHE_MAX_WORKERS:-10}
+    MaxConnectionsPerChild 2000
+</IfModule>
+KeepAliveTimeout 2
+EOF
+# Never let this tuning stop the site: if Apache rejects it, start with the defaults.
+apache2ctl -t >/dev/null 2>&1 || { echo "Apache rejected midad-workers.conf; using the defaults" >&2; rm -f /etc/apache2/conf-enabled/midad-workers.conf; }
+
 php artisan migrate --force
 php artisan storage:link --force >/dev/null 2>&1 || true
 php artisan optimize

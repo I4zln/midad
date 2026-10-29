@@ -30,7 +30,7 @@ RUN apt-get update \
     && printf '<Directory /var/www/html/public>\n    AllowOverride All\n</Directory>\n' > /etc/apache2/conf-available/midad.conf \
     && a2enconf midad \
     && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && printf 'opcache.enable=1\nopcache.validate_timestamps=0\nupload_max_filesize=8M\npost_max_size=10M\nexpose_php=Off\n' > "$PHP_INI_DIR/conf.d/midad.ini"
+    && printf 'opcache.enable=1\nopcache.validate_timestamps=0\nopcache.interned_strings_buffer=16\nrealpath_cache_size=4096K\nrealpath_cache_ttl=600\nupload_max_filesize=8M\npost_max_size=10M\nexpose_php=Off\n' > "$PHP_INI_DIR/conf.d/midad.ini"
 
 WORKDIR /var/www/html
 COPY --from=vendor /app ./
