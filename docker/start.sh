@@ -21,6 +21,9 @@ sed -ri "s/<VirtualHost \*:[0-9]+>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-
 php artisan migrate --force
 php artisan storage:link --force >/dev/null 2>&1 || true
 php artisan optimize
+
+# MIDAD_ADMIN_EMAIL (set in the host dashboard) makes that already registered account an admin.
+if [ -n "$MIDAD_ADMIN_EMAIL" ]; then php artisan midad:make-admin "$MIDAD_ADMIN_EMAIL" || true; fi
 chown -R www-data:www-data storage bootstrap/cache
 
 exec apache2-foreground

@@ -63,3 +63,19 @@ Artisan::command('midad:welcome-test {to* : One or more recipient addresses} {--
 
     return $failed ? 1 : 0;
 })->purpose('Send the MIDAD welcome email to the given addresses');
+
+// Grants the admin role to an existing account, e.g. on a host without database access:
+// php artisan midad:make-admin you@example.com   (docker/start.sh runs it for MIDAD_ADMIN_EMAIL)
+Artisan::command('midad:make-admin {email}', function (string $email) {
+    $user = \App\Models\User::query()->whereRaw('lower(email) = ?', [mb_strtolower(trim($email))])->first();
+    if (! $user) {
+        $this->warn("No account with {$email} yet. Sign up with it first, then restart.");
+
+        return 0;
+    }
+
+    $user->forceFill(['is_admin' => true])->save();
+    $this->info("{$user->email} is now an admin.");
+
+    return 0;
+})->purpose('Give an existing MIDAD account the admin role');

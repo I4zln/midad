@@ -153,7 +153,9 @@ class DiscoverFeed
         return Cache::remember(self::CANDIDATES_CACHE, config('feed.candidates.cache_seconds'), function () {
             $base = fn () => Quote::query()->select(['id', 'user_id', 'author', 'category', 'created_at'])->withCount(['likes', 'favorites']);
             $rows = $base()->orderByDesc('created_at')->orderByDesc('id')->limit(config('feed.candidates.latest'))->get()
-                ->concat($base()->orderByRaw('likes_count + favorites_count desc')->orderByDesc('id')->limit(config('feed.candidates.popular'))->get())
+                // Counted again in ORDER BY: PostgreSQL cannot do arithmetic on the select aliases (SQLite can).
+                ->concat($base()->orderByRaw('((select count(*) from quote_likes where quote_likes.quote_id = quotes.id) + (select count(*) from quote_favorites where quote_favorites.quote_id = quotes.id)) desc')
+                    ->orderByDesc('id')->limit(config('feed.candidates.popular'))->get())
                 ->unique('id');
 
             return $rows->map(fn (Quote $quote) => [
