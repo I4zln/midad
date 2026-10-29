@@ -1028,7 +1028,7 @@ dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(0.25rem); 
 .quotes-index-grid { margin-top: 0; }
 .quotes-index-grid .quote-card { min-height: 20.625rem; }
 .quote-card-publisher { display: flex; align-items: center; gap: 0.5625rem; min-height: 2.3125rem; padding-top: 0.6875rem; border-top: 1px solid var(--line); }
-.quote-card-publisher strong, .quote-card-publisher small { display: block; }
+.quote-card-publisher strong, .quote-card-publisher small { display: block; overflow-wrap: anywhere; }
 .quote-card-publisher strong { color: var(--ink); font-size: max(var(--fs-floor), 0.6875rem); font-weight: 500; }
 .quote-card-publisher small { margin-top: 3px; color: var(--stone); font-size: max(var(--fs-floor), 0.5625rem); }
 .quote-card .card-quote-button { min-height: 8.3125rem; padding-block: 0.9375rem 0.625rem; }
@@ -1646,7 +1646,7 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .discover-item:focus { outline: none; }
 .discover-page[data-restored] .discover-item { animation: none; } /* back from a quote: the list reappears as it was left */
 .discover-item:focus-visible { outline: 2px solid color-mix(in srgb, var(--copper) 60%, transparent); outline-offset: -5px; }
-.card-author { margin: 0 0 0.625rem; color: var(--copper); font-family: var(--font-arabic); font-size: 0.9375rem; text-align: start; }
+.card-author { margin: 0 0 0.625rem; color: var(--copper); font-family: var(--font-arabic); font-size: 0.9375rem; text-align: start; overflow-wrap: anywhere; }
 
 /* Soft ink washes from the theme colours; each quote gets one, low contrast so the words stay the focus. */
 .discover-item[data-tone='0'] { --tone: var(--paper-raised); --wash: var(--copper-soft); }
