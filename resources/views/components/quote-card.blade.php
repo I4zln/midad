@@ -9,6 +9,7 @@
 @endif
     <div class="card-topline"><span class="card-category">{{ $quote->category }}</span><time datetime="{{ $quote->created_at->toIso8601String() }}">{{ $quote->created_at->format('Y/m/d') }}</time></div>
     <a class="card-quote-button" href="{{ route('quotes.show', $quote) }}" aria-label="قراءة الاقتباس كاملًا">
+@if ($feed)<span class="discover-ink" aria-hidden="true"><span class="discover-ink-stroke"></span><span class="discover-pen-track"><span class="discover-pen-lift"><x-fountain-pen class="discover-pen" /></span></span></span>@endif
         <span class="card-quote-mark" aria-hidden="true">“</span><span class="card-quote-text preserve-lines">{{ $quote->text }}</span><span class="quote-read-more">قراءة المزيد</span>
     </a>
 @if ($feed && filled($quote->author))<p class="card-author"><span aria-hidden="true">— </span>{{ $quote->author }}</p>@endif

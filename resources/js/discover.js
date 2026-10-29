@@ -25,6 +25,7 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
     let inFlight = null;
     let emptyBatches = 0;
     let observer = null;
+    let inkObserver = null;
 
     const items = () => [...stream.querySelectorAll('.discover-item')];
     const isFocus = () => page.dataset.mode === 'focus';
@@ -94,6 +95,7 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
             if (shown.has(item.dataset.quoteId)) return; // never the same quote twice in one feed
             shown.add(item.dataset.quoteId);
             stream.insertBefore(item, sentinel);
+            inkObserver?.observe(item);
             added += 1;
         });
         number();
@@ -109,6 +111,20 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
             if (entries.some((entry) => entry.isIntersecting)) load();
         }, { root: isFocus() ? stream : null, rootMargin: isFocus() ? '0px 0px 300% 0px' : '0px 0px 200% 0px' });
         observer.observe(sentinel);
+    };
+
+    // The pen above each quote writes its line the first time that quote comes into view (decoration only, see app.css).
+    const inkWatch = () => {
+        inkObserver?.disconnect();
+        inkObserver = null;
+        if (reducedMotion() || !('IntersectionObserver' in window) || page.dataset.restored) { delete page.dataset.ink; return; }
+        page.dataset.ink = 'true';
+        inkObserver = new IntersectionObserver((entries) => entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-inked');
+            inkObserver?.unobserve(entry.target);
+        }), { root: isFocus() ? stream : null, threshold: 0.3 });
+        items().filter((item) => !item.classList.contains('is-inked')).forEach((item) => inkObserver.observe(item));
     };
 
     async function load() {
@@ -152,6 +168,7 @@ export function initDiscover({ markClampedQuotes }, { restored = false } = {}) {
         sizeStream();
         markClampedQuotes();
         watch();
+        inkWatch();
         if (keep) reveal(keep);
         if (!save) return;
         storage.set('localStorage', MODE_KEY, mode);
