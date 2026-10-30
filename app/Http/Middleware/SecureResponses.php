@@ -42,6 +42,11 @@ class SecureResponses
             ]));
         }
 
+        // Do not advertise the PHP version (php.ini expose_php does the same on the host; this covers any other server).
+        if (! headers_sent()) {
+            header_remove('X-Powered-By');
+        }
+        $response->headers->remove('X-Powered-By');
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
