@@ -29,7 +29,8 @@ class AccountController extends Controller
 
         /** @var User $user */
         $user = $request->user();
-        $files = array_filter([$user->avatar_path, $user->cover_path]);
+        // Older uploads on disk; pictures in the database go with the account (media rows cascade).
+        $files = array_filter([$user->avatar_path, $user->cover_path], fn ($path) => $path && ! \App\Models\Media::idFromPath($path));
 
         // Sign out first: logout() refreshes the remember-me token and saves the user, which after a delete would re-create the account.
         Auth::logout();
@@ -46,6 +47,7 @@ class AccountController extends Controller
             UserNotification::query()->where('user_id', $user->id)->delete();
             UserNotification::query()->where('actor_id', $user->id)->update(['actor_id' => null]);
             SpecialProfileMessage::query()->where('user_id', $user->id)->delete();
+            \App\Models\Media::query()->where('user_id', $user->id)->delete();
             DB::table('password_reset_tokens')->where('email', $user->email)->delete();
             DB::table('sessions')->where('user_id', $user->id)->delete();
             $user->delete();

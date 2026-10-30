@@ -30,8 +30,8 @@
                     <p class="editorial-feature-author">— {{ $featuredQuote->author }}</p>
                 @endif
                 <div class="editorial-feature-source">
-                    @if ($sharer?->avatar_path)
-                        <img class="editorial-feature-avatar" src="{{ asset('storage/'.$sharer->avatar_path) }}" alt="" loading="lazy">
+                    @if ($sharer?->imageUrl('avatar_path'))
+                        <img class="editorial-feature-avatar" src="{{ $sharer->imageUrl('avatar_path') }}" alt="" loading="lazy">
                     @else
                         <span class="editorial-feature-avatar" aria-hidden="true">{{ mb_substr($sharer?->name ?: 'ق', 0, 1) }}</span>
                     @endif

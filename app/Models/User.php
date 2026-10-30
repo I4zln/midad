@@ -70,6 +70,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Quote::class);
     }
 
+    /**
+     * The address of the profile picture or cover ($column: avatar_path / cover_path), or null when there is none
+     * or an older upload's file has gone (a host that wipes its disk on deploy), so the page shows the initial instead.
+     */
+    public function imageUrl(string $column): ?string
+    {
+        $path = $this->{$column};
+        if (! $path) {
+            return null;
+        }
+        if ($id = Media::idFromPath($path)) {
+            return route('media.show', $id);
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path) ? asset('storage/'.$path) : null;
+    }
+
     public function latestQuote(): HasOne
     {
         return $this->hasOne(Quote::class)->latestOfMany();

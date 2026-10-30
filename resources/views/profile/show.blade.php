@@ -12,12 +12,16 @@
     <nav class="breadcrumbs" aria-label="مسار التنقل"><a href="{{ route('home') }}">الرئيسية</a><span>←</span><span>{{ $isOwner ? 'ملفي' : 'الملف الشخصي' }}</span></nav>
 
     <section class="member-profile" aria-labelledby="member-name">
-        <div class="member-cover @if (! $profile->cover_path) is-empty @endif">
-            @if ($profile->cover_path)<img src="{{ asset('storage/'.$profile->cover_path) }}" alt="" loading="lazy">@endif
+        @php
+            $coverUrl = $profile->imageUrl('cover_path');
+            $avatarUrl = $profile->imageUrl('avatar_path');
+        @endphp
+        <div class="member-cover @if (! $coverUrl) is-empty @endif">
+            @if ($coverUrl)<img src="{{ $coverUrl }}" alt="" loading="lazy">@endif
         </div>
         <div class="member-head">
-            @if ($profile->avatar_path)
-                <img class="member-avatar" src="{{ asset('storage/'.$profile->avatar_path) }}" alt="الصورة الشخصية لـ {{ $profile->name }}">
+            @if ($avatarUrl)
+                <img class="member-avatar" src="{{ $avatarUrl }}" alt="الصورة الشخصية لـ {{ $profile->name }}">
             @else
                 <span class="member-avatar member-avatar-fallback" aria-hidden="true">{{ mb_substr($profile->name, 0, 1) }}</span>
             @endif

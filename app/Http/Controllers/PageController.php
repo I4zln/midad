@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Media;
 use App\Models\QuoteFavorite;
 use App\Models\QuoteLike;
 use App\Models\Quote;
@@ -177,7 +178,7 @@ class PageController extends Controller
             'social_links.instagram' => ['nullable', 'url:http,https', 'max:255'],
             'social_links.x' => ['nullable', 'url:http,https', 'max:255'],
             'recovery_phone' => ['nullable', 'string', 'max:25'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
             // A cover may be an animated GIF; it is stored as uploaded, so it keeps moving.
             'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
             'remove_avatar' => ['nullable', 'boolean'],
@@ -200,24 +201,36 @@ class PageController extends Controller
             'recovery_phone' => $recoveryPhone,
         ]);
 
+        $incoming = array_sum(array_map(fn ($input) => $request->hasFile($input) ? $request->file($input)->getSize() : 0, ['avatar', 'cover']));
+        if ($incoming > 0 && ! Media::hasRoomFor($incoming)) {
+            throw ValidationException::withMessages(['cover' => 'مساحة الصور في مِداد ممتلئة حاليًا. احفظ ملفك دون صورة جديدة، وحاول لاحقًا.']);
+        }
+
+        // Pictures go to the database (they survive a host that wipes its disk on deploy); the old one is removed.
         foreach (['avatar' => 'avatar_path', 'cover' => 'cover_path'] as $input => $column) {
-            if ($request->boolean('remove_'.$input)) {
-                if ($user->{$column}) {
-                    Storage::disk('public')->delete($user->{$column});
-                }
+            if ($request->boolean('remove_'.$input) || $request->hasFile($input)) {
+                $this->forgetImage($user->{$column});
                 $user->{$column} = null;
             }
-
             if ($request->hasFile($input)) {
-                if ($user->{$column}) {
-                    Storage::disk('public')->delete($user->{$column});
-                }
-                $user->{$column} = $request->file($input)->store('profiles/'.$input.'s', 'public');
+                $user->{$column} = 'media:'.Media::store($user, $input, $request->file($input))->id;
             }
         }
 
         $user->save();
 
         return redirect()->route('profile.show', $user)->with('status', 'تم تحديث ملفك الشخصي.');
+    }
+
+    private function forgetImage(?string $path): void
+    {
+        if (! $path) {
+            return;
+        }
+        if ($id = Media::idFromPath($path)) {
+            Media::query()->whereKey($id)->delete();
+        } else {
+            Storage::disk('public')->delete($path);
+        }
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\DiscoverController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\QuoteController;
@@ -15,6 +16,12 @@ Route::get('/discover', [DiscoverController::class, 'index'])->name('discover');
 Route::get('/discover/feed', [DiscoverController::class, 'feed'])->middleware('throttle:discover-feed')->name('discover.feed');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
+// Profile pictures and covers from the database: no session or cookies, so a page full of pictures stays light.
+Route::get('/media/{media}', [MediaController::class, 'show'])->whereNumber('media')->withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class, \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class, \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+])->name('media.show');
 // The former «عنّي» page is now the maker section of «من نحن»; keep old links working.
 Route::permanentRedirect('/about-me', '/about#maker')->name('creator');
 Route::get('/muallaqat', [PageController::class, 'muallaqat'])->name('muallaqat.index');
