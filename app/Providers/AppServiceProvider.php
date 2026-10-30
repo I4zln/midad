@@ -43,6 +43,11 @@ class AppServiceProvider extends ServiceProvider
         // so scrolling «اكتشف» would otherwise use up the sign-in and sign-up allowance.
         RateLimiter::for('discover-feed', fn (Request $request) => Limit::perMinute(60)->by('discover-feed|'.($request->user()?->id ?? $request->ip())));
         RateLimiter::for('discover-mode', fn (Request $request) => Limit::perMinute(30)->by('discover-mode|'.($request->user()?->id ?? $request->ip())));
+        // Members' own actions, per account: far above what a person does, low enough to stop a script flooding the site.
+        RateLimiter::for('reactions', fn (Request $request) => Limit::perMinute(60)->by('reactions|'.($request->user()?->id ?? $request->ip())));
+        RateLimiter::for('comments', fn (Request $request) => Limit::perMinute(10)->by('comments|'.($request->user()?->id ?? $request->ip())));
+        RateLimiter::for('follows', fn (Request $request) => Limit::perMinute(20)->by('follows|'.($request->user()?->id ?? $request->ip())));
+        RateLimiter::for('profile', fn (Request $request) => Limit::perMinute(10)->by('profile|'.($request->user()?->id ?? $request->ip())));
         Paginator::defaultView('pagination.midad');
         // MAIL_MAILER=brevo sends through Brevo's HTTPS API with BREVO_API_KEY (hosts that block SMTP, such as Render's free plan).
         Mail::extend('brevo', fn () => (new BrevoTransportFactory(null, $this->app->make('midad.brevo.http')))

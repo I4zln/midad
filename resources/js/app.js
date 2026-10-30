@@ -535,6 +535,7 @@ document.addEventListener('submit', async (event) => {
         render(wasLiked, previousCount);
         showToast(error.message === '401'
             ? 'انتهت جلستك. سجّل الدخول ثم حاول الإعجاب من جديد.'
+            : error.message === '429' ? 'محاولات كثيرة متتالية. انتظر دقيقة ثم حاول مجددًا.'
             : 'تعذّر تحديث الإعجاب. تحقق من الاتصال ثم حاول مرة أخرى.');
     } finally {
         button.disabled = false;
@@ -848,6 +849,7 @@ document.addEventListener('submit', async (event) => {
         render(wasSaved);
         showToast(error.message === '401'
             ? 'انتهت جلستك. سجّل الدخول ثم حاول الحفظ من جديد.'
+            : error.message === '429' ? 'محاولات كثيرة متتالية. انتظر دقيقة ثم حاول مجددًا.'
             : 'تعذّر تحديث المحفوظات. تحقق من الاتصال ثم حاول مرة أخرى.');
     } finally {
         button.disabled = false;

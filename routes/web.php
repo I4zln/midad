@@ -45,15 +45,15 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile/edit', [PageController::class, 'editProfile'])->name('profile.edit');
-    Route::patch('/profile', [PageController::class, 'updateProfile'])->name('profile.update');
+    Route::patch('/profile', [PageController::class, 'updateProfile'])->middleware('throttle:profile')->name('profile.update');
     Route::delete('/account', [\App\Http\Controllers\AccountController::class, 'destroy'])->middleware('throttle:5,1')->name('account.destroy');
     Route::get('/favorites', [PageController::class, 'favorites'])->name('favorites');
     Route::get('/notifications', [PageController::class, 'notifications'])->name('notifications');
-    Route::post('/notifications/read', [PageController::class, 'markNotificationsRead'])->name('notifications.read');
-    Route::post('/quotes/{quote}/like', [CommunityController::class, 'like'])->name('quotes.like');
-    Route::post('/quotes/{quote}/favorite', [CommunityController::class, 'favorite'])->name('quotes.favorite');
-    Route::post('/quotes/{quote}/comments', [CommunityController::class, 'comment'])->name('quotes.comments.store');
-    Route::post('/users/{user}/follow', [CommunityController::class, 'follow'])->name('users.follow');
+    Route::post('/notifications/read', [PageController::class, 'markNotificationsRead'])->middleware('throttle:reactions')->name('notifications.read');
+    Route::post('/quotes/{quote}/like', [CommunityController::class, 'like'])->middleware('throttle:reactions')->name('quotes.like');
+    Route::post('/quotes/{quote}/favorite', [CommunityController::class, 'favorite'])->middleware('throttle:reactions')->name('quotes.favorite');
+    Route::post('/quotes/{quote}/comments', [CommunityController::class, 'comment'])->middleware('throttle:comments')->name('quotes.comments.store');
+    Route::post('/users/{user}/follow', [CommunityController::class, 'follow'])->middleware('throttle:follows')->name('users.follow');
     Route::post('/discover/mode', [DiscoverController::class, 'mode'])->middleware('throttle:discover-mode')->name('discover.mode');
 });
 

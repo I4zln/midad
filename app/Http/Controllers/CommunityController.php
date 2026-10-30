@@ -110,12 +110,11 @@ class CommunityController extends Controller
         }
 
         UserFollow::query()->create(['follower_id' => $follower->id, 'followed_id' => $user->id]);
-        UserNotification::query()->create([
-            'user_id' => $user->id,
-            'actor_id' => $follower->id,
-            'type' => 'follow',
-            'message' => 'بدأ بمتابعتك.',
-        ]);
+        // Following, unfollowing and following again must not flood the other member: one unread notice is enough.
+        UserNotification::query()->firstOrCreate(
+            ['user_id' => $user->id, 'actor_id' => $follower->id, 'type' => 'follow', 'read_at' => null],
+            ['message' => 'بدأ بمتابعتك.'],
+        );
 
         return back()->with('status', 'أصبحت تتابع هذا الحساب.');
     }
