@@ -22,14 +22,14 @@ test('registration rejects bad data with Arabic messages shown next to the field
     expect(User::query()->count())->toBe(1);
 });
 
-test('quotes of 2 and 156 characters are rejected and a valid quote is saved exactly once', function () {
+test('quotes of 2 and 501 characters are rejected and a valid quote is saved exactly once', function () {
     $reader = User::factory()->create();
     $this->actingAs($reader);
 
     $this->from(route('quotes.create'))->post(route('quotes.store'), ['text' => 'اب', 'category' => 'حياة'])
         ->assertSessionHasErrors(['text' => 'عدد أحرف نص الاقتباس يجب ألا يقل عن 3.']);
-    $this->from(route('quotes.create'))->post(route('quotes.store'), ['text' => str_repeat('ب', 156), 'category' => 'حياة'])
-        ->assertSessionHasErrors(['text' => 'عدد أحرف نص الاقتباس يجب ألا يزيد على 155.']);
+    $this->from(route('quotes.create'))->post(route('quotes.store'), ['text' => str_repeat('ب', 501), 'category' => 'حياة'])
+        ->assertSessionHasErrors(['text' => 'عدد أحرف نص الاقتباس يجب ألا يزيد على 500.']);
     $this->post(route('quotes.store'), ['text' => 'كلمة صالحة للنشر.', 'category' => 'حياة'])->assertRedirect(route('home'));
 
     expect(Quote::query()->count())->toBe(1)
@@ -118,11 +118,11 @@ test('like and bookmark state is shown the same way on the home page and the quo
     $this->assertDatabaseCount('quote_likes', 0);
 });
 
-test('legacy quotes longer than 155 characters are kept intact and fully readable', function () {
-    $long = str_repeat('قِفا نَبكِ مِن ذِكرى حَبيبٍ وَمَنزِلِ ', 6);
+test('legacy quotes longer than 500 characters are kept intact and fully readable', function () {
+    $long = str_repeat('قِفا نَبكِ مِن ذِكرى حَبيبٍ وَمَنزِلِ ', 16);
     $quote = Quote::query()->create(['text' => $long, 'category' => 'تأمل']);
 
-    expect(mb_strlen($long))->toBeGreaterThan(155);
+    expect(mb_strlen($long))->toBeGreaterThan(500);
     $this->get(route('quotes.show', $quote))->assertOk()->assertSee(trim($long));
     $this->get(route('quotes.index'))->assertOk()->assertSee('قراءة المزيد');
     expect($quote->fresh()->text)->toBe($long);
@@ -154,10 +154,10 @@ test('every page view extends the shared layout', function () {
 
 test('the owner of a legacy long quote sees a length notice on the edit form', function () {
     $owner = User::factory()->create();
-    $quote = Quote::query()->create(['user_id' => $owner->id, 'text' => str_repeat('كلمة طويلة ', 20), 'category' => 'حياة']);
+    $quote = Quote::query()->create(['user_id' => $owner->id, 'text' => str_repeat('كلمة طويلة ', 50), 'category' => 'حياة']);
 
     $this->actingAs($owner)->get(route('quotes.edit', $quote))->assertOk()
-        ->assertSee('اختصر النص إلى 155 حرفًا أو أقل');
+        ->assertSee('اختصر النص إلى 500 حرف أو أقل');
 });
 
 test('likes and bookmarks toggle, appear on the favorites page and are unique per user at the database level', function () {

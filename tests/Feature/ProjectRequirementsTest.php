@@ -58,7 +58,7 @@ test('registration validates name length, unique valid email, and password lengt
         ->and($user->password)->not->toBe('secure-pass-123');
 });
 
-test('quote creation enforces the 3 to 155 character range and requires a signed-in reader', function () {
+test('quote creation enforces the 3 to 500 character range and requires a signed-in reader', function () {
     $payload = ['category' => 'حياة'];
     $this->post(route('quotes.store'), $payload + ['text' => 'م'])->assertRedirect(route('login'));
 
@@ -67,12 +67,12 @@ test('quote creation enforces the 3 to 155 character range and requires a signed
         ->post(route('quotes.store'), $payload + ['text' => 'اب'])
         ->assertSessionHasErrors('text');
     $this->from(route('quotes.create'))
-        ->post(route('quotes.store'), $payload + ['text' => str_repeat('ا', 156)])
+        ->post(route('quotes.store'), $payload + ['text' => str_repeat('ا', 501)])
         ->assertSessionHasErrors('text');
     $this->from(route('quotes.create'))
-        ->post(route('quotes.store'), $payload + ['text' => str_repeat('ا', 155)])
+        ->post(route('quotes.store'), $payload + ['text' => str_repeat('ا', 500)])
         ->assertRedirect(route('home'));
-    $this->assertDatabaseHas('quotes', ['user_id' => $reader->id, 'text' => str_repeat('ا', 155)]);
+    $this->assertDatabaseHas('quotes', ['user_id' => $reader->id, 'text' => str_repeat('ا', 500)]);
 });
 
 test('only a quote owner can update or delete it and owners can use both actions', function () {
@@ -86,7 +86,7 @@ test('only a quote owner can update or delete it and owners can use both actions
 
     $this->actingAs($owner)->put(route('quotes.update', $quote), ['text' => 'تعديل صحيح.', 'category' => 'حياة'])->assertRedirect(route('quotes.show', $quote));
     $this->assertDatabaseHas('quotes', ['id' => $quote->id, 'text' => 'تعديل صحيح.']);
-    $this->from(route('quotes.edit', $quote))->put(route('quotes.update', $quote), ['text' => str_repeat('ا', 156), 'category' => 'حياة'])->assertSessionHasErrors('text');
+    $this->from(route('quotes.edit', $quote))->put(route('quotes.update', $quote), ['text' => str_repeat('ا', 501), 'category' => 'حياة'])->assertSessionHasErrors('text');
     // Deleted from its own edit page → back to the owner's quotes.
     $this->delete(route('quotes.destroy', $quote))->assertRedirect(route('profile.show', $owner));
     $this->assertDatabaseMissing('quotes', ['id' => $quote->id]);

@@ -19,7 +19,7 @@ class QuoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'text' => ['required', 'string', 'min:3', 'max:155'],
+            'text' => ['required', 'string', 'min:3', 'max:500'],
             'author' => ['nullable', 'string', 'max:120'],
             'source' => ['nullable', 'string', 'max:160'],
             'category' => ['required', 'string', 'in:'.implode(',', self::CATEGORIES)],
