@@ -57,3 +57,22 @@ it('lets the admin close a request without a link, and keeps members out', funct
     $this->actingAs($admin)->from(route('admin.index'))->post(route('admin.help-requests.close', $help))->assertRedirect(route('admin.index'));
     expect($help->fresh()->handled_at)->not->toBeNull();
 });
+
+it('sends the member on to the admin WhatsApp with a clear message that includes the email they typed', function () {
+    noMailHost($this);
+    User::factory()->create(['email' => 'forgot@example.test']);
+
+    $this->from(route('password.request'))->post(route('password.email'), ['email' => ' Forgot@Example.test '])
+        ->assertRedirect(route('password.request'));
+
+    $url = session('whatsapp');
+    expect($url)->toStartWith('https://wa.me/966595167827?text=');
+    $message = rawurldecode(substr($url, strpos($url, '=') + 1));
+    expect($message)->toBe("السلام عليكم، نسيت كلمة المرور في مِداد.\nبريد حسابي: forgot@example.test\nأرجو إرسال رابط استعادة كلمة المرور، وشكرًا لك.");
+
+    $this->get(route('password.request'))->assertSee('data-whatsapp-open="https://wa.me/966595167827?text=', false)->assertSee('افتح واتساب');
+
+    // An address without an account gets the same page and the same message shape: nothing tells them apart.
+    $this->post(route('password.email'), ['email' => 'nobody@example.test']);
+    expect(rawurldecode(substr(session('whatsapp'), strpos(session('whatsapp'), '=') + 1)))->toContain('بريد حسابي: nobody@example.test');
+});

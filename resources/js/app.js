@@ -213,9 +213,19 @@ document.addEventListener('click', (event) => {
     const link = event.target.closest('[data-whatsapp-help]');
     if (!link) return;
     const email = link.closest('main')?.querySelector('input[type="email"]')?.value.trim();
-    const text = link.dataset.helpText + (email ? ` بريدي: ${email}` : '');
+    const text = email ? link.dataset.helpTemplate.replace('__EMAIL__', email) : link.dataset.helpText;
     link.href = `https://wa.me/${link.dataset.whatsappHelp}?text=${encodeURIComponent(text)}`;
 });
+
+// After «نسيت كلمة المرور» on a host without email: open the admin's WhatsApp with the request already written.
+const openWhatsAppHelp = () => {
+    const box = document.querySelector('[data-whatsapp-open]:not([data-opened])');
+    if (!box) return;
+    box.dataset.opened = 'true';
+    window.setTimeout(() => { window.location.href = box.dataset.whatsappOpen; }, 900);
+};
+openWhatsAppHelp();
+document.addEventListener('midad:page-loaded', openWhatsAppHelp);
 
 // A read-only field with a link to copy (admin reset link): one tap selects all of it.
 document.addEventListener('focusin', (event) => event.target.closest?.('[data-select-on-focus]')?.select());

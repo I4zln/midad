@@ -43,7 +43,8 @@ class PasswordResetController extends Controller
         if (! self::mailCanReachInboxes()) {
             $this->askAdmin($request->input('email'));
 
-            return back()->with('status', self::HELP_QUEUED);
+            // The page then opens the admin's WhatsApp with the request written, email included (same for every address).
+            return back()->with('status', self::HELP_QUEUED)->with('whatsapp', self::whatsappHelpUrl($request->input('email')));
         }
 
         try {
@@ -139,6 +140,22 @@ class PasswordResetController extends Controller
             'type' => 'recovery',
             'message' => 'طلب استعادة كلمة المرور. تجده في لوحة الإدارة.',
         ]));
+    }
+
+    /** The WhatsApp message a member sends the admin to ask for a reset link (the email line only when known). */
+    public static function helpMessage(string $email = ''): string
+    {
+        return 'السلام عليكم، نسيت كلمة المرور في مِداد.'
+            .($email !== '' ? "\nبريد حسابي: {$email}" : '')
+            ."\nأرجو إرسال رابط استعادة كلمة المرور، وشكرًا لك.";
+    }
+
+    /** The admin's WhatsApp chat with that message written, or null when no number is set (ethraa.admin_whatsapp). */
+    public static function whatsappHelpUrl(string $email = ''): ?string
+    {
+        $number = config('ethraa.admin_whatsapp');
+
+        return $number ? 'https://wa.me/'.$number.'?text='.rawurlencode(self::helpMessage($email)) : null;
     }
 
     public static function normalizeEmail(mixed $email): string
