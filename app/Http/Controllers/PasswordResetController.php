@@ -28,7 +28,8 @@ class PasswordResetController extends Controller
 
     public function requestForm(): View
     {
-        return view('auth.forgot-password');
+        // Without email, the page apologises and the request continues on the admin's WhatsApp.
+        return view('auth.forgot-password', ['mailWorks' => self::mailCanReachInboxes()]);
     }
 
     public function sendLink(Request $request): RedirectResponse

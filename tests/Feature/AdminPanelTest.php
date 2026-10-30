@@ -89,10 +89,12 @@ it('does not let members create reset links', function () {
     expect(\Illuminate\Support\Facades\DB::table('password_reset_tokens')->count())->toBe(0);
 });
 
-it('links «نسيت كلمة المرور» to the admin WhatsApp with a prepared message', function () {
-    $this->get(route('password.request'))
-        ->assertOk()
-        ->assertSee('https://wa.me/966595167827?text=', false)
-        ->assertSee('data-whatsapp-help="966595167827"', false)
-        ->assertSee('تواصل مع إدارة مِداد على واتساب');
+it('apologises on «نسيت كلمة المرور» only while email cannot be sent', function () {
+    $apology = 'نعتذر، إرسال الرسائل إلى البريد متوقف مؤقتًا';
+
+    $this->get(route('password.request'))->assertOk()->assertDontSee($apology)->assertDontSee('لم تصلك الرسالة؟');
+
+    app()->detectEnvironment(fn () => 'production');
+    config(['mail.default' => 'log', 'app.force_https' => false]);
+    $this->get(route('password.request'))->assertOk()->assertSee($apology)->assertSee('وسنساعدك على اختيار كلمة مرور جديدة');
 });
