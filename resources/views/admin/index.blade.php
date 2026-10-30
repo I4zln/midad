@@ -19,11 +19,34 @@
         {{-- Shown once: the link is not stored anywhere else and stops working after it is used or expires. --}}
         <section class="admin-reset" role="status" aria-labelledby="admin-reset-title">
             <h2 id="admin-reset-title">رابط استعادة كلمة المرور لـ {{ $reset['name'] }}</h2>
-            <p>أرسله له بنفسك (واتساب مثلًا). يعمل مرة واحدة خلال {{ $reset['minutes'] }} دقيقة، ثم ينتهي. لا ترسله لغيره.</p>
+            <p>يعمل مرة واحدة خلال {{ $reset['minutes'] }} دقيقة. {{ $reset['whatsapp'] ? 'أرسله إلى رقم الاستعادة المسجّل في حسابه.' : 'لا رقم استعادة في حسابه: تحقّق منه أولًا، ثم أرسله في المحادثة التي راسلك منها.' }}</p>
+            @include('admin._verify', ['phone' => $reset['phone'], 'username' => $reset['username'], 'joined' => $reset['joined'], 'quotes' => $reset['quotes'], 'latestQuote' => $reset['latestQuote']])
             <div class="admin-reset-link">
                 <input type="text" value="{{ $reset['url'] }}" readonly dir="ltr" aria-label="رابط الاستعادة" data-select-on-focus>
-                <button class="button button-dark button-small" type="button" data-copy-text="{{ $reset['url'] }}" data-copy-message="نُسخ رابط الاستعادة.">نسخ الرابط</button>
+                @if ($reset['whatsapp'])<a class="button button-dark button-small" href="{{ $reset['whatsapp'] }}" target="_blank" rel="noopener noreferrer">أرسل على واتساب إلى رقمه</a>@endif
+                <button class="button {{ $reset['whatsapp'] ? 'button-outline' : 'button-dark' }} button-small" type="button" data-copy-text="{{ $reset['url'] }}" data-copy-message="نُسخ رابط الاستعادة.">نسخ الرابط</button>
             </div>
+        </section>
+    @endif
+
+    @if ($helpRequests->isNotEmpty())
+        {{-- Requests from «نسيت كلمة المرور» while this host cannot send email; each one closes when its link is created. --}}
+        <section class="admin-panel admin-requests" id="admin-requests" aria-labelledby="admin-requests-title">
+            <div class="admin-panel-head"><h2 id="admin-requests-title">طلبات استعادة كلمة المرور</h2><span>{{ $helpRequests->count() }} {{ $helpRequests->count() === 1 ? 'طلب' : 'طلبات' }}</span></div>
+            <p class="admin-hint">طلبها أصحابها من صفحة «نسيت كلمة المرور». من له رقم استعادة: أنشئ الرابط وأرسله إلى رقمه مباشرة. ومن ليس له رقم: انتظر رسالته على واتساب وتحقّق منه أولًا.</p>
+            <ul class="admin-requests-list">
+                @foreach ($helpRequests as $help)
+                    @php($member = $help->user)
+                    <li class="admin-request">
+                        <div class="admin-request-who"><a href="{{ route('profile.show', $member) }}">{{ $member->name }}</a><small dir="ltr">{{ $member->email }}</small><small>طلب {{ $help->updated_at->diffForHumans() }}</small></div>
+                        @include('admin._verify', ['phone' => $member->recovery_phone, 'username' => $member->username, 'joined' => $member->created_at?->format('Y/m/d'), 'quotes' => $member->quotes_count, 'latestQuote' => $member->latestQuote ? \Illuminate\Support\Str::limit($member->latestQuote->text, 60) : null])
+                        <div class="admin-request-actions">
+                            <form method="POST" action="{{ route('admin.users.reset-link', $member) }}">@csrf<button class="button button-dark button-small" type="submit">{{ $member->recovery_phone ? 'أنشئ الرابط وأرسله لرقمه' : 'أنشئ رابط الاستعادة' }}</button></form>
+                            <form method="POST" action="{{ route('admin.help-requests.close', $help) }}">@csrf<button class="admin-action" type="submit" title="أغلق الطلب دون رابط">تمّ</button></form>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
         </section>
     @endif
 
@@ -99,7 +122,7 @@
                     @foreach (array_filter(['q' => $search, 'category' => $category]) as $name => $value)<input type="hidden" name="{{ $name }}" value="{{ $value }}">@endforeach
                     <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input name="member" type="search" value="{{ $memberSearch }}" placeholder="ابحث بالاسم أو البريد" aria-label="ابحث عن عضو"><button class="search-submit" type="submit" aria-label="بحث">↵</button></label>
                 </form>
-                <p class="admin-hint">نسي أحدهم كلمة المرور؟ ابحث عنه وافتح «تحقّق قبل الإرسال». أرسل الرابط فقط إن جاءت رسالته من رقم الاستعادة المسجّل، أو أجاب عمّا لا يعرفه غيره.</p>
+                <p class="admin-hint">راسلك أحدهم على واتساب دون أن يطلب من الموقع؟ ابحث عنه واضغط «رابط استعادة»، وتحقّق منه في الصندوق أعلى الصفحة قبل أن ترسل.</p>
                 @if ($members->isEmpty())
                     <p class="admin-empty">لا يوجد عضو بهذا الاسم أو البريد.</p>
                 @else
@@ -108,18 +131,7 @@
                             <li>
                                 <span class="account-initial" aria-hidden="true">{{ mb_substr($member->name, 0, 1) }}</span>
                                 <span class="admin-member-text"><a href="{{ route('profile.show', $member) }}">{{ $member->name }}</a>@if ($member->is_admin) <span class="admin-badge">مدير</span>@endif<small dir="ltr">{{ $member->email }}</small><small>انضم {{ $member->created_at?->diffForHumans() }} · {{ $member->quotes_count }} اقتباس</small></span>
-                                <details class="admin-verify">
-                                    <summary>تحقّق قبل الإرسال</summary>
-                                    {{-- What only the owner is likely to know; never read these out to the person asking. --}}
-                                    <dl>
-                                        <div><dt>رقم الاستعادة</dt><dd>@if ($member->recovery_phone)<bdi dir="ltr">{{ $member->recovery_phone }}</bdi> <span class="admin-verify-strong">الأوثق: أرسل فقط إن جاءت الرسالة منه</span>@else<span class="admin-verify-none">لم يُضف رقمًا، فاسأله عمّا يلي</span>@endif</dd></div>
-                                        <div><dt>اسم المستخدم</dt><dd>@if ($member->username)<bdi dir="ltr">{{ '@'.$member->username }}</bdi>@else<span class="admin-verify-none">لا يوجد</span>@endif</dd></div>
-                                        <div><dt>انضم في</dt><dd>{{ $member->created_at?->format('Y/m/d') }}</dd></div>
-                                        <div><dt>آخر اقتباس نشره</dt><dd>@if ($member->latestQuote)«{{ \Illuminate\Support\Str::limit($member->latestQuote->text, 50) }}»@else<span class="admin-verify-none">لم ينشر بعد</span>@endif</dd></div>
-                                    </dl>
-                                    <p>اسأله عن واحدة منها دون أن تذكرها له. لا ترسل الرابط إن شككت، وأنشئ رابطًا جديدًا إن أرسلته لغيره (يُلغي القديم).</p>
-                                    <form method="POST" action="{{ route('admin.users.reset-link', $member) }}">@csrf<button class="admin-action admin-member-reset" type="submit" aria-label="رابط استعادة كلمة المرور لـ {{ $member->name }}">رابط استعادة</button></form>
-                                </details>
+                                <form method="POST" action="{{ route('admin.users.reset-link', $member) }}">@csrf<button class="admin-action admin-member-reset" type="submit" aria-label="رابط استعادة كلمة المرور لـ {{ $member->name }}">رابط استعادة</button></form>
                             </li>
                         @endforeach
                     </ul>

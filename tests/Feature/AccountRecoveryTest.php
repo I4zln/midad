@@ -34,12 +34,15 @@ it('shows the admin what to check before sending a link', function () {
     $member = User::factory()->create(['name' => 'صاحب الحساب', 'username' => 'owner1', 'recovery_phone' => '+966511112222']);
     Quote::query()->create(['user_id' => $member->id, 'text' => 'آخر ما كتبه صاحب الحساب', 'category' => 'أمل']);
 
-    $this->actingAs($admin)->get(route('admin.index', ['member' => 'صاحب']))
+    $this->actingAs($admin)->from(route('admin.index'))->post(route('admin.users.reset-link', $member));
+    $this->actingAs($admin)->get(route('admin.index'))
         ->assertOk()
-        ->assertSee('تحقّق قبل الإرسال')
+        ->assertSee('رقم الاستعادة')
         ->assertSee('+966511112222')
         ->assertSee('@owner1')
-        ->assertSee('آخر ما كتبه صاحب الحساب');
+        ->assertSee('آخر ما كتبه صاحب الحساب')
+        ->assertSee('https://wa.me/966511112222?text=', false)
+        ->assertSee('أرسل على واتساب إلى رقمه');
 });
 
 it('tells the owner when a reset link is created for their account', function () {

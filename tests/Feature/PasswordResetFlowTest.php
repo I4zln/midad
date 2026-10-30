@@ -42,7 +42,7 @@ test('registering with a capitalised copy of an existing address is refused', fu
     expect(User::query()->count())->toBe(1);
 });
 
-test('in production without a mail service, the form says the service is unavailable instead of promising an email', function () {
+test('in production without a mail service, the request goes to the admin instead of promising an email', function () {
     Notification::fake();
     app()->detectEnvironment(fn () => 'production');
     // Laravel only skips CSRF checks in the testing environment.
@@ -52,9 +52,10 @@ test('in production without a mail service, the form says the service is unavail
 
     $this->from(route('password.request'))->post(route('password.email'), ['email' => 'reader@example.test'])
         ->assertRedirect(route('password.request'))
-        ->assertSessionHasErrors(['email' => PasswordResetController::UNAVAILABLE])
-        ->assertSessionMissing('status');
+        ->assertSessionHas('status', PasswordResetController::HELP_QUEUED)
+        ->assertSessionHasNoErrors();
 
     Notification::assertNothingSent();
-    expect(DB::table('password_reset_tokens')->count())->toBe(0);
+    expect(DB::table('password_reset_tokens')->count())->toBe(0)
+        ->and(\App\Models\PasswordHelpRequest::query()->open()->where('user_id', $user->id)->exists())->toBeTrue();
 });

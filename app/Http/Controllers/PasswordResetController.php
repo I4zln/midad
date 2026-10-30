@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PasswordHelpRequest;
 use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +22,8 @@ class PasswordResetController extends Controller
 {
     // The same answer for every address, so the form never reveals who has an account.
     public const LINK_SENT = 'إن كان البريد مسجّلًا لدينا فستصلك رسالة خلال دقائق. إن لم تجدها فتحقّق من مجلد الرسائل غير المرغوب فيها.';
-    public const UNAVAILABLE = 'استعادة كلمة المرور غير متاحة مؤقتًا. حاول لاحقًا.';
+    // Shown, whoever the address belongs to, while this host cannot send email: the request goes to the admin instead.
+    public const HELP_QUEUED = 'وصل طلبك إلى إدارة مِداد إن كان البريد مسجّلًا لدينا. سنرسل لك رابط الاستعادة على واتساب إلى رقم الاستعادة في ملفك، وإن لم تكن أضفت رقمًا فراسلنا على واتساب من الرابط أدناه.';
     public const LINK_INVALID = 'رابط الاستعادة غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا.';
 
     public function requestForm(): View
@@ -38,9 +41,9 @@ class PasswordResetController extends Controller
         ]);
 
         if (! self::mailCanReachInboxes()) {
-            Log::error('Password reset requested, but no mail service is configured (MAIL_MAILER='.config('mail.default').').');
+            $this->askAdmin($request->input('email'));
 
-            return back()->withInput()->withErrors(['email' => self::UNAVAILABLE]);
+            return back()->with('status', self::HELP_QUEUED);
         }
 
         try {
@@ -52,6 +55,9 @@ class PasswordResetController extends Controller
             if ($user = Password::broker()->getUser($request->only('email'))) {
                 Password::broker()->deleteToken($user);
             }
+            // Mail is set up but failed (e.g. the host blocks SMTP): the admin still gets the request. The answer stays
+            // the same as for an unknown address, so the form does not reveal who has an account.
+            $this->askAdmin($request->input('email'));
         }
 
         return back()->with('status', self::LINK_SENT);
@@ -109,6 +115,30 @@ class PasswordResetController extends Controller
         }
 
         return redirect()->route('home')->with('status', 'تم تغيير كلمة المرور، وأنت الآن داخل حسابك.');
+    }
+
+    /** Puts the request in the admin panel (one open request per member) and tells the admins once. */
+    private function askAdmin(string $email): void
+    {
+        $user = Password::broker()->getUser(['email' => $email]);
+        if (! $user) {
+            return;
+        }
+
+        $open = PasswordHelpRequest::query()->open()->where('user_id', $user->id)->first();
+        if ($open) {
+            $open->touch();
+
+            return;
+        }
+
+        PasswordHelpRequest::query()->create(['user_id' => $user->id]);
+        User::query()->where('is_admin', true)->whereKeyNot($user->id)->pluck('id')->each(fn ($adminId) => UserNotification::query()->create([
+            'user_id' => $adminId,
+            'actor_id' => $user->id,
+            'type' => 'recovery',
+            'message' => 'طلب استعادة كلمة المرور. تجده في لوحة الإدارة.',
+        ]));
     }
 
     public static function normalizeEmail(mixed $email): string
