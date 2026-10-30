@@ -63,3 +63,17 @@ it('signs the account out on other devices after the password is reset', functio
 
     expect(DB::table('sessions')->where('id', 'other-device')->exists())->toBeFalse();
 });
+
+it('accepts an animated GIF as the profile cover and keeps it as uploaded', function () {
+    \Illuminate\Support\Facades\Storage::fake('public');
+    $user = User::factory()->create();
+    // A two-frame animated GIF, built by hand so the test shows the file is stored byte for byte.
+    $gif = base64_decode('R0lGODlhAgACAPAAAAAAAP///yH/C05FVFNDQVBFMi4wAwEAAAAh+QQACgAAACwAAAAAAgACAAACAoRRACH5BAAKAAAALAAAAAACAAIAAAIChFEAOw==');
+    $file = \Illuminate\Http\UploadedFile::fake()->createWithContent('cover.gif', $gif);
+
+    $this->actingAs($user)->patch(route('profile.update'), ['name' => $user->name, 'cover' => $file])->assertSessionHasNoErrors();
+
+    $path = $user->fresh()->cover_path;
+    expect($path)->toEndWith('.gif');
+    expect(\Illuminate\Support\Facades\Storage::disk('public')->get($path))->toBe($gif);
+});

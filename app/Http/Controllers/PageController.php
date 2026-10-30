@@ -178,7 +178,8 @@ class PageController extends Controller
             'social_links.x' => ['nullable', 'url:http,https', 'max:255'],
             'recovery_phone' => ['nullable', 'string', 'max:25'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            // A cover may be an animated GIF; it is stored as uploaded, so it keeps moving.
+            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
             'remove_avatar' => ['nullable', 'boolean'],
             'remove_cover' => ['nullable', 'boolean'],
         ]);
