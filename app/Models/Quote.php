@@ -14,12 +14,16 @@ class Quote extends Model
 {
     private const AUTHOR_COUNTS_CACHE = 'midad.author-counts';
 
+    // Ids only: the cache never holds quote text or member data, and the order refreshes on every like or comment.
+    public const LEADERBOARD_CACHE = 'midad.leaderboard';
+
     protected static function booted(): void
     {
         // Any added, edited or deleted quote can change the per-author counts and the «اكتشف» candidate pool.
         $forget = function () {
             Cache::forget(self::AUTHOR_COUNTS_CACHE);
             Cache::forget(\App\Services\DiscoverFeed::CANDIDATES_CACHE);
+            Cache::forget(self::LEADERBOARD_CACHE);
         };
         static::saved($forget);
         static::deleted($forget);
@@ -34,6 +38,16 @@ class Quote extends Model
             ->groupBy('author')->orderByDesc('quotes_count')->orderBy('author')
             ->toBase()->get()
             ->map(fn ($row) => (object) ['author' => $row->author, 'quotes_count' => (int) $row->quotes_count]));
+    }
+
+    /** «الأكثر تفاعلًا» on the home page: most likes, then comments, then newest; ranked once and reused until something changes. */
+    public static function leaderboard(int $count = 5): \Illuminate\Database\Eloquent\Collection
+    {
+        $ids = Cache::remember(self::LEADERBOARD_CACHE, 600, fn () => static::query()->withCount(['likes', 'comments'])
+            ->orderByDesc('likes_count')->orderByDesc('comments_count')->latest()->take($count)->get()->modelKeys());
+
+        return static::query()->whereKey($ids)->with('user')->withCount(['likes', 'comments'])->get()
+            ->sortBy(fn (Quote $quote) => array_search($quote->getKey(), $ids, true))->values();
     }
 
     // Everything <x-quote-card> renders, loaded up front so card lists never query inside the loop.

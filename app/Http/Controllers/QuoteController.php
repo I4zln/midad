@@ -33,13 +33,11 @@ class QuoteController extends Controller
 
         $latestQuotes = (clone $query)->take(5)->get();
 
-        $leaderboardQuery = Quote::query()->with('user')->withCount(['likes', 'comments']);
-
         $poets = Quote::authorCounts()->take(12);
 
         return view('welcome', [
             'quotes' => $latestQuotes,
-            'leaderboard' => $leaderboardQuery->orderByDesc('likes_count')->orderByDesc('comments_count')->latest()->take(5)->get(),
+            'leaderboard' => Quote::leaderboard(),
             'featuredQuote' => $latestQuotes->first(),
             'poets' => $poets,
             'activeCategory' => '',

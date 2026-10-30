@@ -50,6 +50,8 @@ class AccountController extends Controller
             DB::table('sessions')->where('user_id', $user->id)->delete();
             $user->delete();
         });
+        // Their likes and comments went in bulk (no model events), so rank «الأكثر تفاعلًا» again.
+        \Illuminate\Support\Facades\Cache::forget(Quote::LEADERBOARD_CACHE);
 
         foreach ($files as $path) {
             Storage::disk('public')->delete($path);
