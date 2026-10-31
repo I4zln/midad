@@ -1086,6 +1086,11 @@ dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(0.25rem); 
 .quote-card-publisher { display: flex; align-items: center; gap: 0.5625rem; min-height: 2.3125rem; padding-top: 0.6875rem; border-top: 1px solid var(--line); }
 .quote-card-publisher strong, .quote-card-publisher small { display: block; overflow-wrap: anywhere; }
 .quote-card-publisher strong { color: var(--ink); font-size: max(var(--fs-floor), 0.6875rem); font-weight: 500; }
+/* The publisher's name opens their profile; it looks the same until hovered or focused. */
+.quote-card-publisher-link { display: block; width: fit-content; color: inherit; }
+.quote-card-publisher-link strong { transition: color .2s ease; }
+.quote-card-publisher-link:hover strong { color: var(--copper); }
+.quote-card-publisher-link:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; border-radius: 2px; }
 .quote-card-publisher small { margin-top: 3px; color: var(--stone); font-size: max(var(--fs-floor), 0.5625rem); }
 .quote-card .card-quote-button { min-height: 8.3125rem; padding-block: 0.9375rem 0.625rem; }
 .quote-card .card-quote-text { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow-wrap: anywhere; }
@@ -1727,6 +1732,7 @@ form[aria-busy='true'] button[type='submit'] { pointer-events: none; }
 .discover-page[data-mode='focus'] .quote-read-more { display: none; }
 .discover-page[data-mode='focus'] .card-author { margin-bottom: 0.875rem; font-size: 1.0625rem; text-align: center; }
 .discover-page[data-mode='focus'] .quote-card-publisher { justify-content: center; margin-bottom: auto; padding-top: 0; border-top: 0; }
+.discover-page[data-mode='focus'] .quote-card-publisher-link { margin-inline: auto; } /* stays centred under the quote */
 .discover-page[data-mode='focus'] .card-actions { flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: clamp(0.5rem, 3cqh, 1.25rem); }
 .discover-page[data-mode='focus'] .card-actions .like-button { min-height: 2.75rem; padding-inline: 0.875rem; font-size: 0.8125rem; }
 .discover-page[data-mode='focus'] .card-actions .icon-button { width: 2.75rem; height: 2.75rem; border-color: var(--line); background: color-mix(in srgb, var(--paper-raised) 70%, transparent); }

@@ -13,7 +13,7 @@
         <span class="card-quote-mark" aria-hidden="true">“</span><span class="card-quote-text preserve-lines">{{ $quote->text }}</span><span class="quote-read-more">قراءة المزيد</span>
     </a>
 @if ($feed && filled($quote->author))<p class="card-author"><span aria-hidden="true">— </span>{{ $quote->author }}</p>@endif
-    <div class="quote-card-publisher"><span class="byline-rule"></span><span><strong>{{ $quote->user?->name ?: 'قارئ سابق' }}</strong><small>نُشر {{ $quote->created_at->diffForHumans() }}</small></span></div>
+    <div class="quote-card-publisher"><span class="byline-rule"></span><span>@if ($quote->user)<a class="quote-card-publisher-link" href="{{ route('profile.show', $quote->user) }}"><strong>{{ $quote->user->name }}</strong></a>@else<strong>قارئ سابق</strong>@endif<small>نُشر {{ $quote->created_at->diffForHumans() }}</small></span></div>
     <div class="card-actions quote-card-actions">
         @auth
             <form method="POST" action="{{ route('quotes.like', $quote) }}" data-like-form>@csrf<button class="like-button {{ $quote->is_liked ?? false ? 'is-liked' : '' }}" type="submit" aria-label="{{ $quote->is_liked ?? false ? 'إزالة الإعجاب' : 'أعجبني' }}" aria-pressed="{{ $quote->is_liked ?? false ? 'true' : 'false' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.3-8.8 10.3S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"/></svg><span>إعجاب</span><b>{{ $quote->likes_count }}</b></button></form>

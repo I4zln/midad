@@ -68,3 +68,13 @@ it('keeps the home ranking between visits and refreshes it when a like changes t
     expect(Quote::leaderboard()->first()->is($second))->toBeTrue()
         ->and(Quote::leaderboard()->first()->likes_count)->toBe(2);
 });
+
+it('links the publisher name on a quote card to their profile, in «اكتشف» and the library', function () {
+    $publisher = User::factory()->create(['name' => 'ناشرة الاقتباس']);
+    Quote::query()->create(['user_id' => $publisher->id, 'text' => 'اقتباس له ناشر', 'category' => 'أمل']);
+    Quote::query()->create(['user_id' => null, 'text' => 'اقتباس بلا ناشر', 'category' => 'أمل']);
+    $link = '<a class="quote-card-publisher-link" href="'.route('profile.show', $publisher).'"><strong>ناشرة الاقتباس</strong></a>';
+
+    $this->get(route('discover', ['tab' => 'latest']))->assertOk()->assertSee($link, false)->assertSee('<strong>قارئ سابق</strong>', false);
+    $this->get(route('quotes.index'))->assertOk()->assertSee($link, false);
+});
