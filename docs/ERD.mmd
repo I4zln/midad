@@ -9,20 +9,21 @@ erDiagram
         text bio
         string location
         string education
-        string avatar_path
-        string cover_path
+        string avatar_path "media:<id> (picture in MEDIA)"
+        string cover_path "media:<id> (cover in MEDIA)"
         json skills
         json social_links
         string discover_mode "focus | timeline, nullable"
         string username UK
         boolean is_admin
+        string recovery_phone "optional WhatsApp number, admin-only"
         timestamp created_at
         timestamp updated_at
     }
     QUOTES {
         bigint id PK
         bigint user_id FK "nullable, nullOnDelete, idx(user_id, created_at)"
-        text text "3-155 chars on create/edit"
+        text text "3-500 chars on create/edit"
         string author "idx(author)"
         string source
         string category "idx(category, created_at)"
@@ -78,6 +79,23 @@ erDiagram
         string sender_name
         string sender_role
         timestamp shown_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    MEDIA {
+        bigint id PK
+        bigint user_id FK "cascadeOnDelete"
+        string kind "avatar | cover"
+        string mime "image/jpeg, png, webp or gif"
+        int size "bytes; total capped at 800 MB"
+        longtext data "base64 image, survives redeploys"
+        timestamp created_at
+        timestamp updated_at
+    }
+    PASSWORD_HELP_REQUESTS {
+        bigint id PK
+        bigint user_id FK "cascadeOnDelete"
+        timestamp handled_at "null = open; idx(handled_at, created_at)"
         timestamp created_at
         timestamp updated_at
     }
@@ -148,4 +166,6 @@ erDiagram
     USERS o|--o{ USER_NOTIFICATIONS : actor
     QUOTES o|--o{ USER_NOTIFICATIONS : refers_to
     USERS ||--o{ SPECIAL_PROFILE_MESSAGES : receives
+    USERS ||--o{ MEDIA : uploads
+    USERS ||--o{ PASSWORD_HELP_REQUESTS : asks_for_reset
 
