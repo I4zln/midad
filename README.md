@@ -102,7 +102,7 @@ php artisan test
 ## Author
 
 **Abdulaziz Al-Matrafi**, Software Engineering student at Umm Al-Qura University.
-[LinkedIn](https://www.linkedin.com/in/abdulaziz-al-matrafi-bbb238358/) · [GitHub](https://github.com/I4zln)
+[LinkedIn](https://www.linkedin.com/in/abdulaziz-al-matrafi/) · [GitHub](https://github.com/I4zln)
 
 ---
 
