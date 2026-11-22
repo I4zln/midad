@@ -27,7 +27,7 @@
 
 MIDAD (مِداد, "ink") is a calm Arabic space for quotes and poetry. Anyone can read and search the library; members share the quotes that stayed with them, save what they love, comment, and follow readers with similar taste. The whole interface is Arabic and right-to-left, with light and dark themes, and works on phones and desktops.
 
-It is my individual final project for the Al-Qimma bootcamp at Tuwaiq Club (programming and development track), built end to end, from the database to the interface and deployment.
+It is my individual final project for the Masar Al-Qimma camp at Tuwaiq Club (programming and development track), built end to end, from the database to the interface and deployment.
 
 ## Features
 
@@ -110,7 +110,7 @@ php artisan test
 
 مِداد مساحة عربية هادئة للاقتباسات والشعر. يقرأ فيها الجميع ويبحثون في المكتبة، ويشارك الأعضاء الاقتباسات التي تركت فيهم أثرًا، ويحفظون ما يعجبهم، ويعلّقون، ويتابعون من يشبههم ذوقًا. الواجهة عربية بالكامل من اليمين إلى اليسار، بوضعين فاتح وداكن، وتعمل على الجوال والحاسب.
 
-وهو مشروعي النهائي الفردي في معسكر القمّة بنادي طويق (مسار البرمجة والتطوير)، بنيته كاملًا من قاعدة البيانات إلى الواجهة والنشر.
+وهو مشروعي النهائي الفردي في معسكر مسار القمة بنادي طويق (مسار البرمجة والتطوير)، بنيته كاملًا من قاعدة البيانات إلى الواجهة والنشر.
 
 **جرّبه الآن:** [midad-zcbt.onrender.com](https://midad-zcbt.onrender.com)
 
