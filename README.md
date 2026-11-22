@@ -29,6 +29,10 @@ MIDAD (مِداد, "ink") is a calm Arabic space for quotes and poetry. Anyone c
 
 It is my individual final project for the Masar Al-Qimma camp at Tuwaiq Club (programming and development track), built end to end, from the database to the interface and deployment.
 
+## Demo
+
+https://github.com/user-attachments/assets/3f2f7deb-1b3d-498b-b8ab-2a2ee39a2ced
+
 ## Features
 
 - **Library:** browse, search by text, author or source, and filter by category
